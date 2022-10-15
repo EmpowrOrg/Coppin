@@ -45,8 +45,6 @@ allprojects {
 }
 
 dependencies {
-    implementation(project(Deps.Download.main))
-    implementation(project(Deps.Download.api))
     implementation(project(Deps.Assignment.main))
     implementation(project(Deps.Assignment.api))
     implementation(project(Deps.Sources.main))

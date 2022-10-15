@@ -5,13 +5,6 @@ object Deps {
         val fakes by lazy { ":command:fakes" }
     }
 
-    object Download {
-        val main by lazy { ":download" }
-        val presenters by lazy { ":download:presenters" }
-        val backend by lazy { ":download:backend" }
-        val api by lazy { ":download:api" }
-    }
-
     object Assignment {
         val api by lazy { ":assignment:api" }
         val presenters by lazy { ":assignment:presenters" }
