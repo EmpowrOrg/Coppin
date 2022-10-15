@@ -1,0 +1,110 @@
+package org.empowrco.coppin.sources
+
+import org.empowrco.coppin.db.Assignments
+import org.empowrco.coppin.models.Assignment
+import org.empowrco.coppin.models.Feedback
+import org.empowrco.coppin.models.StarterCode
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import org.jetbrains.exposed.sql.update
+import java.util.UUID
+
+interface AssignmentSource {
+    suspend fun getAssignment(id: UUID): Assignment?
+    suspend fun getAssignmentByReferenceId(id: String): Assignment?
+    suspend fun createAssignment(assignment: Assignment)
+    suspend fun deleteAssignment(id: UUID): Boolean
+    suspend fun updateAssignment(assignment: Assignment): Boolean
+}
+
+internal class RealAssignmentSource(
+    private val feedbackSource: FeedbackSource,
+    private val starterCodeSource: StarterCodeSource,
+) : AssignmentSource {
+    override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
+        Assignments.select { Assignments.id eq id }.limit(1).map { buildAssigment(it) }.firstOrNull()
+    }
+
+    override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
+        Assignments.select { Assignments.referenceId eq id }.limit(1).map {
+            buildAssigment(it)
+        }.firstOrNull()
+    }
+
+    private suspend fun buildAssigment(result: ResultRow): Assignment {
+        val assignmentId = result[Assignments.id].value
+        val feedback = feedbackSource.getFeedback(assignmentId)
+        val starterCodes = starterCodeSource.getByAssigment(assignmentId)
+        return result.toAssignment(feedback, starterCodes)
+    }
+
+    override suspend fun createAssignment(assignment: Assignment) {
+        dbQuery {
+            Assignments.insert {
+                it.build(assignment)
+            }
+        }
+        feedbackSource.create(assignment.feedback)
+        starterCodeSource.create(assignment.starterCodes)
+    }
+
+    override suspend fun deleteAssignment(id: UUID): Boolean {
+        val result = dbQuery {
+            Assignments.deleteWhere { Assignments.id eq  id }
+        }
+        feedbackSource.deleteByAssignment(id)
+        starterCodeSource.deleteByAssignment(id)
+        return result > 0
+    }
+
+    override suspend fun updateAssignment(assignment: Assignment): Boolean {
+        val result = dbQuery {
+            Assignments.update({ Assignments.id eq assignment.id }) {
+                it.build(assignment)
+            }
+        }
+        feedbackSource.deleteByAssignment(assignment.id)
+        starterCodeSource.deleteByAssignment(assignment.id)
+        feedbackSource.create(assignment.feedback)
+        starterCodeSource.create(assignment.starterCodes)
+        return result > 0
+    }
+}
+
+internal fun UpdateBuilder<*>.build(assignment: Assignment) {
+    this[Assignments.id] = assignment.id
+    this[Assignments.title] = assignment.title
+    this[Assignments.referenceId] = assignment.referenceId
+    this[Assignments.expectedOutput] = assignment.expectedOutput
+    this[Assignments.successMessage] = assignment.successMessage
+    this[Assignments.solution] = assignment.solution
+    this[Assignments.failureMessage] = assignment.failureMessage
+    this[Assignments.instructions] = assignment.instructions
+    this[Assignments.totalAttempts] = assignment.totalAttempts
+    this[Assignments.createdAt] = assignment.createdAt
+    this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
+}
+
+private fun ResultRow.toAssignment(feedback: List<Feedback>, starterCodes: List<StarterCode>): Assignment {
+    val id = this[Assignments.id].value
+    return Assignment(
+        id = id,
+        referenceId = this[Assignments.referenceId],
+        expectedOutput = this[Assignments.expectedOutput],
+        feedback = feedback,
+        starterCodes = starterCodes,
+        title = this[Assignments.title],
+        createdAt = this[Assignments.createdAt],
+        lastModifiedAt = this[Assignments.lastModifiedAt],
+        failureMessage = this[Assignments.failureMessage],
+        successMessage = this[Assignments.successMessage],
+        instructions = this[Assignments.instructions],
+        solution = this[Assignments.solution],
+        totalAttempts = this[Assignments.totalAttempts],
+    )
+}
+
