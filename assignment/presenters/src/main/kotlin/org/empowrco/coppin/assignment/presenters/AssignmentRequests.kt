@@ -3,15 +3,6 @@ package org.empowrco.coppin.assignment.presenters
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RunRequest(
-    val referenceId: String?,
-    val language: String,
-    val executeSuccess: Boolean,
-    val code: String,
-    val output: String,
-)
-
-@Serializable
 data class SubmitRequest(
     val code: String,
     val output: String,
