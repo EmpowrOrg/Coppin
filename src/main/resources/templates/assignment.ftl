@@ -50,7 +50,7 @@
                 this.submit()
             });
             document.getElementById("delete-button").onclick = function () {
-                var result = confirm("Are you sure you want to delete this user?");
+                var result = confirm("Are you sure you want to delete this assignment?");
 
                 if (result) {
                     $("#delete-form").submit();
@@ -59,9 +59,6 @@
                 }
             };
         });
-    </script>
-    <script type="text/javascript">
-
     </script>
     <form id="delete-form" action="/assignments/${assignment.id}/delete" method="post" hidden>
     </form>

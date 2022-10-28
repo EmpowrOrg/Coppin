@@ -91,6 +91,7 @@ fun Application.assignmentPortal() {
                 post("delete") {
                     val assignmentId = call.parameters["uuid"].toString()
                     presenter.deleteAssignment(assignmentId)
+                    call.respondRedirect("/assignments")
                 }
                 route("/feedback/{feedbackId?}") {
                     get {
