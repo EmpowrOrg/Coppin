@@ -16,6 +16,24 @@
 <#-- @ftlvariable name="feedback" type="org.empowrco.coppin.models.portal.FeedbackItem" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            document.getElementById("delete-feedback-button").onclick = function () {
+                var result = confirm("Are you sure you want to delete this feedback?");
+
+                if (result) {
+                    $("#delete-feedback-form").submit();
+                } else {
+                    // Do nothing; they cancelled
+                }
+            };
+        });
+    </script>
+    <form id="delete-feedback-form" action="/assignments/${feedback.assignmentId}/feedback/${feedback.id}/delete"
+          method="post" hidden>
+    </form>
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="col-12">
             <div class="card">
@@ -26,7 +44,8 @@
                     </div>
                     <#if feedback??>
                         <div class="align-content-end">
-                            <button type="button" id="delete-button" class="btn bg-gradient-primary float-end"><i
+                            <button type="button" id="delete-feedback-button" class="btn bg-gradient-primary float-end">
+                                <i
                                         class="fa fa-trash"></i>
                             </button>
                         </div>

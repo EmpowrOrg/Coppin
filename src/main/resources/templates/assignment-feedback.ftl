@@ -74,8 +74,8 @@
                         <#list feedbacks as feedback>
                             <tr>
                                 <td>${feedback.feedback}</td>
-                                <td>${feedback.attempt}</td>
                                 <td>${feedback.regex}</td>
+                                <td>${feedback.attempt}</td>
                                 <td>${feedback.id}</td>
                                 <td>${feedback.assignmentId}</td>
                             </tr>
