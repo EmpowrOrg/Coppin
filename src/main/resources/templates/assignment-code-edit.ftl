@@ -60,11 +60,23 @@
                     .appendTo(this);
                 this.submit()
             });
-            $("#language").change(function(){
+            $("#language").change(function () {
                 solutionCodeCodeMirror.setOption("mode", $(this).val());
             });
+            document.getElementById("delete-code-button").onclick = function () {
+                var result = confirm("Are you sure you want to delete this assignment code?");
+
+                if (result) {
+                    $("#delete-code-form").submit();
+                } else {
+                    // Do nothing; they cancelled
+                }
+            };
         });
     </script>
+    <form id="delete-code-form" action="/assignments/${code.assignmentId}/codes/${code.id}/delete"
+          method="post" hidden>
+    </form>
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="col-12">
             <div class="card">
@@ -73,7 +85,8 @@
                         <h6 class="text-white text-capitalize ps-3">Create Assignment Code</h6>
                     </div>
                     <div class="col-sm align-content-end">
-                        <button type="button" id="delete-button" class="btn bg-gradient-primary float-end"><i class="fa fa-trash"></i>
+                        <button type="button" id="delete-code-button" class="btn bg-gradient-primary float-end"><i
+                                    class="fa fa-trash"></i>
                         </button>
                     </div>
                 </div>
