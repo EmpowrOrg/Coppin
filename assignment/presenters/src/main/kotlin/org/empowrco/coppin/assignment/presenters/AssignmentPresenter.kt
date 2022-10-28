@@ -1,13 +1,11 @@
 package org.empowrco.coppin.assignment.presenters
 
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.assignment.backend.AssignmentRepository
 import org.empowrco.coppin.models.Assignment
-import org.empowrco.coppin.models.Feedback
-import org.empowrco.coppin.models.StarterCode
 import org.empowrco.coppin.utils.InvalidUuidException
+import org.empowrco.coppin.utils.UnknownException
 import org.empowrco.coppin.utils.diff.DiffUtil
 import org.empowrco.coppin.utils.now
 import java.util.UUID
@@ -16,6 +14,7 @@ interface AssignmentPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun create(request: CreateAssignmentRequest): CreateAssignmentResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
+    suspend fun update(request: UpdateAssignmentRequest): UpdateAssignmentResponse
 }
 
 internal class RealAssignmentPresenter(
@@ -83,6 +82,24 @@ internal class RealAssignmentPresenter(
         }
     }
 
+    override suspend fun update(request: UpdateAssignmentRequest): UpdateAssignmentResponse {
+        val assignmentId = UUID.fromString(request.assignmentId) ?: throw InvalidUuidException("assignmentId")
+        val assignment = repo.getAssignment(assignmentId) ?: throw NotFoundException()
+        val assignmentToUpdate = assignment.copy(
+            expectedOutput = request.expectedOutput,
+            instructions = request.instructions,
+            successMessage = request.successMessage,
+            failureMessage = request.failureMessage,
+            totalAttempts = request.totalAttempts,
+            title = request.title,
+        )
+        val result = repo.updateAssignment(assignmentToUpdate)
+        if (!result) {
+            throw UnknownException
+        }
+        return UpdateAssignmentResponse
+    }
+
     private fun getFeedback(
         assignment: Assignment,
         request: SubmitRequest,
@@ -105,12 +122,6 @@ internal class RealAssignmentPresenter(
     override suspend fun create(request: CreateAssignmentRequest): CreateAssignmentResponse {
         val currentTime = LocalDateTime.now()
         val assignmentId = UUID.randomUUID()
-        val primariesSelected = request.starterCodes.filter { it.primary }.size
-        if (primariesSelected == 0) {
-            throw BadRequestException("Must select a primary starter code")
-        } else if (primariesSelected > 1) {
-            throw BadRequestException("Only one primary starter code should be selected")
-        }
         val assignment = Assignment(
             id = assignmentId,
             referenceId = request.referenceId,
@@ -118,34 +129,10 @@ internal class RealAssignmentPresenter(
             successMessage = request.successMessage,
             instructions = request.instructions,
             expectedOutput = request.expectedOutput,
-            solution = request.solution,
             totalAttempts = request.totalAttempts,
             title = request.title,
-            feedback = request.feedback.map {
-                Feedback(
-                    id = UUID.randomUUID(),
-                    feedback = it.feedback,
-                    regexMatcher = it.regex,
-                    attempt = it.attempt,
-                    createdAt = currentTime,
-                    lastModifiedAt = currentTime,
-                    assignmentId = assignmentId
-                )
-            },
-            starterCodes = request.starterCodes.map {
-                val languageUuid = UUID.fromString(it.languageId) ?: throw InvalidUuidException("languageId")
-                val language =
-                    repo.getLanguage(languageUuid) ?: throw NotFoundException("language not found for $languageUuid")
-                StarterCode(
-                    id = UUID.randomUUID(),
-                    assignmentId = assignmentId,
-                    code = it.code,
-                    language = language,
-                    primary = it.primary,
-                    createdAt = currentTime,
-                    lastModifiedAt = currentTime,
-                )
-            },
+            feedback = emptyList(),
+            assignmentCodes = emptyList(),
             createdAt = currentTime,
             lastModifiedAt = currentTime,
         )
@@ -156,22 +143,22 @@ internal class RealAssignmentPresenter(
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException()
         val shouldFilter = request.supportedLanguageMimes.isNotEmpty()
-        val starterCodes = assignment.starterCodes.mapNotNull {
+        val assignmentCodes = assignment.assignmentCodes.mapNotNull {
             if (shouldFilter && !request.supportedLanguageMimes.contains(it.language.mime)) {
                 return@mapNotNull null
             }
-            GetAssignmentResponse.StarterCode(
+            GetAssignmentResponse.AssignmentCode(
                 displayName = it.language.name,
                 mime = it.language.mime,
-                starterCode = it.code,
+                starterCode = it.starterCode,
                 primary = it.primary,
+                solutionCode = it.solutionCode
             )
         }
         return GetAssignmentResponse(
             instructions = assignment.instructions,
             title = assignment.title,
-            solution = assignment.solution,
-            starterCodes = starterCodes,
+            assignmentCodes = assignmentCodes,
         )
     }
 }

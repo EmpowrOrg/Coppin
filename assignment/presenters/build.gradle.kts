@@ -11,6 +11,8 @@ dependencies {
     implementation(project(Deps.Assignment.Backend.main))
     implementation(project(Deps.Utils.Diff.main))
     implementation(project(Deps.Utils.main))
+    implementation("org.apache.commons:commons-text:1.10.0")
+
     testImplementation(project(Deps.Assignment.Backend.fakes))
     testImplementation(project(Deps.Utils.Diff.fakes))
 }

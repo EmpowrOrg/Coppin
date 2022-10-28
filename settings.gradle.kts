@@ -27,3 +27,10 @@ include("utils:files")
 findProject(":utils:files")?.name = "files"
 include("utils:diff:fakes")
 findProject(":utils:diff:fakes")?.name = "fakes"
+include("languages")
+include("languages:api")
+findProject(":languages:api")?.name = "api"
+include("languages:backend")
+findProject(":languages:backend")?.name = "backend"
+include("languages:presenters")
+findProject(":languages:presenters")?.name = "presenters"

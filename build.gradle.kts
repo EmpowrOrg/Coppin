@@ -47,9 +47,12 @@ allprojects {
 dependencies {
     implementation(project(Deps.Assignment.main))
     implementation(project(Deps.Assignment.api))
+    implementation(project(Deps.Languages.main))
+    implementation(project(Deps.Languages.api))
     implementation(project(Deps.Sources.main))
     implementation(project(Deps.Command.main))
     implementation(project(Deps.Db.main))
+    implementation(project(Deps.Models.main))
     implementation(project(Deps.Utils.routing))
     implementation(Deps.Koin.main)
     implementation(Deps.Ktor.callLogging)
@@ -60,6 +63,7 @@ dependencies {
     implementation(Deps.Ktor.contentNegotiation)
     implementation(Deps.Ktor.json)
     implementation(Deps.Ktor.netty)
+    implementation(Deps.Ktor.freeMarker)
     implementation(Deps.Logback.main)
     implementation(project(Deps.Utils.main))
 }

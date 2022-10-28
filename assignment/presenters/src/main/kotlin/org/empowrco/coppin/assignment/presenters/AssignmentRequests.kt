@@ -17,29 +17,41 @@ data class SubmitRequest(
 data class CreateAssignmentRequest(
     val referenceId: String,
     val expectedOutput: String,
-    val feedback: List<Feedback>,
     val instructions: String,
-    val solution: String,
     val successMessage: String,
     val failureMessage: String,
     val totalAttempts: Int,
     val title: String,
-    val starterCodes: List<StarterCode>
-) {
-    @Serializable
-    data class Feedback(
-        val attempt: Int,
-        val feedback: String,
-        val regex: String,
-    )
+)
 
-    @Serializable
-    data class StarterCode(
-        val code: String,
-        val languageId: String,
-        val primary: Boolean,
-    )
-}
+
+@Serializable
+data class UpdateAssignmentRequest(
+    val assignmentId: String,
+    val expectedOutput: String,
+    val instructions: String,
+    val successMessage: String,
+    val failureMessage: String,
+    val totalAttempts: Int,
+    val title: String,
+)
+
+@Serializable
+data class CreateAssignmentFeedbackRequest(
+    val assignmentId: String,
+    val attempt: Int,
+    val feedback: String,
+    val regex: String,
+)
+
+@Serializable
+data class CreateAssignmentCodeRequest(
+    val assignmentId: String,
+    val starterCode: String,
+    val solutionCode: String,
+    val languageId: String,
+    val primary: Boolean,
+)
 
 @Serializable
 data class GetAssignmentRequest(

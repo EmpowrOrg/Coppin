@@ -17,6 +17,18 @@ object Deps {
         val main by lazy { ":assignment" }
     }
 
+    object Languages {
+        val api by lazy { ":languages:api" }
+        val presenters by lazy { ":languages:presenters" }
+
+        object Backend {
+            val main by lazy { ":languages:backend" }
+            val fakes by lazy { ":languages:backend:fakes" }
+        }
+
+        val main by lazy { ":languages" }
+    }
+
     object Utils {
         val routing by lazy { ":utils:routing" }
         val main by lazy { ":utils" }
@@ -71,6 +83,7 @@ object Deps {
         val statusPages by lazy { "io.ktor:ktor-server-status-pages:${Versions.ktor}" }
         val test by lazy { "io.ktor:ktor-server-test-host:${Versions.ktor}" }
         val callLogging by lazy { "io.ktor:ktor-server-call-logging:${Versions.ktor}" }
+        val freeMarker by lazy {"io.ktor:ktor-server-freemarker:${Versions.ktor}"}
     }
 
     object Sources {

@@ -7,6 +7,7 @@ data class Language(
     val id: UUID,
     val name: String,
     val mime: String,
+    val url: String,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 )

@@ -12,7 +12,7 @@ object DatabaseFactory {
         Assignments,
         Feedbacks,
         Languages,
-        StarterCodes
+        AssignmentCodes
     ).toTypedArray()
 
     fun init() {

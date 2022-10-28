@@ -15,9 +15,6 @@ fun Application.assignmentRouting() {
             authPost("/submit") {
                 presenter.submit(it.receive())
             }
-            authPost("/create") {
-                presenter.create(it.receive())
-            }
             authPost("/request") {
                 presenter.get(it.receive())
             }

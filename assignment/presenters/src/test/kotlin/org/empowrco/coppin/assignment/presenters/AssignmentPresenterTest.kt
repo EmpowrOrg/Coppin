@@ -204,7 +204,7 @@ class AssignmentPresenterTest {
                     assignmentId = UUID.randomUUID()
                 ),
             ),
-            starterCodes = emptyList(),
+            assignmentCodes = emptyList(),
             title = "title",
         )
     }

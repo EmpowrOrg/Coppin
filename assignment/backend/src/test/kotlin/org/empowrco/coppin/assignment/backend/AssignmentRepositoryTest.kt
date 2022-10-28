@@ -29,7 +29,7 @@ class AssignmentRepositoryTest {
             totalAttempts = 4,
             instructions = "instructions",
             solution = "solution",
-            starterCodes = emptyList(),
+            assignmentCodes = emptyList(),
             title = "title",
         )
         assignmentSource.assignments.add(assignment)
@@ -51,7 +51,7 @@ class AssignmentRepositoryTest {
             totalAttempts = 4,
             instructions = "instructions",
             solution = "solution",
-            starterCodes = emptyList(),
+            assignmentCodes = emptyList(),
             title = "title",
         )
         assignmentSource.assignments.add(assignment)

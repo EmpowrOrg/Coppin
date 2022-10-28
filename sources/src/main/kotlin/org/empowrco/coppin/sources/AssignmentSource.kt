@@ -2,13 +2,14 @@ package org.empowrco.coppin.sources
 
 import org.empowrco.coppin.db.Assignments
 import org.empowrco.coppin.models.Assignment
+import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Feedback
-import org.empowrco.coppin.models.StarterCode
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -19,14 +20,19 @@ interface AssignmentSource {
     suspend fun createAssignment(assignment: Assignment)
     suspend fun deleteAssignment(id: UUID): Boolean
     suspend fun updateAssignment(assignment: Assignment): Boolean
+    suspend fun getAssignments(): List<Assignment>
 }
 
 internal class RealAssignmentSource(
     private val feedbackSource: FeedbackSource,
-    private val starterCodeSource: StarterCodeSource,
+    private val assignmentCodesSource: AssignmentCodesSource,
 ) : AssignmentSource {
     override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
         Assignments.select { Assignments.id eq id }.limit(1).map { buildAssigment(it) }.firstOrNull()
+    }
+
+    override suspend fun getAssignments(): List<Assignment> = dbQuery {
+        Assignments.selectAll().map { buildAssigment(it) }
     }
 
     override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
@@ -37,8 +43,8 @@ internal class RealAssignmentSource(
 
     private suspend fun buildAssigment(result: ResultRow): Assignment {
         val assignmentId = result[Assignments.id].value
-        val feedback = feedbackSource.getFeedback(assignmentId)
-        val starterCodes = starterCodeSource.getByAssigment(assignmentId)
+        val feedback = feedbackSource.getFeedbackByAssignment(assignmentId)
+        val starterCodes = assignmentCodesSource.getByAssigment(assignmentId)
         return result.toAssignment(feedback, starterCodes)
     }
 
@@ -48,8 +54,6 @@ internal class RealAssignmentSource(
                 it.build(assignment)
             }
         }
-        feedbackSource.create(assignment.feedback)
-        starterCodeSource.create(assignment.starterCodes)
     }
 
     override suspend fun deleteAssignment(id: UUID): Boolean {
@@ -57,7 +61,7 @@ internal class RealAssignmentSource(
             Assignments.deleteWhere { Assignments.id eq  id }
         }
         feedbackSource.deleteByAssignment(id)
-        starterCodeSource.deleteByAssignment(id)
+        assignmentCodesSource.deleteByAssignment(id)
         return result > 0
     }
 
@@ -67,10 +71,6 @@ internal class RealAssignmentSource(
                 it.build(assignment)
             }
         }
-        feedbackSource.deleteByAssignment(assignment.id)
-        starterCodeSource.deleteByAssignment(assignment.id)
-        feedbackSource.create(assignment.feedback)
-        starterCodeSource.create(assignment.starterCodes)
         return result > 0
     }
 }
@@ -81,7 +81,6 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment) {
     this[Assignments.referenceId] = assignment.referenceId
     this[Assignments.expectedOutput] = assignment.expectedOutput
     this[Assignments.successMessage] = assignment.successMessage
-    this[Assignments.solution] = assignment.solution
     this[Assignments.failureMessage] = assignment.failureMessage
     this[Assignments.instructions] = assignment.instructions
     this[Assignments.totalAttempts] = assignment.totalAttempts
@@ -89,21 +88,20 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment) {
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
 }
 
-private fun ResultRow.toAssignment(feedback: List<Feedback>, starterCodes: List<StarterCode>): Assignment {
+private fun ResultRow.toAssignment(feedback: List<Feedback>, assignmentCodes: List<AssignmentCode>): Assignment {
     val id = this[Assignments.id].value
     return Assignment(
         id = id,
         referenceId = this[Assignments.referenceId],
         expectedOutput = this[Assignments.expectedOutput],
         feedback = feedback,
-        starterCodes = starterCodes,
+        assignmentCodes = assignmentCodes,
         title = this[Assignments.title],
         createdAt = this[Assignments.createdAt],
         lastModifiedAt = this[Assignments.lastModifiedAt],
         failureMessage = this[Assignments.failureMessage],
         successMessage = this[Assignments.successMessage],
         instructions = this[Assignments.instructions],
-        solution = this[Assignments.solution],
         totalAttempts = this[Assignments.totalAttempts],
     )
 }

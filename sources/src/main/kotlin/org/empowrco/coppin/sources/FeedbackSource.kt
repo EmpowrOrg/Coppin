@@ -14,7 +14,8 @@ import java.util.UUID
 interface FeedbackSource {
     suspend fun create(feedback: List<Feedback>)
     suspend fun deleteByAssignment(assignmentId: UUID): Boolean
-    suspend fun getFeedback(assignmentId: UUID): List<Feedback>
+    suspend fun getFeedbackByAssignment(assignmentId: UUID): List<Feedback>
+    suspend fun getFeedback(id: UUID): Feedback?
     suspend fun updateFeedback(feedback: Feedback): Boolean
     suspend fun deleteFeedback(id: UUID): Boolean
 }
@@ -31,8 +32,12 @@ internal class RealFeedbackSource: FeedbackSource {
         Feedbacks.deleteWhere { Feedbacks.assignmentId eq  assignmentId } > 0
     }
 
-    override suspend fun getFeedback(assignmentId: UUID): List<Feedback> = dbQuery {
+    override suspend fun getFeedbackByAssignment(assignmentId: UUID): List<Feedback> = dbQuery {
         Feedbacks.select { Feedbacks.assignmentId eq assignmentId }.map { it.toFeedback() }
+    }
+
+    override suspend fun getFeedback(id: UUID): Feedback? = dbQuery {
+        Feedbacks.select { Feedbacks.id eq id }.map { it.toFeedback() }.firstOrNull()
     }
 
     override suspend fun updateFeedback(feedback: Feedback): Boolean = dbQuery {

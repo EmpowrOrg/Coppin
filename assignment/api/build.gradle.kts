@@ -8,6 +8,7 @@ dependencies {
     implementation(Deps.Ktor.core)
     implementation(Deps.Ktor.gson)
     implementation(Deps.Ktor.contentNegotiation)
+    implementation(Deps.Ktor.freeMarker)
     implementation(Deps.Kotlin.coroutines)
     implementation(project(Deps.Models.main))
     implementation(project(Deps.Utils.routing))
