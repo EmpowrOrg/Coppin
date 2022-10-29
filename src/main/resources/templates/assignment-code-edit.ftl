@@ -91,9 +91,10 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form role="form" id="create-assignment-code" action="/assignments/${code.assignmentId}/codes/${code.id}" method="post">
+                    <form role="form" id="create-assignment-code" action="/assignments/${code.assignmentId}/codes/${code.id}"
+                          method="post">
                         <div class="row">
-                            <div class="col-sm input-group input-group-outline mb-3">
+                            <div class="col-sm form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="primary" name="primary" ${code.primary?string('checked','')}>
                                 <label class="form-check-label" for="primary">Primary</label><br>
 
