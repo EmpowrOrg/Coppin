@@ -183,11 +183,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     override suspend fun saveCode(request: UpdateCodePortalRequest) {
         val currentTime = LocalDateTime.now()
         val language = repo.getLanguage(request.languageMime) ?: throw NotFoundException("language")
+        val primary = request.primary == "on"
+        // new assignment code
         if (request.id == null) {
             val code = AssignmentCode(
                 id = UUID.randomUUID(),
                 language = language,
-                primary = request.primary,
+                primary = primary,
                 assignmentId = UUID.fromString(request.assignmentId),
                 starterCode = request.starterCode ?: "",
                 solutionCode = request.solutionCode ?: "",
@@ -195,20 +197,24 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 lastModifiedAt = currentTime,
             )
             repo.saveCode(code)
-            return
-        }
-        val assignmentCodeId = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
-        val code = repo.getCode(assignmentCodeId) ?: throw NotFoundException()
-        val updatedCode = code.copy(
-            starterCode = request.starterCode ?: "",
-            solutionCode = request.solutionCode ?: "",
-            language = language,
-            primary = request.primary,
-            lastModifiedAt = currentTime,
-        )
-        val result = repo.updateCode(updatedCode)
-        if (!result) {
-            throw UnknownException
+        } else { // updating existing assignment code
+            if (primary) {
+                val assignmentId = UUID.fromString(request.assignmentId)
+                repo.deprimaryAssignmentCodes(assignmentId)
+            }
+            val assignmentCodeId = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
+            val code = repo.getCode(assignmentCodeId) ?: throw NotFoundException()
+            val updatedCode = code.copy(
+                starterCode = request.starterCode ?: "",
+                solutionCode = request.solutionCode ?: "",
+                language = language,
+                primary = primary,
+                lastModifiedAt = currentTime,
+            )
+            val result = repo.updateCode(updatedCode)
+            if (!result) {
+                throw UnknownException
+            }
         }
     }
 

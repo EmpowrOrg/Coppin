@@ -137,7 +137,7 @@ fun Application.assignmentPortal() {
                         val codeId = call.parameters["codeId"]
                         val formParameters = call.receiveParameters()
                         val languageId = formParameters["language"].toString()
-                        val primary = formParameters["primary"].toBoolean()
+                        val primary = formParameters["primary"].toString()
                         val starterCode = formParameters["starter-code"]
                         val solutionCode = formParameters["solution-code"]
                         presenter.saveCode(

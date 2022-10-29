@@ -27,6 +27,7 @@ interface AssignmentPortalRepository {
     suspend fun updateFeedback(feedback: Feedback): Boolean
     suspend fun deleteFeedback(id: UUID)
     suspend fun deleteCode(id: UUID)
+    suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
 }
 
 internal class RealAssignmentPortalRepository(
@@ -90,6 +91,10 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun deleteFeedback(id: UUID) {
         feedbackSource.deleteFeedback(id)
+    }
+
+    override suspend fun deprimaryAssignmentCodes(assignmentId: UUID) {
+        codesSource.deprimaryAssignmentCodes(assignmentId)
     }
 
     override suspend fun deleteCode(id: UUID) {

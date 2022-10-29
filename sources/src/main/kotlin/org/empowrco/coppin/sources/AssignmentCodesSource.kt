@@ -19,6 +19,7 @@ interface AssignmentCodesSource {
     suspend fun delete(id: UUID): Boolean
     suspend fun update(assignmentCode: AssignmentCode): Boolean
     suspend fun deleteByAssignment(assignmentId: UUID): Boolean
+    suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
 }
 
 internal class RealAssignmentCodesSource(private val languagesSource: LanguagesSource): AssignmentCodesSource {
@@ -55,6 +56,13 @@ internal class RealAssignmentCodesSource(private val languagesSource: LanguagesS
         AssignmentCodes.update({ AssignmentCodes.id eq assignmentCode.id }) {
             it.build(assignmentCode)
         } > 0
+    }
+
+    override suspend fun deprimaryAssignmentCodes(assignmentId: UUID) = dbQuery {
+        AssignmentCodes.update({ AssignmentCodes.assignment eq assignmentId }) {
+            it[primary] = false
+        }
+        Unit
     }
 }
 

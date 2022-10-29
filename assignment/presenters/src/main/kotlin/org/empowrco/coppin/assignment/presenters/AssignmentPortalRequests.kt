@@ -30,7 +30,7 @@ data class UpdateCodePortalRequest(
     val languageMime: String,
     val starterCode: String?,
     val solutionCode: String?,
-    val primary: Boolean,
+    val primary: String,
     val assignmentId: String,
 )
 
