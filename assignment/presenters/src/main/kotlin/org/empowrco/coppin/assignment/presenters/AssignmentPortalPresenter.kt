@@ -27,7 +27,7 @@ interface AssignmentPortalPresenter {
     suspend fun getCode(id: String?, assignmentId: String): AssignmentCodeItem
     suspend fun getFeedback(id: String?, assignmentId: String): FeedbackItem
     suspend fun saveCode(request: UpdateCodePortalRequest)
-    suspend fun createAssignment(request: CreateAssignmentPortalRequest)
+    suspend fun createAssignment(request: CreateAssignmentPortalRequest): UUID
     suspend fun saveFeedback(request: SaveFeedbackRequest)
     suspend fun deleteFeedback(id: String)
     suspend fun deleteCode(id: String)
@@ -65,10 +65,11 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         }
     }
 
-    override suspend fun createAssignment(request: CreateAssignmentPortalRequest) {
+    override suspend fun createAssignment(request: CreateAssignmentPortalRequest): UUID {
         val currentTime = LocalDateTime.now()
+        val id = UUID.randomUUID()
         val assignment = Assignment(
-            id = UUID.randomUUID(),
+            id = id,
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
             instructions = request.instructions,
@@ -82,6 +83,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             lastModifiedAt = currentTime,
         )
         repo.createAssignment(assignment)
+        return id
     }
 
     override suspend fun getAssignment(id: String): GetAssignmentPortalResponse {

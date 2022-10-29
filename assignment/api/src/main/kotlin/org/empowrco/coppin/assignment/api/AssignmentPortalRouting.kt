@@ -40,7 +40,7 @@ fun Application.assignmentPortal() {
                     val referenceId = formParameters["reference-id"].toString()
                     val title = formParameters["title"].toString()
                     val totalAttempts = formParameters["total-attempts"].toString().toInt()
-                    presenter.createAssignment(
+                    val id = presenter.createAssignment(
                         CreateAssignmentPortalRequest(
                             referenceId = referenceId,
                             expectedOutput = expectedOutput,
@@ -51,7 +51,7 @@ fun Application.assignmentPortal() {
                             totalAttempts = totalAttempts
                         )
                     )
-                    call.respondRedirect("/assignments")
+                    call.respondRedirect("/assignments/$id")
                 }
             }
             route("{uuid}") {
