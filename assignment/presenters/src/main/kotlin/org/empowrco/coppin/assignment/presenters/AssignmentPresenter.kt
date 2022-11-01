@@ -1,20 +1,13 @@
 package org.empowrco.coppin.assignment.presenters
 
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.assignment.backend.AssignmentRepository
 import org.empowrco.coppin.models.Assignment
-import org.empowrco.coppin.utils.InvalidUuidException
-import org.empowrco.coppin.utils.UnknownException
 import org.empowrco.coppin.utils.diff.DiffUtil
-import org.empowrco.coppin.utils.now
-import java.util.UUID
 
 interface AssignmentPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
-    suspend fun create(request: CreateAssignmentRequest): CreateAssignmentResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
-    suspend fun update(request: UpdateAssignmentRequest): UpdateAssignmentResponse
 }
 
 internal class RealAssignmentPresenter(
@@ -82,23 +75,6 @@ internal class RealAssignmentPresenter(
         }
     }
 
-    override suspend fun update(request: UpdateAssignmentRequest): UpdateAssignmentResponse {
-        val assignmentId = UUID.fromString(request.assignmentId) ?: throw InvalidUuidException("assignmentId")
-        val assignment = repo.getAssignment(assignmentId) ?: throw NotFoundException()
-        val assignmentToUpdate = assignment.copy(
-            expectedOutput = request.expectedOutput,
-            instructions = request.instructions,
-            successMessage = request.successMessage,
-            failureMessage = request.failureMessage,
-            totalAttempts = request.totalAttempts,
-            title = request.title,
-        )
-        val result = repo.updateAssignment(assignmentToUpdate)
-        if (!result) {
-            throw UnknownException
-        }
-        return UpdateAssignmentResponse
-    }
 
     private fun getFeedback(
         assignment: Assignment,
@@ -119,27 +95,6 @@ internal class RealAssignmentPresenter(
         return feedback?.feedback ?: ""
     }
 
-    override suspend fun create(request: CreateAssignmentRequest): CreateAssignmentResponse {
-        val currentTime = LocalDateTime.now()
-        val assignmentId = UUID.randomUUID()
-        val assignment = Assignment(
-            id = assignmentId,
-            referenceId = request.referenceId,
-            failureMessage = request.failureMessage,
-            successMessage = request.successMessage,
-            instructions = request.instructions,
-            expectedOutput = request.expectedOutput,
-            totalAttempts = request.totalAttempts,
-            title = request.title,
-            feedback = emptyList(),
-            assignmentCodes = emptyList(),
-            createdAt = currentTime,
-            lastModifiedAt = currentTime,
-        )
-        repo.createAssignment(assignment)
-        return CreateAssignmentResponse
-    }
-
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException()
         val shouldFilter = request.supportedLanguageMimes.isNotEmpty()
@@ -154,6 +109,22 @@ internal class RealAssignmentPresenter(
                 primary = it.primary,
                 solutionCode = it.solutionCode
             )
+        }.toMutableList()
+        if (assignmentCodes.isEmpty()) {
+            repo.getLanguages().forEachIndexed { index, language ->
+                if (shouldFilter && !request.supportedLanguageMimes.contains(language.mime)) {
+                    return@forEachIndexed
+                }
+                assignmentCodes.add(
+                    GetAssignmentResponse.AssignmentCode(
+                        displayName = language.name,
+                        mime = language.mime,
+                        starterCode = "",
+                        primary = index == 0,
+                        solutionCode = "",
+                    )
+                )
+            }
         }
         return GetAssignmentResponse(
             instructions = assignment.instructions,

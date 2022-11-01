@@ -23,7 +23,10 @@
 <script>
     $(document).ready(function () {
         const table = $('#assignment-codes-table').DataTable({
-            language: {search: ""},
+            language: {
+                search: "",
+                emptyTable: "If no code is given, students will be allowed to complete in any language."
+            },
             columnDefs: [
                 {
                     target: 5,

@@ -8,10 +8,9 @@ import java.util.UUID
 
 interface AssignmentRepository {
     suspend fun getAssignment(referenceId: String): Assignment?
-    suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getAssignment(id: UUID): Assignment?
-    suspend fun createAssignment(assignment: Assignment)
     suspend fun getLanguage(id: UUID): Language?
+    suspend fun getLanguages(): List<Language>
 }
 
 internal class RealAssignmentRepository(
@@ -23,8 +22,8 @@ internal class RealAssignmentRepository(
         return assignmentSource.getAssignment(id)
     }
 
-    override suspend fun updateAssignment(assignment: Assignment): Boolean {
-        return assignmentSource.updateAssignment(assignment)
+    override suspend fun getLanguages(): List<Language> {
+        return languagesSource.getLanguages()
     }
 
     override suspend fun getAssignment(referenceId: String): Assignment? {
@@ -33,9 +32,5 @@ internal class RealAssignmentRepository(
 
     override suspend fun getLanguage(id: UUID): Language? {
         return languagesSource.getLanguage(id)
-    }
-
-    override suspend fun createAssignment(assignment: Assignment) {
-        return assignmentSource.createAssignment(assignment)
     }
 }
