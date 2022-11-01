@@ -28,6 +28,7 @@ interface AssignmentPortalRepository {
     suspend fun deleteFeedback(id: UUID)
     suspend fun deleteCode(id: UUID)
     suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
+    suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode>
 }
 
 internal class RealAssignmentPortalRepository(
@@ -39,6 +40,10 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getAssignments(): List<Assignment> {
         return assignmentSource.getAssignments()
+    }
+
+    override suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode> {
+        return codesSource.getByAssigment(id)
     }
 
     override suspend fun updateAssignment(assignment: Assignment): Boolean {

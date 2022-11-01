@@ -183,9 +183,14 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     override suspend fun saveCode(request: UpdateCodePortalRequest) {
         val currentTime = LocalDateTime.now()
         val language = repo.getLanguage(request.languageMime) ?: throw NotFoundException("language")
-        val primary = request.primary == "on"
+        var primary = request.primary == "on"
         // new assignment code
+        val assignmentId = UUID.fromString(request.assignmentId)
         if (request.id == null) {
+            val codes = repo.getAssignmentCodes(assignmentId)
+            if (codes.isEmpty()) {
+                primary = true
+            }
             val code = AssignmentCode(
                 id = UUID.randomUUID(),
                 language = language,
@@ -199,7 +204,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             repo.saveCode(code)
         } else { // updating existing assignment code
             if (primary) {
-                val assignmentId = UUID.fromString(request.assignmentId)
                 repo.deprimaryAssignmentCodes(assignmentId)
             }
             val assignmentCodeId = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
