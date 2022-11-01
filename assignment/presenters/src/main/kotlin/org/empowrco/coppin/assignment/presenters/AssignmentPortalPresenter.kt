@@ -256,6 +256,12 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     }
 
     override suspend fun deleteCode(id: String) {
-        repo.deleteCode(UUID.fromString(id))
+        val uuid = UUID.fromString(id)
+        val code = repo.getCode(uuid) ?: throw NotFoundException()
+        repo.deleteCode(uuid)
+        val codes = repo.getAssignmentCodes(code.assignmentId)
+        if (codes.size == 1) {
+            repo.updateCode(codes.first().copy(primary = true))
+        }
     }
 }
