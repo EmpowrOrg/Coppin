@@ -24,7 +24,10 @@
 <script>
     $(document).ready(function () {
         const table = $('#assignment-feedback-table').DataTable({
-            language: {search: ""},
+            language: {
+                search: "",
+                emptyTable: "It is recommended to always give student feedback"
+            },
             columnDefs: [
                 {
                     target: 3,
