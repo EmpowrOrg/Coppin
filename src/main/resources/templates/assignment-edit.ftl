@@ -116,8 +116,14 @@
                                                   class="form-control"
                                                   rows="2"></textarea>
                         </div>
-                        <div class="col-sm input-group input-group-outline mb-3">
-                            <input type="text" name="expected-output" class="form-control" placeholder="Expected Output">
+                        <div class="row  mt-3 col-sm w-100">
+                            <label for="expected-output">Expected Output.</label>
+                            <div class="input-group input-group-outline mb-3">
+                        <textarea id="expected-output"
+                                  name="expected-output"
+                                  class="form-control w-100"
+                                  form="create-assignment"></textarea>
+                            </div>
                         </div>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="submit"

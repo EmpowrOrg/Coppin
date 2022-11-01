@@ -86,7 +86,8 @@
                         </div>
                     </div>
                     <div class="col-sm align-content-end">
-                        <button type="button" id="delete-button" class="btn bg-gradient-primary float-end"><i class="fa fa-trash"></i>
+                        <button type="button" id="delete-button" class="btn bg-gradient-primary float-end"><i
+                                    class="fa fa-trash"></i>
                         </button>
                     </div>
                 </div>
