@@ -4,24 +4,26 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateAssignmentPortalRequest(
-    val expectedOutput: String,
+    val expectedOutput: String?,
     val referenceId: String,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,
     val totalAttempts: Int,
     val title: String,
+    val gradingType: String,
 )
 
 @Serializable
 data class UpdateAssignmentPortalRequest(
     val id: String,
-    val expectedOutput: String,
+    val expectedOutput: String?,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,
     val totalAttempts: Int,
     val title: String,
+    val gradingType: String,
 )
 
 @Serializable
@@ -32,6 +34,7 @@ data class UpdateCodePortalRequest(
     val solutionCode: String?,
     val primary: String,
     val assignmentId: String,
+    val unitTest: String?,
 )
 
 data class SaveFeedbackRequest(

@@ -71,6 +71,9 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Has Solution Code
                             </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                Has Unit Tests
+                            </th>
                             <th class="text-secondary opacity-7"></th>
                         </tr>
                         </thead>
@@ -81,13 +84,8 @@
                                 <td>${code.primary}</td>
                                 <td>${code.hasStarter}</td>
                                 <td>${code.hasSolution}</td>
-                                <td>
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs"
-                                       data-toggle="tooltip" data-original-title="Edit user">
-                                        Edit
-                                    </a>
-                                </td>
-                                <td >${code.id}</td>
+                                <td>${code.hasUnitTests}</td>
+                                <td>${code.id}</td>
                                 <td>${code.assignmentId}</td>
                             </tr>
                         </#list>

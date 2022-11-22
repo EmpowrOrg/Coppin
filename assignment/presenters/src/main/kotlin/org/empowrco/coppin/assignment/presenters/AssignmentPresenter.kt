@@ -3,6 +3,8 @@ package org.empowrco.coppin.assignment.presenters
 import io.ktor.server.plugins.NotFoundException
 import org.empowrco.coppin.assignment.backend.AssignmentRepository
 import org.empowrco.coppin.models.Assignment
+import org.empowrco.coppin.utils.AssignmentLanguageSupportException
+import org.empowrco.coppin.utils.LanguageSupportException
 import org.empowrco.coppin.utils.diff.DiffUtil
 
 interface AssignmentPresenter {
@@ -22,7 +24,7 @@ internal class RealAssignmentPresenter(
         if (assignment.totalAttempts > 0 && request.attempt > assignment.totalAttempts) {
             return SubmitResponse(
                 output = assignment.failureMessage,
-                expectedOutput = assignment.expectedOutput,
+                expectedOutput = "",
                 success = false,
                 finalAttempt = true,
                 feedback = "",
@@ -30,12 +32,37 @@ internal class RealAssignmentPresenter(
             )
         }
 
-        return if (!request.executeSuccess) {
-            val error = request.output
+        val codeResponse = when (assignment.gradingType) {
+            Assignment.GradingType.Output -> {
+                repo.runCode(request.language, request.code)
+            }
+
+            Assignment.GradingType.UnitTests -> {
+                val assignmentCode =
+                    assignment.assignmentCodes.find {
+                        it.language.mime.equals(
+                            request.language,
+                            ignoreCase = true
+                        ) || it.language.name.equals(request.language, ignoreCase = true)
+                    } ?: run {
+                        throw AssignmentLanguageSupportException(request.language)
+                    }
+                if (!assignmentCode.language.supportsUnitTests) {
+                    throw LanguageSupportException(assignmentCode.language.name)
+                }
+                if (assignmentCode.unitTest == null) {
+                    throw RuntimeException("No unit test created for this assignment")
+                }
+                repo.testCode(request.language, request.code, assignmentCode.unitTest!!)
+            }
+        }
+
+        return if (!codeResponse.success) {
+            val error = codeResponse.output
             if (assignment.feedback.isEmpty()) {
                 return SubmitResponse(
                     output = error,
-                    expectedOutput = assignment.expectedOutput,
+                    expectedOutput = "",
                     success = false,
                     finalAttempt = isFinalAttempt,
                     feedback = "",
@@ -45,33 +72,62 @@ internal class RealAssignmentPresenter(
             val feedback = getFeedback(assignment, request, error)
             SubmitResponse(
                 output = error,
-                expectedOutput = assignment.expectedOutput,
+                expectedOutput = "",
                 success = false,
                 finalAttempt = isFinalAttempt,
                 feedback = feedback,
                 diff = null,
             )
         } else {
-            if (assignment.expectedOutput == request.output) {
-                SubmitResponse(
-                    output = request.output,
-                    expectedOutput = assignment.expectedOutput,
-                    success = true,
-                    finalAttempt = isFinalAttempt,
-                    feedback = assignment.successMessage,
-                    diff = null,
-                )
-            } else {
-                val feedback = getFeedback(assignment, request, request.output)
-                SubmitResponse(
-                    output = request.output,
-                    expectedOutput = assignment.expectedOutput,
-                    success = false,
-                    finalAttempt = isFinalAttempt,
-                    feedback = feedback,
-                    diff = diffUtil.generateDiffHtml(request.output, assignment.expectedOutput),
-                )
+            when (assignment.gradingType) {
+                Assignment.GradingType.Output -> {
+                    val expectedOutput = assignment.expectedOutput!!
+                    if (codeResponse.output == expectedOutput) {
+                        SubmitResponse(
+                            output = codeResponse.output,
+                            expectedOutput = "",
+                            success = true,
+                            finalAttempt = isFinalAttempt,
+                            feedback = assignment.successMessage,
+                            diff = null,
+                        )
+                    } else {
+                        val feedback = getFeedback(assignment, request, codeResponse.output)
+                        SubmitResponse(
+                            output = codeResponse.output,
+                            expectedOutput = expectedOutput,
+                            success = false,
+                            finalAttempt = isFinalAttempt,
+                            feedback = feedback,
+                            diff = diffUtil.generateDiffHtml(codeResponse.output, expectedOutput),
+                        )
+                    }
+                }
+
+                Assignment.GradingType.UnitTests -> {
+                    val matches = "(?<=XCTAssertEqual failed:).*\\n".toRegex().findAll(codeResponse.output).toList()
+                    return if (matches.isNotEmpty()) {
+                        SubmitResponse(
+                            output = matches.first().value,
+                            expectedOutput = "",
+                            success = false,
+                            finalAttempt = isFinalAttempt,
+                            feedback = matches.first().value,
+                            diff = null,
+                        )
+                    } else {
+                        SubmitResponse(
+                            output = assignment.successMessage,
+                            expectedOutput = "",
+                            success = true,
+                            finalAttempt = isFinalAttempt,
+                            feedback = assignment.successMessage,
+                            diff = null,
+                        )
+                    }
+                }
             }
+
         }
     }
 

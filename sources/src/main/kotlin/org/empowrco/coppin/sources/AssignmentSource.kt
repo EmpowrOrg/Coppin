@@ -79,13 +79,14 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment) {
     this[Assignments.id] = assignment.id
     this[Assignments.title] = assignment.title
     this[Assignments.referenceId] = assignment.referenceId
-    this[Assignments.expectedOutput] = assignment.expectedOutput
+    this[Assignments.gradingType] = assignment.gradingType
     this[Assignments.successMessage] = assignment.successMessage
     this[Assignments.failureMessage] = assignment.failureMessage
     this[Assignments.instructions] = assignment.instructions
     this[Assignments.totalAttempts] = assignment.totalAttempts
     this[Assignments.createdAt] = assignment.createdAt
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
+    this[Assignments.expectedOutput] = assignment.expectedOutput
 }
 
 private fun ResultRow.toAssignment(feedback: List<Feedback>, assignmentCodes: List<AssignmentCode>): Assignment {
@@ -93,11 +94,12 @@ private fun ResultRow.toAssignment(feedback: List<Feedback>, assignmentCodes: Li
     return Assignment(
         id = id,
         referenceId = this[Assignments.referenceId],
-        expectedOutput = this[Assignments.expectedOutput],
+        gradingType = this[Assignments.gradingType],
         feedback = feedback,
         assignmentCodes = assignmentCodes,
         title = this[Assignments.title],
         createdAt = this[Assignments.createdAt],
+        expectedOutput = this[Assignments.expectedOutput],
         lastModifiedAt = this[Assignments.lastModifiedAt],
         failureMessage = this[Assignments.failureMessage],
         successMessage = this[Assignments.successMessage],

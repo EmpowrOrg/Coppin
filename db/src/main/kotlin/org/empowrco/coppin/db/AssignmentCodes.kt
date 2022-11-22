@@ -7,6 +7,7 @@ object AssignmentCodes : BaseTable() {
     val language = reference("language", Languages.id, onDelete = ReferenceOption.CASCADE)
     val starterCode = text("starter_code")
     val solutionCode = text("solution_code")
+    val unitTest = text("unit_test").nullable()
     val primary = bool("primary")
 
     init {

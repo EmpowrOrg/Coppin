@@ -8,6 +8,7 @@ data class AssignmentCodeItem(
     val starterCode: String,
     val solutionCode: String,
     val assignmentId: String,
+    val unitTest: String?,
     val primary: Boolean,
     val language: Language,
     val languages: List<Language>,
