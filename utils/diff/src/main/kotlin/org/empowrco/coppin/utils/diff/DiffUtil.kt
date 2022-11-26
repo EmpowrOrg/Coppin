@@ -70,7 +70,6 @@ class RealDiffUtil(private val fileUtil: FileUtil, private val commander: Comman
         if (minifyResult is CommandResponse.Error) {
             return null
         }
-        println(minifyResult.output)
         return minifyResult.output
     }
 }

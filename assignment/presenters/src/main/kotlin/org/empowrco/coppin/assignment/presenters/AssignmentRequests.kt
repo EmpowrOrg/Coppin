@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SubmitRequest(
     val code: String,
-    val output: String,
-    val executeSuccess: Boolean,
     val referenceId: String,
     val language: String,
     val email: String,

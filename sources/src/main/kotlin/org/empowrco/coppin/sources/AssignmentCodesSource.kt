@@ -22,7 +22,7 @@ interface AssignmentCodesSource {
     suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
 }
 
-internal class RealAssignmentCodesSource(private val languagesSource: LanguagesSource): AssignmentCodesSource {
+internal class RealAssignmentCodesSource(private val languagesSource: LanguagesSource) : AssignmentCodesSource {
     override suspend fun create(assignmentCodes: List<org.empowrco.coppin.models.AssignmentCode>) = dbQuery {
         AssignmentCodes.batchInsert(assignmentCodes) { this.build(it) }
         Unit
@@ -66,24 +66,26 @@ internal class RealAssignmentCodesSource(private val languagesSource: LanguagesS
     }
 }
 
-private fun ResultRow.toStarterCode(language: Language): org.empowrco.coppin.models.AssignmentCode {
-    return org.empowrco.coppin.models.AssignmentCode(
+private fun ResultRow.toStarterCode(language: Language): AssignmentCode {
+    return AssignmentCode(
         id = this[AssignmentCodes.id].value,
         assignmentId = this[AssignmentCodes.assignment].value,
         language = language,
         starterCode = this[AssignmentCodes.starterCode],
         solutionCode = this[AssignmentCodes.solutionCode],
         primary = this[AssignmentCodes.primary],
+        unitTest = this[AssignmentCodes.unitTest],
         createdAt = this[AssignmentCodes.createdAt],
         lastModifiedAt = this[AssignmentCodes.lastModifiedAt],
     )
 }
 
-private fun UpdateBuilder<*>.build(assignmentCode: org.empowrco.coppin.models.AssignmentCode) {
+private fun UpdateBuilder<*>.build(assignmentCode: AssignmentCode) {
     this[AssignmentCodes.id] = assignmentCode.id
     this[AssignmentCodes.assignment] = assignmentCode.assignmentId
     this[AssignmentCodes.starterCode] = assignmentCode.starterCode
     this[AssignmentCodes.solutionCode] = assignmentCode.solutionCode
+    this[AssignmentCodes.unitTest] = assignmentCode.unitTest
     this[AssignmentCodes.language] = assignmentCode.language.id
     this[AssignmentCodes.createdAt] = assignmentCode.createdAt
     this[AssignmentCodes.lastModifiedAt] = assignmentCode.lastModifiedAt

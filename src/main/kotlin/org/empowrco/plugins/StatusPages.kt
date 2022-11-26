@@ -8,7 +8,9 @@ import io.ktor.server.plugins.CannotTransformContentToTypeException
 import io.ktor.server.plugins.MissingRequestParameterException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import org.empowrco.coppin.utils.AssignmentLanguageSupportException
 import org.empowrco.coppin.utils.InvalidUuidException
+import org.empowrco.coppin.utils.LanguageSupportException
 import org.empowrco.coppin.utils.UnauthorizedException
 import org.empowrco.coppin.utils.UnsupportedLanguage
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -16,6 +18,12 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<UnsupportedLanguage> { call, cause ->
+            respond(call, cause, HttpStatusCode.NotFound)
+        }
+        exception<LanguageSupportException> { call, cause ->
+            respond(call, cause, HttpStatusCode.NotFound)
+        }
+        exception<AssignmentLanguageSupportException> { call, cause ->
             respond(call, cause, HttpStatusCode.NotFound)
         }
         exception<InvalidUuidException> {call, cause ->

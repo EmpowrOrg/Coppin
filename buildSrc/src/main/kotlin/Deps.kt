@@ -16,7 +16,6 @@ object Deps {
 
         val main by lazy { ":assignment" }
     }
-
     object Languages {
         val api by lazy { ":languages:api" }
         val presenters by lazy { ":languages:presenters" }
@@ -33,9 +32,10 @@ object Deps {
         val routing by lazy { ":utils:routing" }
         val main by lazy { ":utils" }
         val files by lazy { ":utils:files" }
+
         object Diff {
-            val main by lazy {":utils:diff"}
-            val fakes by lazy {":utils:diff:fakes"}
+            val main by lazy { ":utils:diff" }
+            val fakes by lazy { ":utils:diff:fakes" }
         }
     }
 
@@ -83,7 +83,15 @@ object Deps {
         val statusPages by lazy { "io.ktor:ktor-server-status-pages:${Versions.ktor}" }
         val test by lazy { "io.ktor:ktor-server-test-host:${Versions.ktor}" }
         val callLogging by lazy { "io.ktor:ktor-server-call-logging:${Versions.ktor}" }
-        val freeMarker by lazy {"io.ktor:ktor-server-freemarker:${Versions.ktor}"}
+        val freeMarker by lazy { "io.ktor:ktor-server-freemarker:${Versions.ktor}" }
+
+        object Client {
+            val core by lazy { "io.ktor:ktor-client-core:${Versions.ktor}" }
+            val serialization by lazy { "io.ktor:ktor-client-content-negotiation:${Versions.ktor}" }
+            val json by lazy { "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}" }
+            val auth by lazy { "io.ktor:ktor-client-auth:${Versions.ktor}" }
+            val engine by lazy { "io.ktor:ktor-client-apache:${Versions.ktor}" }
+        }
     }
 
     object Sources {

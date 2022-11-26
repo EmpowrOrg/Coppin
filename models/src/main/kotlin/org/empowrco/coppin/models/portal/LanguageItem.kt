@@ -5,4 +5,5 @@ data class LanguageItem(
     val name: String,
     val url: String,
     val mime: String,
+    val supportsUnitTests: Boolean,
 )

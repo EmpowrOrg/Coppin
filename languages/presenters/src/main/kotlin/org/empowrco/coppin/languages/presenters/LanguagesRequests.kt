@@ -7,6 +7,7 @@ data class CreateLanguageRequest(
     val url: String,
     val mime: String,
     val name: String,
+    val supportsUnitTests: String,
 )
 
 @Serializable
@@ -15,4 +16,5 @@ data class UpdateLanguageRequest(
     val url: String,
     val mime: String,
     val name: String,
+    val supportsUnitTests: String?,
 )

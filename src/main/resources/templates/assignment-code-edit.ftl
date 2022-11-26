@@ -22,9 +22,10 @@
     <#list code.languages as language>
         <script src="${language.url}" crossorigin="anonymous"></script>
     </#list>
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const codemirror_config = {
                 value: "${code.starterCode}",
                 lineNumbers: true,
@@ -46,7 +47,16 @@
                 solutionCodeTextArea.parentNode.replaceChild(elt, solutionCodeTextArea);
             }, solution_config);
             solutionCodeCodeMirror.setSize('100%');
-            $("#create-assignment-code").submit( function(eventObj) {
+            <#if code.unitTest??>
+            const unit_test_config = codemirror_config
+            unit_test_config.value = "${code.unitTest}"
+            const unitTestTextArea = document.getElementById("unit-test-code");
+            const unitTestCodeMirror = CodeMirror(function (elt) {
+                unitTestTextArea.parentNode.replaceChild(elt, unitTestTextArea);
+            }, unit_test_config);
+            unitTestCodeMirror.setSize('100%');
+            </#if>
+            $("#create-assignment-code").submit(function (eventObj) {
                 eventObj.preventDefault()
                 $("<input />")
                     .attr("name", "starter-code")
@@ -58,10 +68,21 @@
                     .attr("type", "hidden")
                     .val(solutionCodeCodeMirror.getValue())
                     .appendTo(this);
+                <#if code.unitTest??>
+                $("<input />")
+                    .attr("name", "unit-test-code")
+                    .attr("type", "hidden")
+                    .val(unitTestCodeMirror.getValue())
+                    .appendTo(this);
+                </#if>
                 this.submit()
             });
             $("#language").change(function () {
                 solutionCodeCodeMirror.setOption("mode", $(this).val());
+                starterCodeCodeMirror.setOption("mode", $(this).val());
+                <#if code.unitTest??>
+                unitTestCodeMirror.setOption("mode", $(this).val());
+                </#if>
             });
             document.getElementById("delete-code-button").onclick = function () {
                 var result = confirm("Are you sure you want to delete this assignment code?");
@@ -91,11 +112,13 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form role="form" id="create-assignment-code" action="/assignments/${code.assignmentId}/codes/${code.id}"
+                    <form role="form" id="create-assignment-code"
+                          action="/assignments/${code.assignmentId}/codes/${code.id}"
                           method="post">
                         <div class="row">
                             <div class="col-sm form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="primary" name="primary" ${code.primary?string('checked','')}>
+                                <input class="form-check-input" type="checkbox" id="primary"
+                                       name="primary" ${code.primary?string('checked','')}>
                                 <label class="form-check-label" for="primary">Primary</label><br>
 
                             </div>
@@ -123,6 +146,18 @@
                                                   rows="5"
                                         ></textarea>
                         </div>
+                        <#if code.unitTest??>
+                            <label for="unit-test-code">Unit Tests</label>
+                            <p>Please only include the test class.</p>
+                            <div class="input-group input-group-outline mb-3">
+                                        <textarea id="unit-test-code"
+                                                  name="unit-test-code"
+                                                  form="create-assignment-code"
+                                                  class="form-control"
+                                                  rows="5"
+                                        ></textarea>
+                            </div>
+                        </#if>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="submit"
                                    class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"

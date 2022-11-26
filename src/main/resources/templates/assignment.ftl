@@ -125,15 +125,18 @@
                         </div>
                     </div>
                     <div class="row pt-3 w-100">
-                        <label for="expected-output" style="font-variant: small-caps;font-weight: bolder">Expected
-                            Output.</label>
-                        <div class="input-group input-group-outline mb-3">
+                        <#if assignment.gradingType == "Output">
+                            <label for="expected-output" style="font-variant: small-caps;font-weight: bolder">Expected
+                                Output.</label>
+                            <div class="input-group input-group-outline mb-3">
                         <textarea id="expected-output"
                                   name="expected-output"
                                   class="w-100 form-control"
                                   form="edit-assignment"
                                   style="resize: none">${assignment.expectedOutput}</textarea>
-                        </div>
+                            </div>
+                        </#if>
+
                     </div>
                     <div class="col-sm input-group input-group-outline mb-3">
                         <input

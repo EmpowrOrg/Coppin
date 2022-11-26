@@ -57,6 +57,7 @@ private fun UpdateBuilder<*>.build(language: Language, isUpdate: Boolean) {
     this[Languages.mime] = language.mime
     this[Languages.name] = language.name
     this[Languages.url] = language.url
+    this[Languages.supportsUnitTest] = language.supportsUnitTests
     if (!isUpdate) {
         this[Languages.createdAt] = language.createdAt
     }
@@ -69,6 +70,7 @@ private fun ResultRow.toLanguage(): Language {
         name = this[Languages.name],
         mime = this[Languages.mime],
         url = this[Languages.url],
+        supportsUnitTests = this[Languages.supportsUnitTest],
         lastModifiedAt = this[Languages.lastModifiedAt],
         createdAt = this[Languages.createdAt],
     )

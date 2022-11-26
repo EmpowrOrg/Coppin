@@ -33,13 +33,14 @@ fun Application.assignmentPortal() {
                 }
                 post {
                     val formParameters = call.receiveParameters()
-                    val expectedOutput = formParameters["expected-output"].toString()
+                    val expectedOutput = formParameters["expected-output"]
                     val failureMessage = formParameters["failure-message"].toString()
                     val successMessage = formParameters["success-message"].toString()
                     val instructions = formParameters["instructions"].toString()
                     val referenceId = formParameters["reference-id"].toString()
                     val title = formParameters["title"].toString()
                     val totalAttempts = formParameters["total-attempts"].toString().toInt()
+                    val gradingType = formParameters["grading-type"].toString()
                     val id = presenter.createAssignment(
                         CreateAssignmentPortalRequest(
                             referenceId = referenceId,
@@ -48,7 +49,8 @@ fun Application.assignmentPortal() {
                             successMessage = successMessage,
                             instructions = instructions,
                             title = title,
-                            totalAttempts = totalAttempts
+                            totalAttempts = totalAttempts,
+                            gradingType = gradingType,
                         )
                     )
                     call.respondRedirect("/assignments/$id")
@@ -69,12 +71,13 @@ fun Application.assignmentPortal() {
                 }
                 post {
                     val formParameters = call.receiveParameters()
-                    val expectedOutput = formParameters["expected-output"].toString()
+                    val expectedOutput = formParameters["expected-output"]
                     val failureMessage = formParameters["failure-message"].toString()
                     val successMessage = formParameters["success-message"].toString()
                     val instructions = formParameters["instructions"].toString()
                     val title = formParameters["title"].toString()
                     val totalAttempts = formParameters["total-attempts"].toString().toInt()
+                    val gradingType = formParameters["grading-type"].toString()
                     presenter.updateAssignment(
                         UpdateAssignmentPortalRequest(
                             id = call.parameters["uuid"]!!,
@@ -84,6 +87,7 @@ fun Application.assignmentPortal() {
                             instructions = instructions,
                             title = title,
                             totalAttempts = totalAttempts,
+                            gradingType = gradingType
                         )
                     )
                     call.respondRedirect("/assignments")
@@ -140,11 +144,13 @@ fun Application.assignmentPortal() {
                         val primary = formParameters["primary"].toString()
                         val starterCode = formParameters["starter-code"]
                         val solutionCode = formParameters["solution-code"]
+                        val unitTest = formParameters["unit-test-code"]
                         presenter.saveCode(
                             UpdateCodePortalRequest(
                                 languageMime = languageId,
                                 primary = primary,
                                 starterCode = starterCode,
+                                unitTest = unitTest,
                                 solutionCode = solutionCode,
                                 id = codeId,
                                 assignmentId = uuid,
