@@ -41,7 +41,6 @@ class AssignmentRepositoryTest {
     fun createAssignment() = runBlocking {
         val assignment = Assignment(
             id = UUID.randomUUID(),
-            expectedOutput = "e_o",
             feedback = emptyList(),
             lastModifiedAt = LocalDateTime.Companion.now(),
             createdAt = LocalDateTime.Companion.now(),

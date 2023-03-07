@@ -14,7 +14,6 @@ data class SubmitRequest(
 @Serializable
 data class CreateAssignmentRequest(
     val referenceId: String,
-    val expectedOutput: String,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,
@@ -26,7 +25,6 @@ data class CreateAssignmentRequest(
 @Serializable
 data class UpdateAssignmentRequest(
     val assignmentId: String,
-    val expectedOutput: String,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,

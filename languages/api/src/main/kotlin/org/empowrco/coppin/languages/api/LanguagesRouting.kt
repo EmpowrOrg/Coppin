@@ -36,13 +36,11 @@ fun Application.languagesRouting() {
                     val name = formParameters["name"].toString()
                     val mime = formParameters["mime"].toString()
                     val url = formParameters["url"].toString()
-                    val supportsUnitTests = formParameters["supportsUnitTests"].toString()
                     presenter.saveLanguage(
                         CreateLanguageRequest(
                             name = name,
                             mime = mime,
                             url = url,
-                            supportsUnitTests = supportsUnitTests,
                         )
                     )
                     call.respondRedirect("/languages")
@@ -62,14 +60,12 @@ fun Application.languagesRouting() {
                     val name = formParameters["name"].toString()
                     val mime = formParameters["mime"].toString()
                     val url = formParameters["url"].toString()
-                    val supportsUnitTests = formParameters["supports-unit-tests"]
                     presenter.updateLanguage(
                         UpdateLanguageRequest(
                             name = name,
                             mime = mime,
                             url = url,
                             id = uuid,
-                            supportsUnitTests = supportsUnitTests,
                         )
                     )
                     call.respondRedirect("/languages")

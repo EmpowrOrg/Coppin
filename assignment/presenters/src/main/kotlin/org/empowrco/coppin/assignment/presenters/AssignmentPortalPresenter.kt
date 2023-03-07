@@ -50,15 +50,9 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val uuid = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
         val assignment = repo.getAssignment(uuid) ?: throw NotFoundException()
         val currentTime = LocalDateTime.now()
-        val gradingType = if (request.gradingType == "unit-tests") {
-            Assignment.GradingType.UnitTests
-        } else {
-            Assignment.GradingType.Output
-        }
         val updatedAssignment = assignment.copy(
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
-            gradingType = gradingType,
             instructions = request.instructions,
             totalAttempts = request.totalAttempts,
             title = request.title,
@@ -73,18 +67,12 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     override suspend fun createAssignment(request: CreateAssignmentPortalRequest): UUID {
         val currentTime = LocalDateTime.now()
         val id = UUID.randomUUID()
-        val gradingType = if (request.gradingType == "unit-tests") {
-            Assignment.GradingType.UnitTests
-        } else {
-            Assignment.GradingType.Output
-        }
 
         val assignment = Assignment(
             id = id,
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
             instructions = request.instructions,
-            gradingType = gradingType,
             totalAttempts = request.totalAttempts,
             referenceId = request.referenceId,
             feedback = emptyList(),
@@ -92,7 +80,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             title = request.title,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
-            expectedOutput = request.expectedOutput,
         )
         repo.createAssignment(assignment)
         return id
@@ -103,14 +90,12 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val assignment = repo.getAssignment(assignmentId) ?: throw NotFoundException()
         val assignmentItem = AssignmentItem(
             title = assignment.title,
-            gradingType = assignment.gradingType,
             successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
             referenceId = "Reference Id: ${assignment.referenceId}",
             failureMessage = StringEscapeUtils.escapeJava(assignment.failureMessage),
             attempts = assignment.totalAttempts,
             id = assignment.id.toString(),
             instructions = StringEscapeUtils.escapeJava(assignment.instructions),
-            expectedOutput = assignment.expectedOutput
         )
         val codes = assignment.assignmentCodes.map {
             CodeListItem(
@@ -162,7 +147,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 solutionCode = "",
                 languages = languages,
                 assignmentId = assignment.id.toString(),
-                unitTest = if (assignment.gradingType == Assignment.GradingType.UnitTests) "" else null,
+                unitTest = "",
                 primary = false,
                 language = languages.first()
             )

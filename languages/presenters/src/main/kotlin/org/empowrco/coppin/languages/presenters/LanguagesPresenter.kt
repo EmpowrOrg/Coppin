@@ -40,20 +40,17 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository): La
                 name = it.name,
                 url = it.url,
                 mime = it.mime,
-                supportsUnitTests = it.supportsUnitTests,
             )
         }
     }
 
     override suspend fun saveLanguage(request: CreateLanguageRequest) {
         val currentTime = LocalDateTime.now()
-        val supportsUnitTests = request.supportsUnitTests == "on"
         val language = Language(
             id = UUID.randomUUID(),
             url = request.url,
             mime = request.mime,
             name = request.name,
-            supportsUnitTests = supportsUnitTests,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
         )
@@ -64,13 +61,11 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository): La
         val currentTime = LocalDateTime.now()
         val uuid = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
         val language = repo.getLanguage(uuid) ?: throw NotFoundException()
-        val supportsUnitTests = request.supportsUnitTests == "on"
         val updatedLanguage = language.copy(
             url = request.url,
             mime = request.mime,
             name = request.name,
             lastModifiedAt = currentTime,
-            supportsUnitTests = supportsUnitTests,
         )
         repo.updateLanguage(updatedLanguage)
     }

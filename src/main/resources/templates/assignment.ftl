@@ -1,18 +1,3 @@
-<!--
-=========================================================
-* Material Dashboard 2 - v3.0.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
 <#-- @ftlvariable name="assignment" type="org.empowrco.coppin.models.portal.AssignmentItem" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
@@ -123,20 +108,6 @@
                                   form="edit-assignment"
                                   style="resize: none">${assignment.failureMessage}</textarea>
                         </div>
-                    </div>
-                    <div class="row pt-3 w-100">
-                        <#if assignment.gradingType == "Output">
-                            <label for="expected-output" style="font-variant: small-caps;font-weight: bolder">Expected
-                                Output.</label>
-                            <div class="input-group input-group-outline mb-3">
-                        <textarea id="expected-output"
-                                  name="expected-output"
-                                  class="w-100 form-control"
-                                  form="edit-assignment"
-                                  style="resize: none">${assignment.expectedOutput}</textarea>
-                            </div>
-                        </#if>
-
                     </div>
                     <div class="col-sm input-group input-group-outline mb-3">
                         <input

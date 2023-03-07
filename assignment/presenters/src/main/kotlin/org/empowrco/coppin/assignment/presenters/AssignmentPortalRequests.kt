@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateAssignmentPortalRequest(
-    val expectedOutput: String?,
     val referenceId: String,
     val instructions: String,
     val successMessage: String,
@@ -17,7 +16,6 @@ data class CreateAssignmentPortalRequest(
 @Serializable
 data class UpdateAssignmentPortalRequest(
     val id: String,
-    val expectedOutput: String?,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,

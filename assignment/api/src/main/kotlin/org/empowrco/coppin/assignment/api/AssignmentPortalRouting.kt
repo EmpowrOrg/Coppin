@@ -33,7 +33,6 @@ fun Application.assignmentPortal() {
                 }
                 post {
                     val formParameters = call.receiveParameters()
-                    val expectedOutput = formParameters["expected-output"]
                     val failureMessage = formParameters["failure-message"].toString()
                     val successMessage = formParameters["success-message"].toString()
                     val instructions = formParameters["instructions"].toString()
@@ -44,7 +43,6 @@ fun Application.assignmentPortal() {
                     val id = presenter.createAssignment(
                         CreateAssignmentPortalRequest(
                             referenceId = referenceId,
-                            expectedOutput = expectedOutput,
                             failureMessage = failureMessage,
                             successMessage = successMessage,
                             instructions = instructions,
@@ -71,7 +69,6 @@ fun Application.assignmentPortal() {
                 }
                 post {
                     val formParameters = call.receiveParameters()
-                    val expectedOutput = formParameters["expected-output"]
                     val failureMessage = formParameters["failure-message"].toString()
                     val successMessage = formParameters["success-message"].toString()
                     val instructions = formParameters["instructions"].toString()
@@ -81,7 +78,6 @@ fun Application.assignmentPortal() {
                     presenter.updateAssignment(
                         UpdateAssignmentPortalRequest(
                             id = call.parameters["uuid"]!!,
-                            expectedOutput = expectedOutput,
                             failureMessage = failureMessage,
                             successMessage = successMessage,
                             instructions = instructions,

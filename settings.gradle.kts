@@ -34,3 +34,10 @@ include("languages:backend")
 findProject(":languages:backend")?.name = "backend"
 include("languages:presenters")
 findProject(":languages:presenters")?.name = "presenters"
+include("users")
+include("users:api")
+findProject(":users:api")?.name = "api"
+include("users:backend")
+findProject(":users:backend")?.name = "backend"
+include("users:presenters")
+findProject(":users:presenters")?.name = "presenters"

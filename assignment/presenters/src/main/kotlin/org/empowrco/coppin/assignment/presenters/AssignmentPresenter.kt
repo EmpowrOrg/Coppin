@@ -24,7 +24,6 @@ internal class RealAssignmentPresenter(
         if (assignment.totalAttempts > 0 && request.attempt > assignment.totalAttempts) {
             return SubmitResponse(
                 output = assignment.failureMessage,
-                expectedOutput = "",
                 success = false,
                 finalAttempt = true,
                 feedback = "",
@@ -32,37 +31,28 @@ internal class RealAssignmentPresenter(
             )
         }
 
-        val codeResponse = when (assignment.gradingType) {
-            Assignment.GradingType.Output -> {
-                repo.runCode(request.language, request.code)
+        val assignmentCode =
+            assignment.assignmentCodes.find {
+                it.language.mime.equals(
+                    request.language,
+                    ignoreCase = true
+                ) || it.language.name.equals(request.language, ignoreCase = true)
+            } ?: run {
+                throw AssignmentLanguageSupportException(request.language)
             }
-
-            Assignment.GradingType.UnitTests -> {
-                val assignmentCode =
-                    assignment.assignmentCodes.find {
-                        it.language.mime.equals(
-                            request.language,
-                            ignoreCase = true
-                        ) || it.language.name.equals(request.language, ignoreCase = true)
-                    } ?: run {
-                        throw AssignmentLanguageSupportException(request.language)
-                    }
-                if (!assignmentCode.language.supportsUnitTests) {
-                    throw LanguageSupportException(assignmentCode.language.name)
-                }
-                if (assignmentCode.unitTest == null) {
-                    throw RuntimeException("No unit test created for this assignment")
-                }
-                repo.testCode(request.language, request.code, assignmentCode.unitTest!!)
-            }
+        if (!assignmentCode.language.supportsUnitTests) {
+            throw LanguageSupportException(assignmentCode.language.name)
         }
+        if (assignmentCode.unitTest == null) {
+            throw RuntimeException("No unit test created for this assignment")
+        }
+        val codeResponse = repo.testCode(request.language, request.code, assignmentCode.unitTest!!)
 
         return if (!codeResponse.success) {
             val error = codeResponse.output
             if (assignment.feedback.isEmpty()) {
                 return SubmitResponse(
                     output = error,
-                    expectedOutput = "",
                     success = false,
                     finalAttempt = isFinalAttempt,
                     feedback = "",
@@ -72,61 +62,31 @@ internal class RealAssignmentPresenter(
             val feedback = getFeedback(assignment, request, error)
             SubmitResponse(
                 output = error,
-                expectedOutput = "",
                 success = false,
                 finalAttempt = isFinalAttempt,
                 feedback = feedback,
                 diff = null,
             )
         } else {
-            when (assignment.gradingType) {
-                Assignment.GradingType.Output -> {
-                    val expectedOutput = assignment.expectedOutput!!
-                    if (codeResponse.output == expectedOutput) {
-                        SubmitResponse(
-                            output = codeResponse.output,
-                            expectedOutput = "",
-                            success = true,
-                            finalAttempt = isFinalAttempt,
-                            feedback = assignment.successMessage,
-                            diff = null,
-                        )
-                    } else {
-                        val feedback = getFeedback(assignment, request, codeResponse.output)
-                        SubmitResponse(
-                            output = codeResponse.output,
-                            expectedOutput = expectedOutput,
-                            success = false,
-                            finalAttempt = isFinalAttempt,
-                            feedback = feedback,
-                            diff = diffUtil.generateDiffHtml(codeResponse.output, expectedOutput),
-                        )
-                    }
-                }
-
-                Assignment.GradingType.UnitTests -> {
-                    val matches = "(?<=XCTAssertEqual failed:).*\\n".toRegex().findAll(codeResponse.output).toList()
-                    return if (matches.isNotEmpty()) {
-                        SubmitResponse(
-                            output = matches.first().value,
-                            expectedOutput = "",
-                            success = false,
-                            finalAttempt = isFinalAttempt,
-                            feedback = matches.first().value,
-                            diff = null,
-                        )
-                    } else {
-                        SubmitResponse(
-                            output = assignment.successMessage,
-                            expectedOutput = "",
-                            success = true,
-                            finalAttempt = isFinalAttempt,
-                            feedback = assignment.successMessage,
-                            diff = null,
-                        )
-                    }
-                }
+            val matches = "(?<=XCTAssertEqual failed:).*\\n".toRegex().findAll(codeResponse.output).toList()
+            return if (matches.isNotEmpty()) {
+                SubmitResponse(
+                    output = matches.first().value,
+                    success = false,
+                    finalAttempt = isFinalAttempt,
+                    feedback = matches.first().value,
+                    diff = null,
+                )
+            } else {
+                SubmitResponse(
+                    output = assignment.successMessage,
+                    success = true,
+                    finalAttempt = isFinalAttempt,
+                    feedback = assignment.successMessage,
+                    diff = null,
+                )
             }
+
 
         }
     }
@@ -135,7 +95,7 @@ internal class RealAssignmentPresenter(
     private fun getFeedback(
         assignment: Assignment,
         request: SubmitRequest,
-        output: String
+        output: String,
     ): String {
         val validAttemptFeedback = assignment.feedback.filter {
             it.attempt <= request.attempt

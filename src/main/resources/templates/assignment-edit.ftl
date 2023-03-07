@@ -21,9 +21,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.js"
             crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const codemirror_config = {
                 value: "",
                 lineNumbers: true,
@@ -48,7 +49,7 @@
                 failureTextArea.parentNode.replaceChild(elt, failureTextArea);
             }, codemirror_config);
             failureCodeMirror.setSize('100%');
-            $("#create-assignment").submit( function(eventObj) {
+            $("#create-assignment").submit(function (eventObj) {
                 console.log('create')
                 eventObj.preventDefault()
                 $("<input />")
@@ -88,7 +89,8 @@
                                 <input type="text" name="reference-id" class="form-control" placeholder="Reference Id">
                             </div>
                             <div class="col-sm input-group input-group-outline mb-3">
-                                <input type="number" name="total-attempts" class="form-control" min="0" max="10" placeholder="Total Attempts">
+                                <input type="number" name="total-attempts" class="form-control" min="0" max="10"
+                                       placeholder="Total Attempts">
                             </div>
                         </div>
                         <label for="instructions">Instructions. Accepts Markdown Language</label>
@@ -115,23 +117,6 @@
                                                   form="create-assignment"
                                                   class="form-control"
                                                   rows="2"></textarea>
-                        </div>
-                        <label>Grading Type</label>
-                        <div class="row  mt-3 col-sm w-100">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="grading-type" value="expected-output"
-                                       id="expected-output">
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Expected Output (Success is based on if the console prints an expected output)
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="grading-type" id="unit-tests"
-                                       value="unit-tests" checked>
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Unit Tests (Success is based on provided unit tests passing)
-                                </label>
-                            </div>
                         </div>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="submit"

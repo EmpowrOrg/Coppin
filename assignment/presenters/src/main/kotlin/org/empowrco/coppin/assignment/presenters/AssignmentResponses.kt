@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SubmitResponse(
     val output: String,
-    val expectedOutput: String,
     val feedback: String,
     val success: Boolean,
     val finalAttempt: Boolean,

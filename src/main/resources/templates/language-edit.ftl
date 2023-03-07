@@ -47,13 +47,6 @@
                                 <input type="text" name="mime" class="form-control" placeholder="Mime"
                                        <#if language??>value="${language.mime}" </#if>>
                             </div>
-                            <div class="col-sm form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="supports-unit-tests"
-                                       name="supports-unit-tests" ${language.supportsUnitTests?string('checked','')}>
-                                <label class="form-check-label" for="supports-unit-tests">Supports Unit
-                                    Tests</label><br>
-
-                            </div>
                         </div>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="text" name="url" class="form-control" placeholder="CodeMirror Url"
