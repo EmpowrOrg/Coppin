@@ -1,4 +1,4 @@
 object ConfigData {
-    const val version = "1.0.0"
+    const val version = "0.3.2"
     const val baseGroup = "org.empowrco.coppin"
 }

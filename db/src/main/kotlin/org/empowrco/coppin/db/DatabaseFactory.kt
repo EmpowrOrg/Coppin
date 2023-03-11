@@ -12,7 +12,8 @@ object DatabaseFactory {
         Assignments,
         Feedbacks,
         Languages,
-        AssignmentCodes
+        AssignmentCodes,
+        Users,
     ).toTypedArray()
 
     fun init() {
@@ -25,7 +26,7 @@ object DatabaseFactory {
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()
         val databaseDriver = System.getenv("DATABASE_DRIVER")
-        config.dataSourceClassName = databaseDriver// 1
+        config.dataSourceClassName = databaseDriver
         config.addDataSourceProperty("databaseName", System.getenv("DATABASE_NAME"))
         config.addDataSourceProperty("portNumber", System.getenv("DATABASE_PORT"))
         config.addDataSourceProperty("serverName", System.getenv("DATABASE_SERVER"))

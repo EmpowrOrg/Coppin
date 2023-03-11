@@ -9,4 +9,5 @@ val sourcesModule = module {
     singleOf(::RealLanguageSource) { bind<LanguagesSource>() }
     singleOf(::RealFeedbackSource) { bind<FeedbackSource>() }
     singleOf(::RealAssignmentCodesSource) { bind<AssignmentCodesSource>() }
+    singleOf(::RealUsersSource) { bind<UsersSource>() }
 }

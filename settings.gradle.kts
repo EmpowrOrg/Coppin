@@ -41,3 +41,14 @@ include("users:backend")
 findProject(":users:backend")?.name = "backend"
 include("users:presenters")
 findProject(":users:presenters")?.name = "presenters"
+include("utils:authenticator")
+findProject(":utils:authenticator")?.name = "authenticator"
+include("utils:exposed")
+findProject(":utils:exposed")?.name = "exposed"
+include("dashboard")
+include("dashboard:api")
+findProject(":dashboard:api")?.name = "api"
+include("dashboard:backend")
+findProject(":dashboard:backend")?.name = "backend"
+include("dashboard:presenters")
+findProject(":dashboard:presenters")?.name = "presenters"

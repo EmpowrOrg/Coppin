@@ -13,10 +13,12 @@ import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.api.assignmentPortal
 import org.empowrco.coppin.assignment.api.assignmentRouting
 import org.empowrco.coppin.languages.api.languagesRouting
+import org.empowrco.copping.users.api.usersRouting
 
 fun Application.configureRouting() {
     assignmentRouting()
     assignmentPortal()
+    usersRouting()
     languagesRouting()
     routing {
         authenticate("auth-session") {

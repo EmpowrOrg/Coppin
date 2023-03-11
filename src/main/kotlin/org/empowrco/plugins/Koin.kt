@@ -6,11 +6,13 @@ import org.empowrco.coppin.assignment.assignmentModule
 import org.empowrco.coppin.command.commandModule
 import org.empowrco.coppin.languages.languagesModule
 import org.empowrco.coppin.sources.sourcesModule
+import org.empowrco.coppin.users.usersModule
+import org.empowrco.coppin.utils.authenticator.authenticatorModule
 import org.empowrco.coppin.utils.utilsModule
 import org.koin.ktor.plugin.Koin
 
 fun Application.configureKoin() {
     install(Koin) {
-        modules(assignmentModule + commandModule + sourcesModule + utilsModule + languagesModule)
+        modules(assignmentModule + authenticatorModule + commandModule + sourcesModule + utilsModule + languagesModule + usersModule)
     }
 }
