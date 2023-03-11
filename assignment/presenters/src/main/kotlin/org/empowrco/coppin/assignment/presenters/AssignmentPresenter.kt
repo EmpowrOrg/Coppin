@@ -4,7 +4,6 @@ import io.ktor.server.plugins.NotFoundException
 import org.empowrco.coppin.assignment.backend.AssignmentRepository
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
-import org.empowrco.coppin.utils.LanguageSupportException
 import org.empowrco.coppin.utils.diff.DiffUtil
 
 interface AssignmentPresenter {
@@ -40,9 +39,6 @@ internal class RealAssignmentPresenter(
             } ?: run {
                 throw AssignmentLanguageSupportException(request.language)
             }
-        if (!assignmentCode.language.supportsUnitTests) {
-            throw LanguageSupportException(assignmentCode.language.name)
-        }
         if (assignmentCode.unitTest == null) {
             throw RuntimeException("No unit test created for this assignment")
         }

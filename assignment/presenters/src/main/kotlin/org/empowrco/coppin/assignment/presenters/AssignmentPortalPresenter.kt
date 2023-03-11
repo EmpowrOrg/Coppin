@@ -129,7 +129,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         repo.deleteAssignment(assignmentId)
     }
 
-    override suspend fun getCode(id: String?, assignmentId: String): AssignmentCodeItem {
+    override suspend fun getCode(id: String?, assignmentIdString: String): AssignmentCodeItem {
         val languages = repo.getLanguages().map {
             AssignmentCodeItem.Language(
                 name = it.name,
@@ -138,7 +138,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 mime = it.mime,
             )
         }
-        val assignmentId = UUID.fromString(assignmentId)
+        val assignmentId = UUID.fromString(assignmentIdString)
         val assignment = repo.getAssignment(assignmentId) ?: throw NotFoundException("")
         if (id == null) {
             return AssignmentCodeItem(
