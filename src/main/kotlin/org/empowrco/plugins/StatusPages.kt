@@ -9,6 +9,7 @@ import io.ktor.server.plugins.MissingRequestParameterException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
+import org.empowrco.coppin.utils.DuplicateKeyException
 import org.empowrco.coppin.utils.InvalidUuidException
 import org.empowrco.coppin.utils.LanguageSupportException
 import org.empowrco.coppin.utils.UnauthorizedException
@@ -41,6 +42,9 @@ fun Application.configureStatusPages() {
         exception<MissingRequestParameterException> { call, cause ->
             respond(call, cause, HttpStatusCode.BadRequest)
         }
+        exception<DuplicateKeyException> { call, cause ->
+            respond(call, cause.duplicateKeyError, HttpStatusCode.Conflict)
+        }
         exception<Throwable> { call, cause ->
             respond(call, cause, HttpStatusCode.InternalServerError)
         }
@@ -52,31 +56,16 @@ private suspend fun respond(
     cause: Throwable,
     status: HttpStatusCode,
 ) {
-    call.respond(status, ErrorStatus(cause.cause?.localizedMessage ?: cause.message))
+    respond(call, cause.localizedMessage ?: cause.message, status)
+}
+
+private suspend fun respond(
+    call: ApplicationCall,
+    cause: String?,
+    status: HttpStatusCode,
+) {
+    call.respond(status, ErrorStatus(cause))
 }
 
 @kotlinx.serialization.Serializable
 private data class ErrorStatus(val error: String?)
-
-private fun ExposedSQLException.parseMessage(): String {
-    return when {
-        message == null -> "Unknown error"
-        message!!.contains("duplicate key") -> {
-            parseDuplicateKey(message!!)
-        }
-
-        else -> message!!
-    }
-}
-
-private fun parseDuplicateKey(message: String): String {
-    val keyInfo = message.substringAfter("Detail: Key ")
-    val keyNames = keyInfo.substringAfter("(").substringBefore(")").split(",").map { it.trim() }
-    val valueNames = keyInfo.substringAfterLast("(").substringBeforeLast(")").split(",").map { it.trim() }
-    val messageBuilder = StringBuilder()
-    messageBuilder.appendLine("An object with these values already exists. ")
-    keyNames.forEachIndexed { index, keyName ->
-        messageBuilder.appendLine("$keyName: ${valueNames[index]}")
-    }
-    return messageBuilder.toString()
-}
