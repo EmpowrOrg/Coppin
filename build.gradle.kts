@@ -37,6 +37,20 @@ allprojects {
 
     dependencies {
         implementation(kotlin("stdlib"))
+        implementation(Deps.Kotlin.dateTime)
+        if (name.contains("api")) {
+            implementation(Deps.Ktor.core)
+            implementation(Deps.Koin.main)
+            implementation(project(Deps.Utils.routing))
+        }
+        if (name.contains("presenters")) {
+            implementation(Deps.Koin.main)
+            implementation(project(Deps.Utils.main))
+        }
+        if (name.contains("backend")) {
+            implementation(project(Deps.Sources.main))
+            implementation(Deps.Koin.main)
+        }
         testImplementation(kotlin("test"))
     }
     tasks.test {
