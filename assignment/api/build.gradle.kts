@@ -11,5 +11,4 @@ dependencies {
     implementation(Deps.Ktor.freeMarker)
     implementation(Deps.Kotlin.coroutines)
     implementation(project(Deps.Models.main))
-    implementation(project(Deps.Utils.routing))
 }
