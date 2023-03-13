@@ -21,7 +21,7 @@
             $('#assignments-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
             $('#assignments-table tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
-                window.location = "/assignments/" + data[4]
+                window.location = "/assignments/" + data[3]
             });
         });
     </script>
