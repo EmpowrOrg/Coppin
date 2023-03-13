@@ -1,7 +1,5 @@
 package org.empowrco.coppin.assignment.presenters
 
-import org.empowrco.coppin.models.portal.CodeListItem
-
 data class GetAssignmentPortalResponse(
     val id: String?,
     val referenceId: String?,
@@ -10,8 +8,17 @@ data class GetAssignmentPortalResponse(
     val failureMessage: String?,
     val attempts: Int?,
     val title: String?,
-    val codes: List<CodeListItem>,
-) {}
+    val codes: List<Code>,
+) {
+    data class Code(
+        val id: String,
+        val assignmentId: String,
+        val language: String,
+        val primary: String,
+        val hasSolution: String,
+        val hasStarter: String,
+    )
+}
 
 data class GetAssignmentsResponse(val assignments: List<AssignmentListItem>) {
     data class AssignmentListItem(val referenceId: String, val id: String, val title: String, val createdAt: String)

@@ -5,7 +5,6 @@ import org.apache.commons.text.StringEscapeUtils
 import org.empowrco.coppin.assignment.backend.AssignmentPortalRepository
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
-import org.empowrco.coppin.models.portal.CodeListItem
 import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.nonEmpty
@@ -18,10 +17,10 @@ interface AssignmentPortalPresenter {
     suspend fun getAssignments(): Result<GetAssignmentsResponse>
     suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse>
     suspend fun updateAssignment(request: UpdateAssignmentPortalRequest): Result<UpdateAssignmentResponse>
-    suspend fun getCode(id: String?, assignmentIdString: String): Result<GetCodeResponse>
+    suspend fun getCode(request: GetCodeRequest): Result<GetCodeResponse>
     suspend fun saveCode(request: UpdateCodePortalRequest): Result<SaveCodeResponse>
     suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse>
-    suspend fun deleteCode(id: String): Result<DeleteCodeResponse>
+    suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse>
 }
 
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
@@ -92,7 +91,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("Assignment not found")
         val codes = assignment.assignmentCodes.map {
-            CodeListItem(
+            GetAssignmentPortalResponse.Code(
                 id = it.id.toString(),
                 language = it.language.name,
                 primary = if (it.primary) "True" else "",
@@ -113,9 +112,9 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         ).toResult()
     }
 
-    override suspend fun getCode(id: String?, assignmentIdString: String): Result<GetCodeResponse> {
+    override suspend fun getCode(request: GetCodeRequest): Result<GetCodeResponse> {
 
-        val assignmentId = assignmentIdString.toUuid() ?: return failure("Invalid assignment id")
+        val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         val existingLanguageIds = repo.getAssignmentCodes(assignmentId).map { it.language.id }
         val selectableLanguages = repo.getLanguages().mapNotNull {
@@ -129,7 +128,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 mime = it.mime,
             )
         }
-        if (id == null) {
+        if (request.id == null) {
             return GetCodeResponse(
                 id = "",
                 starterCode = "",
@@ -142,7 +141,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
 
                 ).toResult()
         }
-        val assignmentCodeId = id.toUuid() ?: return failure("Invalid id")
+        val assignmentCodeId = request.id.toUuid() ?: return failure("Invalid id")
         val code = repo.getCode(assignmentCodeId) ?: return failure("Code not found")
         return GetCodeResponse(
             id = code.id.toString(),
@@ -207,8 +206,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         return SaveCodeResponse.toResult()
     }
 
-    override suspend fun deleteCode(id: String): Result<DeleteCodeResponse> {
-        val uuid = id.toUuid() ?: return failure("Invalid code id")
+    override suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse> {
+        val uuid = request.id.toUuid() ?: return failure("Invalid code id")
         val code = repo.getCode(uuid) ?: return failure("Code not found")
         repo.deleteCode(uuid)
         if (code.primary) {

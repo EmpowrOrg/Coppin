@@ -17,6 +17,11 @@ data class GetAssignmentRequest(
     val id: String?,
 )
 
+data class GetCodeRequest(
+    val id: String?,
+    val assignmentId: String,
+)
+
 @Serializable
 data class UpdateAssignmentPortalRequest(
     val id: String?,
@@ -39,10 +44,4 @@ data class UpdateCodePortalRequest(
     val unitTest: String?,
 )
 
-data class SaveFeedbackRequest(
-    val feedback: String,
-    val attempt: Int,
-    val regex: String,
-    val id: String?,
-    val assignmentId: String,
-)
+data class DeleteCodeRequest(val id: String)
