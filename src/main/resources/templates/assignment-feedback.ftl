@@ -52,7 +52,7 @@
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3" style="display:inline-block;">Feedback</h6>
                     <a class="btn btn-lg bg-gradient-dark btn-lg mb-0"
-                       href="/assignments/${content.assignment.id}/feedback"
+                       href="/assignments/${content.id}/feedback"
                        style="display:inline-block;margin-left: 20px">Create
                     </a>
                 </div>

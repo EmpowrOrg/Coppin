@@ -95,18 +95,20 @@
                     <form role="form" id="create-assignment-code"
                           action="/assignments/${content.assignmentId}/codes/${content.id}"
                           method="post">
-                        <div class="row col-lg-12 align-items-center">
-                            <div class="col">
-                                <div class="form-check form-check-inline">
-                                    <label class="d-inline-block me-2" for="language">Language</label>
-                                    <select class="d-inline-block form-select" id="language" name="language"
-                                            style="width: auto; min-width: 200px" form="create-assignment-code">
-                                        <#list content.languages as language>
-                                            <option value="${language.mime}">${language.name}</option>
-                                        </#list>
-                                    </select>
+                        <div class="row col-lg-12 align-items-center mb-3">
+                            <#if content.languages?has_content>
+                                <div class="col">
+                                    <div class="form-check form-check-inline">
+                                        <label class="d-inline-block me-2" for="language">Language</label>
+                                        <select class="d-inline-block form-select" id="language" name="language"
+                                                style="width: auto; min-width: 200px" form="create-assignment-code">
+                                            <#list content.languages as language>
+                                                <option value="${language.mime}">${language.name}</option>
+                                            </#list>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                            </#if>
                             <div class="col-2">
                                 <div class="align-items-center ">
                                     <div class="d-inline-block form-check-label">Primary Language</div>
@@ -118,38 +120,39 @@
 
                                 </div>
                             </div>
-                            <label for="starter-code">Starter Code.</label>
-                            <div class="input-group input-group-outline mb-3">
+                        </div>
+                        <label for="starter-code">Starter Code.</label>
+                        <div class="input-group input-group-outline mb-3">
                                         <textarea id="starter-code"
                                                   name="starter-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                            </div>
-                            <label for="solution-code">Solution Code.</label>
-                            <div class="input-group input-group-outline mb-3">
+                        </div>
+                        <label for="solution-code">Solution Code.</label>
+                        <div class="input-group input-group-outline mb-3">
                                         <textarea id="solution-code"
                                                   name="solution-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                            </div>
-                            <label for="unit-test-code">Unit Tests (Include Test Class)</label>
-                            <div class="input-group input-group-outline mb-3">
+                        </div>
+                        <label for="unit-test-code">Unit Tests (Include Test Class)</label>
+                        <div class="input-group input-group-outline mb-3">
                                         <textarea id="unit-test-code"
                                                   name="unit-test-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                            </div>
-                            <div class="col-sm input-group input-group-outline mb-3">
-                                <input type="submit"
-                                       class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
-                                       value="Save">
-                            </div>
+                        </div>
+                        <div class="col-sm input-group input-group-outline mb-3">
+                            <input type="submit"
+                                   class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
+                                   value="Save">
+                        </div>
                     </form>
                     <#if content.id??>
                         <div class="mt-3 d-flex justify-content-center">
@@ -196,35 +199,16 @@
                 method: "DELETE",
                 headers: {'Content-Type': 'application/json'},
             }).then(async response => {
-                const body = response.body
-                const bodyString = await getTextFromStream(body)
-                try {
-                    return JSON.parse(bodyString)
-                } catch (e) {
-                    let errorMessage = 'Status: ' + response.status
-                    if (bodyString) {
-                        errorMessage = errorMessage + ', Body: ' + bodyString
-                    }
-                    throw new Error(errorMessage)
-                }
+                return await parseResponse(response);
             }).then(async res => {
                 if (res.error) {
                     throw new Error(res.error)
                 } else {
-                    await new BsDialogs().ok('Assignment Deleted', 'Assignment was successfully deleted');
-                    window.location.replace("/assignments")
+                    await new BsDialogs().ok('Code Deleted', 'Code was successfully deleted');
+                    window.location.replace("/assignments/${content.assignmentId}")
                 }
             }).catch(async error => {
-                console.log(error.message.toString())
-                let message;
-                if (error.error) {
-                    message = error.error
-                } else if (error.message) {
-                    message = error.message
-                } else {
-                    message = error.toString()
-                }
-                await new BsDialogs().ok('Error', message);
+                await showError(error);
             });
         });
     </script>

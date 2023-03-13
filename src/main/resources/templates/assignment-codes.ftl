@@ -50,7 +50,7 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3" style="display:inline-block;">Assignment Codes</h6>
-                    <a href="/assignments/${content.assignment.id}/codes/"
+                    <a href="/assignments/${content.id}/codes/"
                        class="btn btn-lg bg-gradient-dark btn-lg mb-0">Create</a>
                 </div>
             </div>

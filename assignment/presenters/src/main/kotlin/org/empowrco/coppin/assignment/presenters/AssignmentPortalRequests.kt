@@ -13,9 +13,13 @@ data class CreateAssignmentPortalRequest(
     val gradingType: String,
 )
 
+data class GetAssignmentRequest(
+    val id: String?,
+)
+
 @Serializable
 data class UpdateAssignmentPortalRequest(
-    val id: String,
+    val id: String?,
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,

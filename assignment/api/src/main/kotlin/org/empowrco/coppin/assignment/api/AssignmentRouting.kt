@@ -5,12 +5,14 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.presenters.AssignmentPortalPresenter
 import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
+import org.empowrco.coppin.assignment.presenters.GetAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.SaveFeedbackRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
@@ -34,9 +36,6 @@ fun Application.assignmentRouting() {
 
                 }
                 route("create") {
-                    get {
-                        call.respondFreemarker("assignment-edit.ftl")
-                    }
                     post {
                         val formParameters = call.receiveParameters()
                         val failureMessage = formParameters["failure-message"].toString()
@@ -63,9 +62,13 @@ fun Application.assignmentRouting() {
                         })
                     }
                 }
-                route("{uuid}") {
+                route("{uuid?}") {
                     get {
-                        presenter.getAssignment(call.parameters["uuid"]!!).fold({
+                        presenter.getAssignment(
+                            GetAssignmentRequest(
+                                id = call.parameters["uuid"]
+                            )
+                        ).fold({
                             call.respondFreemarker("assignment.ftl", it)
                         }, {
                             call.errorRedirect(it, "/assignments")
@@ -81,7 +84,7 @@ fun Application.assignmentRouting() {
                         val gradingType = formParameters["grading-type"].toString()
                         presenter.updateAssignment(
                             UpdateAssignmentPortalRequest(
-                                id = call.parameters["uuid"]!!,
+                                id = call.parameters["uuid"],
                                 failureMessage = failureMessage,
                                 successMessage = successMessage,
                                 instructions = instructions,
@@ -175,7 +178,7 @@ fun Application.assignmentRouting() {
                                 call.errorRedirect(it)
                             })
                         }
-                        post("delete") {
+                        delete {
                             val uuid = call.parameters["uuid"].toString()
                             val codeId = call.parameters["codeId"].toString()
                             presenter.deleteCode(codeId).fold({

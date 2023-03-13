@@ -17,24 +17,32 @@
                 autoCloseBrackets: true,
             }
             const instructionsConfig = baseCodeMirrorConfig
-            instructionsConfig.value = "${content.assignment.instructions}"
+            <#if content.instructions??>
+            instructionsConfig.value = "${content.instructions}"
+            </#if>
             const instructionsTextArea = document.getElementById("instructions");
             const instructionsCodeMirror = CodeMirror(function (elt) {
                 instructionsTextArea.parentNode.replaceChild(elt, instructionsTextArea);
             }, instructionsConfig);
+            instructionsCodeMirror.setSize('100%');
             const successConfig = baseCodeMirrorConfig
-            successConfig.value = "${content.assignment.successMessage}"
+            <#if content.successMessage??>
+            successConfig.value = "${content.successMessage}"
+            </#if>
             const successMessageTextArea = document.getElementById("success-message");
             const successMessageCodeMirror = CodeMirror(function (elt) {
                 successMessageTextArea.parentNode.replaceChild(elt, successMessageTextArea);
             }, successConfig);
+            successMessageCodeMirror.setSize('100%');
             const failureConfig = baseCodeMirrorConfig
-            failureConfig.value = "${content.assignment.failureMessage}"
+            <#if content.failureMessage??>
+            failureConfig.value = "${content.failureMessage}"
+            </#if>
             const failureMessageTextArea = document.getElementById("failure-message");
             const failureMessageCodeMirror = CodeMirror(function (elt) {
                 failureMessageTextArea.parentNode.replaceChild(elt, failureMessageTextArea);
             }, failureConfig);
-            instructionsCodeMirror.setSize('100%');
+            failureMessageCodeMirror.setSize('100%');
             $("#edit-assignment").submit(function (eventObj) {
                 eventObj.preventDefault()
                 console.log('intercept')
@@ -57,7 +65,9 @@
             });
         });
     </script>
-    <form id="delete-form" action="/assignments/${content.assignment.id}/delete" method="post" hidden>
+<#if content.id??>
+    <form id="delete-form" action="/assignments/${content.id}/delete" method="post" hidden>
+        </#if>
     </form>
     <div class="row pb-4">
         <div class="page-header min-height-300 border-radius-xl mt-4"
@@ -65,7 +75,9 @@
             <span class="mask  bg-gradient-primary  opacity-6"></span>
         </div>
         <div class="card card-body mx-3 mx-md-4 mt-n6 pb-2">
-            <form role="form" id="edit-assignment" action="/assignments/${content.assignment.id}" method="post">
+            <form role="form" id="edit-assignment"
+                  action="/assignments/<#if content.id??>${content.id}<#else >create</#if>"
+                  method="post">
                 <div class="mt-3 d-flex justify-content-center">
                     <#include "error.ftl">
                 </div>
@@ -74,14 +86,14 @@
                         <div class="input-group input-group-outline my-3">
                             <label for="title" class="form-label">Title</label>
                             <input name="title" id="title" type="text" class="form-control"
-                                   value="${content.assignment.title}">
+                                   value="<#if content.title??>${content.title}</#if>">
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="input-group input-group-outline my-3">
                             <label for="reference-id" class="form-label">Reference Id</label>
                             <input name="reference-id" id="reference-id" type="text" class="form-control"
-                                   value="${content.assignment.referenceId}">
+                                   value="<#if content.referenceId??>${content.referenceId}</#if>">
                         </div>
                     </div>
                 </div>
@@ -90,7 +102,7 @@
                         <div class="input-group input-group-outline my-3">
                             <label for="total-attempts" class="form-label">Total Attempts</label>
                             <input name="total-attempts" id="total-attempts" type="number" class="form-control"
-                                   value="${content.assignment.attempts}">
+                                   value="<#if content.attempts??>${content.attempts}</#if>">
                         </div>
                     </div>
                 </div>
@@ -112,9 +124,7 @@
                         <div class="input-group input-group-outline mb-3">
                         <textarea id="success-message"
                                   name="success-message"
-                                  class="w-100 form-control"
-                                  form="edit-assignment"
-                                  style="resize: none"></textarea>
+                                  form="edit-assignment"></textarea>
                         </div>
                     </div>
                     <div class="row pt-3 w-100">
@@ -123,9 +133,7 @@
                         <div class="input-group input-group-outline mb-3">
                         <textarea id="failure-message"
                                   name="failure-message"
-                                  class="w-100 form-control"
-                                  form="edit-assignment"
-                                  style="resize: none"></textarea>
+                                  form="edit-assignment"></textarea>
                         </div>
                     </div>
                     <div class="col-sm input-group input-group-outline mb-3">
@@ -171,45 +179,30 @@
             </div>
         </div>
     </div>
-    <#include "assignment-codes.ftl">
-    <#include "assignment-feedback.ftl">
-    <script>
-        $('#delete-confirm').on('click', async function () {
-            $('#deleteModal').modal('hide')
-            fetch('/assignments/${content.assignment.id}', {
-                method: "DELETE",
-                headers: {'Content-Type': 'application/json'},
-            }).then(async response => {
-                const body = response.body
-                const bodyString = await getTextFromStream(body)
-                try {
-                    return JSON.parse(bodyString)
-                } catch (e) {
-                    let errorMessage = 'Status: ' + response.status
-                    if (bodyString) {
-                        errorMessage = errorMessage + ', Body: ' + bodyString
+
+    <#if content.id??>
+        <#include "assignment-codes.ftl">
+        <#include "assignment-feedback.ftl">
+        <script>
+            $('#delete-confirm').on('click', async function () {
+                $('#deleteModal').modal('hide')
+                fetch('/assignments/${content.id}', {
+                    method: "DELETE",
+                    headers: {'Content-Type': 'application/json'},
+                }).then(async response => {
+                    return await parseResponse(response)
+                }).then(async res => {
+                    if (res.error) {
+                        throw new Error(res.error)
+                    } else {
+                        await new BsDialogs().ok('Assignment Deleted', 'Assignment was successfully deleted');
+                        window.location.replace("/assignments")
                     }
-                    throw new Error(errorMessage)
-                }
-            }).then(async res => {
-                if (res.error) {
-                    throw new Error(res.error)
-                } else {
-                    await new BsDialogs().ok('Assignment Deleted', 'Assignment was successfully deleted');
-                    window.location.replace("/assignments")
-                }
-            }).catch(async error => {
-                console.log(error.message.toString())
-                let message;
-                if (error.error) {
-                    message = error.error
-                } else if (error.message) {
-                    message = error.message
-                } else {
-                    message = error.toString()
-                }
-                await new BsDialogs().ok('Error', message);
+                }).catch(async error => {
+                    await showError(error)
+                });
             });
-        });
-    </script>
+        </script>
+    </#if>
+
 </@layout.header>

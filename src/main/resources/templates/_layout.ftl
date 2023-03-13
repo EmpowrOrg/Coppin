@@ -87,6 +87,32 @@
             console.log('finishing read')
             return resultStr;
         }
+
+        async function showError(error) {
+            let message;
+            if (error.error) {
+                message = error.error
+            } else if (error.message) {
+                message = error.message
+            } else {
+                message = error.toString()
+            }
+            await new BsDialogs().ok('Error', message);
+        }
+
+        async function parseResponse(response) {
+            const body = response.body
+            const bodyString = await getTextFromStream(body)
+            try {
+                return JSON.parse(bodyString)
+            } catch (e) {
+                let errorMessage = 'Status: ' + response.status
+                if (bodyString) {
+                    errorMessage = errorMessage + ', Body: ' + bodyString
+                }
+                throw new Error(errorMessage)
+            }
+        }
     </script>
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>

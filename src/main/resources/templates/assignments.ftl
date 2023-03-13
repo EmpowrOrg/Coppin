@@ -119,7 +119,7 @@
         </div>
     </div>
     <div class="fixed-plugin">
-        <a href="/assignments/create" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+        <a href="/assignments/" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
             <i class="material-icons py-2">add</i>
         </a>
     </div>
