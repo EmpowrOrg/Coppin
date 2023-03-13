@@ -12,10 +12,10 @@ import java.util.UUID
 
 interface LanguagesPresenter {
     suspend fun getLanguages(): GetLanguagesResponse
-    suspend fun getLanguage(id: String?): LanguageItem?
+    suspend fun getLanguage(request: GetLanguageRequest): LanguageItem?
     suspend fun saveLanguage(request: CreateLanguageRequest)
     suspend fun updateLanguage(request: UpdateLanguageRequest)
-    suspend fun deleteLanguage(id: String)
+    suspend fun deleteLanguage(request: DeleteLanguageRequest)
 }
 
 internal class RealLanguagesPresenter(private val repo: LanguagesRepository): LanguagesPresenter {
@@ -31,9 +31,9 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository): La
         )
     }
 
-    override suspend fun getLanguage(id: String?): LanguageItem? {
-        id ?: return null
-        val uuid = UUID.fromString(id) ?: throw InvalidUuidException("id")
+    override suspend fun getLanguage(request: GetLanguageRequest): LanguageItem? {
+        request.id ?: return null
+        val uuid = UUID.fromString(request.id) ?: throw InvalidUuidException("id")
         return repo.getLanguage(uuid)?.let {
             LanguageItem(
                 id = it.id.toString(),
@@ -70,7 +70,7 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository): La
         repo.updateLanguage(updatedLanguage)
     }
 
-    override suspend fun deleteLanguage(id: String) {
-        repo.deleteLanguage(UUID.fromString(id))
+    override suspend fun deleteLanguage(request: DeleteLanguageRequest) {
+        repo.deleteLanguage(UUID.fromString(request.id))
     }
 }

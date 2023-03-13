@@ -9,10 +9,18 @@ data class CreateLanguageRequest(
     val name: String,
 )
 
+data class GetLanguageRequest(
+    val id: String?,
+)
+
 @Serializable
 data class UpdateLanguageRequest(
     val id: String,
     val url: String,
     val mime: String,
     val name: String,
+)
+
+data class DeleteLanguageRequest(
+    val id: String,
 )
