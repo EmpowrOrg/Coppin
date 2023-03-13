@@ -182,6 +182,7 @@
 
     <#if content.id??>
         <#include "assignment-codes.ftl">
+        <div class="pb-6"/>
         <script>
             $('#delete-confirm').on('click', async function () {
                 $('#deleteModal').modal('hide')
@@ -202,6 +203,11 @@
                 });
             });
         </script>
+        <div class="fixed-plugin">
+            <a href="/assignments/${content.id}/codes/" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+                <i class="material-icons py-2">add</i>
+            </a>
+        </div>
     </#if>
 
 </@layout.header>
