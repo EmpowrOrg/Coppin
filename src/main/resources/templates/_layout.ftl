@@ -112,14 +112,14 @@
 </html>
     <script>
         $(document).ready(function () {
-            const formElements1 = new Array();
+            const formElements = new Array();
             $("form :input").each(function () {
                 const containsFormControl = this.classList.contains("form-control")
                 if (containsFormControl) {
-                    formElements1.push(this)
+                    formElements.push(this)
                 }
             });
-            for (const element of formElements1) {
+            for (const element of formElements) {
                 if (element.value != null && !element.value.isEmpty) {
                     const event = new Event('focusout');
                     element.dispatchEvent(event)
