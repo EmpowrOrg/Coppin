@@ -13,7 +13,7 @@
                 language: {search: ""},
                 columnDefs: [
                     {
-                        target: 4,
+                        target: 3,
                         visible: false,
                     },
                 ],
@@ -86,12 +86,6 @@
                                     </td>
                                     <td>
                                         <span class="text-secondary text-xs font-weight-bold">${assignment.createdAt}</span>
-                                    </td>
-                                    <td>
-                                        <a href="javascript:;" class="text-secondary font-weight-bold text-xs"
-                                           data-toggle="tooltip" data-original-title="Edit">
-                                            Edit
-                                        </a>
                                     </td>
                                     <td >${assignment.id}</td>
                                 </tr>
