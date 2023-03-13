@@ -78,15 +78,6 @@
                 starterCodeCodeMirror.setOption("mode", $(this).val());
                 unitTestCodeMirror.setOption("mode", $(this).val());
             });
-            document.getElementById("delete-code-button").onclick = function () {
-                var result = confirm("Are you sure you want to delete this assignment code?");
-
-                if (result) {
-                    $("#delete-code-form").submit();
-                } else {
-                    // Do nothing; they cancelled
-                }
-            };
         });
     </script>
     <form id="delete-code-form" action="/assignments/${content.assignmentId}/codes/${content.id}/delete"
@@ -99,65 +90,142 @@
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                         <h6 class="text-white text-capitalize ps-3">Create Assignment Code</h6>
                     </div>
-                    <div class="col-sm align-content-end">
-                        <button type="button" id="delete-code-button" class="btn bg-gradient-primary float-end"><i
-                                    class="fa fa-trash"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <form role="form" id="create-assignment-code"
                           action="/assignments/${content.assignmentId}/codes/${content.id}"
                           method="post">
-                        <div class="row">
-                            <div class="col-sm form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="primary"
-                                       name="primary" ${content.primary?string('checked','')}>
-                                <label class="form-check-label" for="primary">Primary</label><br>
-
+                        <div class="row col-lg-12 align-items-center">
+                            <div class="col">
+                                <div class="form-check form-check-inline">
+                                    <label class="d-inline-block me-2" for="language">Language</label>
+                                    <select class="d-inline-block form-select" id="language" name="language"
+                                            style="width: auto; min-width: 200px" form="create-assignment-code">
+                                        <#list content.languages as language>
+                                            <option value="${language.mime}">${language.name}</option>
+                                        </#list>
+                                    </select>
+                                </div>
                             </div>
-                            <select class="form-select" id="language" name="language" form="create-assignment-code">
-                                <#list content.languages as language>
-                                    <option value="${language.mime}">${language.name}</option>
-                                </#list>
-                            </select>
-                        </div>
-                        <label for="starter-code">Starter Code.</label>
-                        <div class="input-group input-group-outline mb-3">
+                            <div class="col-2">
+                                <div class="align-items-center ">
+                                    <div class="d-inline-block form-check-label">Primary Language</div>
+                                    <div class="ms-2 form-check form-switch d-inline-block align-items-center">
+                                        <input class="form-check-input mt-2 d-inline-block" type="checkbox" id="primary"
+                                               name="primary" ${content.primary?string('checked','')}>
+                                        <label class="form-check-label" for="primary"></label>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <label for="starter-code">Starter Code.</label>
+                            <div class="input-group input-group-outline mb-3">
                                         <textarea id="starter-code"
                                                   name="starter-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                        </div>
-                        <label for="solution-code">Solution Code.</label>
-                        <div class="input-group input-group-outline mb-3">
+                            </div>
+                            <label for="solution-code">Solution Code.</label>
+                            <div class="input-group input-group-outline mb-3">
                                         <textarea id="solution-code"
                                                   name="solution-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                        </div>
-                        <label for="unit-test-code">Unit Tests</label>
-                        <p>Please only include the test class.</p>
-                        <div class="input-group input-group-outline mb-3">
+                            </div>
+                            <label for="unit-test-code">Unit Tests (Include Test Class)</label>
+                            <div class="input-group input-group-outline mb-3">
                                         <textarea id="unit-test-code"
                                                   name="unit-test-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                        </div>
-                        <div class="col-sm input-group input-group-outline mb-3">
-                            <input type="submit"
-                                   class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
-                                   value="Save">
-                        </div>
+                            </div>
+                            <div class="col-sm input-group input-group-outline mb-3">
+                                <input type="submit"
+                                       class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
+                                       value="Save">
+                            </div>
                     </form>
+                    <#if content.id??>
+                        <div class="mt-3 d-flex justify-content-center">
+                            <button id="delete-assignment" onclick="$('#deleteModal').modal('show')"
+                                    data-toggle="modal" data-target="#assignModal"
+                                    class="btn btn-lg btn-outline-danger" style="--bs-btn-border-color: transparent;">
+                                Delete
+                            </button>
+                        </div>
+                        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+                             aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Delete Assignment Code</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        By clicking delete, you will permanently delete this assignment code.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close
+                                        </button>
+                                        <button type="submit" class="btn btn-primary"
+                                                id="delete-confirm"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </#if>
+
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        $('#delete-confirm').on('click', async function () {
+            $('#deleteModal').modal('hide')
+            fetch('/assignments/${content.assignmentId}/codes/${content.id}', {
+                method: "DELETE",
+                headers: {'Content-Type': 'application/json'},
+            }).then(async response => {
+                const body = response.body
+                const bodyString = await getTextFromStream(body)
+                try {
+                    return JSON.parse(bodyString)
+                } catch (e) {
+                    let errorMessage = 'Status: ' + response.status
+                    if (bodyString) {
+                        errorMessage = errorMessage + ', Body: ' + bodyString
+                    }
+                    throw new Error(errorMessage)
+                }
+            }).then(async res => {
+                if (res.error) {
+                    throw new Error(res.error)
+                } else {
+                    await new BsDialogs().ok('Assignment Deleted', 'Assignment was successfully deleted');
+                    window.location.replace("/assignments")
+                }
+            }).catch(async error => {
+                console.log(error.message.toString())
+                let message;
+                if (error.error) {
+                    message = error.error
+                } else if (error.message) {
+                    message = error.message
+                } else {
+                    message = error.toString()
+                }
+                await new BsDialogs().ok('Error', message);
+            });
+        });
+    </script>
 </@layout.header>

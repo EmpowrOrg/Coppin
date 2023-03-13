@@ -145,7 +145,7 @@ fun Application.assignmentRouting() {
                             val codeId = call.parameters["codeId"]
                             val uuid = call.parameters["uuid"].toString()
                             presenter.getCode(codeId, uuid).fold({
-                                call.respondFreemarker("assignment-code-edit.ftl", it)
+                                call.respondFreemarker("assignment-code.ftl", it)
                             }, {
                                 call.errorRedirect(it)
                             })

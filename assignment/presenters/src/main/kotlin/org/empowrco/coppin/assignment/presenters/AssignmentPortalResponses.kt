@@ -25,7 +25,7 @@ data class FeedbackResponse(
 )
 
 data class GetCodeResponse(
-    val id: String,
+    val id: String?,
     val starterCode: String,
     val solutionCode: String,
     val assignmentId: String,
