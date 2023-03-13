@@ -6,4 +6,5 @@ import org.koin.dsl.module
 
 val languagesPresentersModule = module {
     singleOf(::RealLanguagesPresenter) { bind<LanguagesPresenter>() }
+    singleOf(::RealLanguagesApiPresenter) { bind<LanguagesApiPresenter>() }
 }

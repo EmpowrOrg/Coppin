@@ -9,7 +9,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import org.empowrco.coppin.languages.presenters.DeleteLanguageRequest
 import org.empowrco.coppin.languages.presenters.GetLanguageRequest
 import org.empowrco.coppin.languages.presenters.LanguagesPresenter
 import org.empowrco.coppin.languages.presenters.UpsertLanguageRequest
@@ -24,24 +23,24 @@ fun Application.languagesRouting() {
             route("languages") {
                 get {
                     presenter.getLanguages().fold({
-                        call.respondFreemarker("languages.ftl", mapOf("languages" to it.languages))
+                        call.respondFreemarker("languages.ftl", it)
                     }, {
                         call.errorRedirect(it)
                     })
                 }
 
-                route("{uuid}") {
+                route("{uuid?}") {
                     get {
-                        val uuid = call.parameters["uuid"].toString()
+                        val uuid = call.parameters["uuid"]
                         presenter.getLanguage(GetLanguageRequest(uuid)).fold({
-                            call.respondFreemarker("language-edit.ftl", mapOf("language" to it))
+                            call.respondFreemarker("language.ftl", it)
                         }, {
                             call.errorRedirect(it)
                         })
                     }
 
                     post {
-                        val uuid = call.parameters["uuid"].toString()
+                        val uuid = call.parameters["uuid"]
                         val formParameters = call.receiveParameters()
                         val name = formParameters["name"].toString()
                         val mime = formParameters["mime"].toString()
@@ -55,14 +54,6 @@ fun Application.languagesRouting() {
                             )
                         )
                         call.respondRedirect("/languages")
-                    }
-                    post("delete") {
-                        val uuid = call.parameters["uuid"].toString()
-                        presenter.deleteLanguage(DeleteLanguageRequest(uuid)).fold({
-                            call.respondRedirect("languages")
-                        }, {
-                            call.errorRedirect(it)
-                        })
                     }
                 }
             }

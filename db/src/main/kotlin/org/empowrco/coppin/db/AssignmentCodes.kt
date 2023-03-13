@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
 
 object AssignmentCodes : BaseTable() {
     val assignment = reference("assignment", Assignments.id, onDelete = ReferenceOption.CASCADE)
-    val language = reference("language", Languages.id, onDelete = ReferenceOption.CASCADE)
+    val language = reference("language", Languages.id)
     val starterCode = text("starter_code")
     val solutionCode = text("solution_code")
     val unitTest = text("unit_test")

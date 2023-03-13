@@ -12,6 +12,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.api.assignmentApi
 import org.empowrco.coppin.assignment.api.assignmentRouting
+import org.empowrco.coppin.languages.api.languagesApi
 import org.empowrco.coppin.languages.api.languagesRouting
 import org.empowrco.coppin.users.api.usersRouting
 
@@ -19,6 +20,7 @@ fun Application.configureRouting() {
     assignmentApi()
     assignmentRouting()
     usersRouting()
+    languagesApi()
     languagesRouting()
     routing {
         authenticate("auth-session") {

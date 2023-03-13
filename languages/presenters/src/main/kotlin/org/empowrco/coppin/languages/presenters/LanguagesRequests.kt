@@ -4,7 +4,6 @@ data class GetLanguageRequest(
     val id: String?,
 )
 
-
 data class UpsertLanguageRequest(
     val id: String?,
     val url: String,

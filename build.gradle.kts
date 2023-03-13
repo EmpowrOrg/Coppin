@@ -65,6 +65,7 @@ dependencies {
     implementation(project(Deps.Assignment.api))
     implementation(project(Deps.Languages.main))
     implementation(project(Deps.Languages.api))
+    implementation(project(Deps.Languages.presenters))
     implementation(project(Deps.Sources.main))
     implementation(project(Deps.Command.main))
     implementation(project(Deps.Db.main))

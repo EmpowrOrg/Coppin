@@ -13,7 +13,7 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
-<#-- @ftlvariable name="languages" type="kotlin.collections.List<org.empowrco.coppin.models.portal.LanguageListItem>" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.languages.presenters.GetLanguagesResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <!-- Data Tables -->
@@ -84,7 +84,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <#list languages as language>
+                            <#list content.languages as language>
                                 <tr>
                                     <td>
                                         <div class="d-flex px-2 py-1">
@@ -107,7 +107,7 @@
         </div>
     </div>
     <div class="fixed-plugin">
-        <a href="/languages/create" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+        <a href="/languages/" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
             <i class="material-icons py-2">add</i>
         </a>
     </div>

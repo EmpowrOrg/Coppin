@@ -20,6 +20,7 @@ interface AssignmentCodesSource {
     suspend fun update(assignmentCode: AssignmentCode): Boolean
     suspend fun deleteByAssignment(assignmentId: UUID): Boolean
     suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
+    suspend fun getCodeCountForLanguage(id: UUID): Long
 }
 
 internal class RealAssignmentCodesSource(private val languagesSource: LanguagesSource) : AssignmentCodesSource {
@@ -42,6 +43,10 @@ internal class RealAssignmentCodesSource(private val languagesSource: LanguagesS
             val language = languagesSource.getLanguage(languageId)!!
             it.toStarterCode(language)
         }.firstOrNull()
+    }
+
+    override suspend fun getCodeCountForLanguage(id: UUID): Long = dbQuery {
+        AssignmentCodes.select { AssignmentCodes.language eq id }.count()
     }
 
     override suspend fun delete(id: UUID): Boolean = dbQuery {
