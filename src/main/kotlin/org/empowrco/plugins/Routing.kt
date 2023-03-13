@@ -13,7 +13,7 @@ import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.api.assignmentApi
 import org.empowrco.coppin.assignment.api.assignmentRouting
 import org.empowrco.coppin.languages.api.languagesRouting
-import org.empowrco.copping.users.api.usersRouting
+import org.empowrco.coppin.users.api.usersRouting
 
 fun Application.configureRouting() {
     assignmentApi()
