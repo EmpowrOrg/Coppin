@@ -47,13 +47,13 @@
                                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Name
                                             </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Email
                                             </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Authorized
                                             </th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Type
                                             </th>
                                         </tr>
@@ -61,16 +61,16 @@
                                         <tbody>
                                         <#list content.users as user>
                                             <tr>
-                                                <td class="text-center text-sm">
+                                                <td class="text-sm">
                                                     <span class="text-xs font-weight-bold">${user.name}</span>
                                                 </td>
-                                                <td class="text-center text-sm">
+                                                <td class="text-sm">
                                                     <span class="text-xs font-weight-bold">${user.email}</span>
                                                 </td>
-                                                <td class="text-center text-sm">
+                                                <td class="text-sm">
                                                     <span class="text-xs font-weight-bold">${user.authorized?string("yes","no")}</span>
                                                 </td>
-                                                <td class="text-center text-sm">
+                                                <td class="text-sm">
                                                     <span class="text-xs font-weight-bold">${user.type}</span>
                                                 </td>
                                                 <td class="align-middle">${user.id}</td>
