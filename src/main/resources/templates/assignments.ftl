@@ -13,7 +13,7 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
-<#-- @ftlvariable name="assignments" type="kotlin.collections.List<org.empowrco.coppin.models.portal.AssignmentListItem>" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentsResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <!-- Data Tables -->
@@ -66,7 +66,6 @@
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                         <h6 class="text-white text-capitalize ps-3">Assignments</h6>
-                        <a href="/assignments/create" class="btn btn-lg bg-gradient-dark btn-lg mb-0">Create</a>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -87,7 +86,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <#list assignments as assignment>
+                            <#list content.assignments as assignment>
                                 <tr>
                                     <td>
                                         <div class="d-flex px-2 py-1">
@@ -118,5 +117,9 @@
             </div>
         </div>
     </div>
+    <div class="fixed-plugin">
+        <a href="/assignments/create" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+            <i class="material-icons py-2">add</i>
+        </a>
+    </div>
 </@layout.header>
-`
