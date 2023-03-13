@@ -38,6 +38,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
         <!-- CSS Files -->
         <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+        <link id="pagestyle" href="/css/coppin.css" rel="stylesheet"/>
         <script src="https://code.jquery.com/jquery-3.6.1.min.js"
                 integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     </head>
@@ -69,6 +70,22 @@
                 damping: '0.5'
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <script>
+        async function getTextFromStream(readableStream) {
+            let reader = readableStream.getReader();
+            let utf8Decoder = new TextDecoder();
+            let nextChunk;
+
+            let resultStr = '';
+            console.log('starting read')
+            while (!(nextChunk = await reader.read()).done) {
+                let partialData = nextChunk.value;
+                resultStr += utf8Decoder.decode(partialData);
+            }
+            console.log('finishing read')
+            return resultStr;
         }
     </script>
     <link rel="stylesheet" type="text/css"
