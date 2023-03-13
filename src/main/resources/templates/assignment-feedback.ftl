@@ -12,8 +12,7 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
-<#-- @ftlvariable name="feedbacks" type="kotlin.collections.List<org.empowrco.coppin.models.portal.FeedbackListItem>" -->
-<#-- @ftlvariable name="assignment" type="org.empowrco.coppin.models.portal.AssignmentItem" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentPortalResponse" -->
 
 <!-- Data Tables -->
 <link rel="stylesheet" type="text/css"
@@ -41,7 +40,7 @@
         });
         $('#assignment-feedback-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
         $('#assignment-feedback-table tbody').on('click', 'tr', function () {
-            var data = table.row(this).data();
+            const data = table.row(this).data();
             window.location = "/assignments/" + data[4] + "/feedback/" + data[3]
         });
     });
@@ -52,8 +51,9 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3" style="display:inline-block;">Feedback</h6>
-                    <a class="btn btn-lg bg-gradient-dark btn-lg mb-0" href="/assignments/${assignment.id}/feedback"
-                            style="display:inline-block;margin-left: 20px">Create
+                    <a class="btn btn-lg bg-gradient-dark btn-lg mb-0"
+                       href="/assignments/${content.assignment.id}/feedback"
+                       style="display:inline-block;margin-left: 20px">Create
                     </a>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <#list feedbacks as feedback>
+                        <#list content.feedback as feedback>
                             <tr>
                                 <td>${feedback.feedback}</td>
                                 <td>${feedback.regex}</td>
