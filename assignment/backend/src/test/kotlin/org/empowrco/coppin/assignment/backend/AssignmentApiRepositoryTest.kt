@@ -10,16 +10,15 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class AssignmentRepositoryTest {
+class AssignmentApiRepositoryTest {
     private val assignmentSource = FakeAssignmentSource()
     private val languagesSource = FakeLanguagesSource()
-    private val repo = RealAssignmentRepository(assignmentSource, languagesSource)
+    private val repo = RealAssignmentApiRepository(assignmentSource, languagesSource)
 
     @Test
     fun getAssignment() = runBlocking {
         val assignment = Assignment(
             id = UUID.randomUUID(),
-            expectedOutput = "e_o",
             feedback = emptyList(),
             lastModifiedAt = LocalDateTime.Companion.now(),
             createdAt = LocalDateTime.Companion.now(),
@@ -28,33 +27,12 @@ class AssignmentRepositoryTest {
             referenceId = "reference",
             totalAttempts = 4,
             instructions = "instructions",
-            solution = "solution",
             assignmentCodes = emptyList(),
             title = "title",
         )
         assignmentSource.assignments.add(assignment)
         val result = repo.getAssignment("reference")
         assertEquals(assignment, result)
-    }
-
-    @Test
-    fun createAssignment() = runBlocking {
-        val assignment = Assignment(
-            id = UUID.randomUUID(),
-            feedback = emptyList(),
-            lastModifiedAt = LocalDateTime.Companion.now(),
-            createdAt = LocalDateTime.Companion.now(),
-            successMessage = "success",
-            failureMessage = "failure",
-            referenceId = "reference",
-            totalAttempts = 4,
-            instructions = "instructions",
-            solution = "solution",
-            assignmentCodes = emptyList(),
-            title = "title",
-        )
-        assignmentSource.assignments.add(assignment)
-        repo.createAssignment(assignment)
     }
 
 }
