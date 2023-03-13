@@ -13,13 +13,13 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
-<#-- @ftlvariable name="code" type="org.empowrco.coppin.models.portal.AssignmentCodeItem" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetCodeResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.js"
             crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.css" rel="stylesheet">
-    <#list code.languages as language>
+    <#list content.languages as language>
         <script src="${language.url}" crossorigin="anonymous"></script>
     </#list>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
@@ -27,9 +27,9 @@
     <script>
         $(document).ready(function () {
             const codemirror_config = {
-                value: "${code.starterCode}",
+                value: "${content.starterCode}",
                 lineNumbers: true,
-                mode: "${code.language.mime}",
+                mode: "${content.language.mime}",
                 lineWrapping: true,
                 indentWithTabs: true,
                 lineWiseCopyCut: true,
@@ -41,14 +41,14 @@
             }, codemirror_config);
             starterCodeCodeMirror.setSize('100%');
             const solution_config = codemirror_config
-            solution_config.value = "${code.solutionCode}"
+            solution_config.value = "${content.solutionCode}"
             const solutionCodeTextArea = document.getElementById("solution-code");
             const solutionCodeCodeMirror = CodeMirror(function (elt) {
                 solutionCodeTextArea.parentNode.replaceChild(elt, solutionCodeTextArea);
             }, solution_config);
             solutionCodeCodeMirror.setSize('100%');
             const unit_test_config = codemirror_config
-            unit_test_config.value = "${code.unitTest}"
+            unit_test_config.value = "${content.unitTest}"
             const unitTestTextArea = document.getElementById("unit-test-code");
             const unitTestCodeMirror = CodeMirror(function (elt) {
                 unitTestTextArea.parentNode.replaceChild(elt, unitTestTextArea);
@@ -89,7 +89,7 @@
             };
         });
     </script>
-    <form id="delete-code-form" action="/assignments/${code.assignmentId}/codes/${code.id}/delete"
+    <form id="delete-code-form" action="/assignments/${content.assignmentId}/codes/${content.id}/delete"
           method="post" hidden>
     </form>
     <div class="row" xmlns="http://www.w3.org/1999/html">
@@ -107,17 +107,17 @@
                 </div>
                 <div class="card-body">
                     <form role="form" id="create-assignment-code"
-                          action="/assignments/${code.assignmentId}/codes/${code.id}"
+                          action="/assignments/${content.assignmentId}/codes/${content.id}"
                           method="post">
                         <div class="row">
                             <div class="col-sm form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="primary"
-                                       name="primary" ${code.primary?string('checked','')}>
+                                       name="primary" ${content.primary?string('checked','')}>
                                 <label class="form-check-label" for="primary">Primary</label><br>
 
                             </div>
                             <select class="form-select" id="language" name="language" form="create-assignment-code">
-                                <#list code.languages as language>
+                                <#list content.languages as language>
                                     <option value="${language.mime}">${language.name}</option>
                                 </#list>
                             </select>

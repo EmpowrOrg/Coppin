@@ -47,10 +47,10 @@ internal class RealAssignmentApiPresenter(
             } ?: run {
                 throw AssignmentLanguageSupportException(request.language)
             }
-        if (assignmentCode.unitTest == null) {
+        if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
-        val codeResponse = repo.testCode(request.language, request.code, assignmentCode.unitTest!!)
+        val codeResponse = repo.testCode(request.language, request.code, assignmentCode.unitTest)
 
         return if (!codeResponse.success) {
             val error = codeResponse.output

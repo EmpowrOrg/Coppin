@@ -24,24 +24,22 @@ data class FeedbackResponse(
     val assignmentId: String,
 )
 
-data class GetCodeResponse(val code: AssignmentCodeItem) {
-    data class AssignmentCodeItem(
+data class GetCodeResponse(
+    val id: String,
+    val starterCode: String,
+    val solutionCode: String,
+    val assignmentId: String,
+    val unitTest: String,
+    val primary: Boolean,
+    val language: Language,
+    val languages: List<Language>,
+) {
+    data class Language(
+        val name: String,
         val id: String,
-        val starterCode: String,
-        val solutionCode: String,
-        val assignmentId: String,
-        val unitTest: String,
-        val primary: Boolean,
-        val language: Language,
-        val languages: List<Language>,
-    ) {
-        data class Language(
-            val name: String,
-            val id: String,
-            val url: String,
-            val mime: String,
-        )
-    }
+        val url: String,
+        val mime: String,
+    )
 }
 
 data class CreateAssignmentResponse(val id: String)

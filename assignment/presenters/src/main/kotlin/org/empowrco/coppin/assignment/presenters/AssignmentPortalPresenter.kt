@@ -11,6 +11,7 @@ import org.empowrco.coppin.models.portal.CodeListItem
 import org.empowrco.coppin.models.portal.FeedbackListItem
 import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.nonEmpty
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
@@ -122,7 +123,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
 
     override suspend fun getCode(id: String?, assignmentIdString: String): Result<GetCodeResponse> {
         val languages = repo.getLanguages().map {
-            GetCodeResponse.AssignmentCodeItem.Language(
+            GetCodeResponse.Language(
                 name = it.name,
                 id = it.id.toString(),
                 url = it.url,
@@ -133,36 +134,33 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         if (id == null) {
             return GetCodeResponse(
-                code = GetCodeResponse.AssignmentCodeItem(
-                    id = "",
-                    starterCode = "",
-                    solutionCode = "",
-                    assignmentId = assignment.id.toString(),
-                    unitTest = "",
-                    language = languages.first(),
-                    primary = false,
-                    languages = languages,
-                )
-            ).toResult()
+                id = "",
+                starterCode = "",
+                solutionCode = "",
+                assignmentId = assignment.id.toString(),
+                unitTest = "",
+                language = languages.first(),
+                primary = false,
+                languages = languages,
+
+                ).toResult()
         }
         val assignmentCodeId = id.toUuid() ?: return failure("Invalid id")
         val code = repo.getCode(assignmentCodeId) ?: return failure("Code not found")
         return GetCodeResponse(
-            code = GetCodeResponse.AssignmentCodeItem(
-                id = code.id.toString(),
-                primary = code.primary,
-                starterCode = StringEscapeUtils.escapeJava(code.starterCode),
-                solutionCode = StringEscapeUtils.escapeJava(code.solutionCode),
-                assignmentId = code.assignmentId.toString(),
-                unitTest = StringEscapeUtils.escapeJava(code.unitTest),
-                language = GetCodeResponse.AssignmentCodeItem.Language(
-                    name = code.language.name,
-                    id = code.language.id.toString(),
-                    mime = code.language.mime,
-                    url = code.language.url,
-                ),
-                languages = languages,
-            )
+            id = code.id.toString(),
+            primary = code.primary,
+            starterCode = StringEscapeUtils.escapeJava(code.starterCode),
+            solutionCode = StringEscapeUtils.escapeJava(code.solutionCode),
+            assignmentId = code.assignmentId.toString(),
+            unitTest = StringEscapeUtils.escapeJava(code.unitTest),
+            language = GetCodeResponse.Language(
+                name = code.language.name,
+                id = code.language.id.toString(),
+                mime = code.language.mime,
+                url = code.language.url,
+            ),
+            languages = languages,
         ).toResult()
     }
 
@@ -190,7 +188,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         var primary = request.primary == "on"
         // new assignment code
         val assignmentId = request.assignmentId.toUuid() ?: return failure("No assignment found for this id")
-        if (request.id == null) {
+        val codeIdString = request.id?.nonEmpty()
+        if (codeIdString == null) {
             val codes = repo.getAssignmentCodes(assignmentId)
             if (codes.isEmpty()) {
                 primary = true
@@ -202,7 +201,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 assignmentId = UUID.fromString(request.assignmentId),
                 starterCode = request.starterCode ?: "",
                 solutionCode = request.solutionCode ?: "",
-                unitTest = request.unitTest,
+                unitTest = request.unitTest ?: "",
                 createdAt = currentTime,
                 lastModifiedAt = currentTime,
             )
@@ -211,14 +210,14 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             if (primary) {
                 repo.deprimaryAssignmentCodes(assignmentId)
             }
-            val assignmentCodeId = request.id.toUuid() ?: return failure("Invalid id")
+            val assignmentCodeId = codeIdString.toUuid() ?: return failure("Invalid id")
             val code = repo.getCode(assignmentCodeId) ?: return failure("Code not found")
             val updatedCode = code.copy(
                 starterCode = request.starterCode ?: "",
                 solutionCode = request.solutionCode ?: "",
                 language = language,
                 primary = primary,
-                unitTest = request.unitTest,
+                unitTest = request.unitTest ?: "",
                 lastModifiedAt = currentTime,
             )
             val result = repo.updateCode(updatedCode)

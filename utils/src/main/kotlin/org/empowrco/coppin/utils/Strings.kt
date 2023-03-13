@@ -20,6 +20,14 @@ fun String.capitalize(): String {
     }
 }
 
+fun String?.nonEmpty(): String? {
+    return if (isNullOrBlank()) {
+        null
+    } else {
+        this
+    }
+}
+
 
 fun String.toUuid(): UUID? {
     return try {

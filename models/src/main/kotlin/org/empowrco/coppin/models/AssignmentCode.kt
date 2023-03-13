@@ -7,7 +7,7 @@ data class AssignmentCode(
     val id: UUID,
     val starterCode: String,
     val solutionCode: String,
-    val unitTest: String?,
+    val unitTest: String,
     val language: Language,
     val assignmentId: UUID,
     val primary: Boolean,
