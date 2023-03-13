@@ -30,13 +30,17 @@
                 {
                     target: 4,
                     visible: false,
+                },
+                {
+                    target: 5,
+                    visible: false,
                 }
             ],
         });
         $('#assignment-codes-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
         $('#assignment-codes-table tbody').on('click', 'tr', function () {
             const data = table.row(this).data();
-            window.location = "/assignments/" + data[6] + "/codes/" + data[5]
+            window.location = "/assignments/" + data[5] + "/codes/" + data[4]
         });
     });
 </script>
