@@ -61,6 +61,7 @@ allprojects {
 
 dependencies {
     implementation(project(Deps.Assignment.main))
+    implementation(project(Deps.Assignment.presenters))
     implementation(project(Deps.Assignment.api))
     implementation(project(Deps.Languages.main))
     implementation(project(Deps.Languages.api))
