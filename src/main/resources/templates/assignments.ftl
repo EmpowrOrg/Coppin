@@ -68,6 +68,7 @@
                         <h6 class="text-white text-capitalize ps-3">Assignments</h6>
                     </div>
                 </div>
+                <#include "error.ftl"/>
                 <div class="card-body px-0 pb-2">
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0" id="assignments-table">
