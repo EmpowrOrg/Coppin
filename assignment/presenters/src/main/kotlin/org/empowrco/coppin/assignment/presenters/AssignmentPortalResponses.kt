@@ -10,3 +10,45 @@ data class GetAssignmentPortalResponse(
     val feedback: List<FeedbackListItem>,
 )
 
+data class GetAssignmentsResponse(val assignments: List<AssignmentListItem>) {
+    data class AssignmentListItem(val referenceId: String, val id: String, val title: String, val createdAt: String)
+}
+
+object UpdateAssignmentResponse
+
+data class FeedbackResponse(
+    val feedback: String,
+    val id: String,
+    val attempt: Int,
+    val regex: String,
+    val assignmentId: String,
+)
+
+data class GetCodeResponse(val code: AssignmentCodeItem) {
+    data class AssignmentCodeItem(
+        val id: String,
+        val starterCode: String,
+        val solutionCode: String,
+        val assignmentId: String,
+        val unitTest: String,
+        val primary: Boolean,
+        val language: Language,
+        val languages: List<Language>,
+    ) {
+        data class Language(
+            val name: String,
+            val id: String,
+            val url: String,
+            val mime: String,
+        )
+    }
+}
+
+data class CreateAssignmentResponse(val id: String)
+
+object SaveAssignmentResponse
+
+
+object SaveFeedbackResponse
+object DeleteCodeResponse
+object DeleteFeedbackResponse

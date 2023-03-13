@@ -5,6 +5,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val assignmentBackendModule = module {
-    singleOf(::RealAssignmentRepository) { bind<AssignmentRepository>() }
+    singleOf(::RealAssignmentApiRepository) { bind<AssignmentApiRepository>() }
     singleOf(::RealAssignmentPortalRepository) { bind<AssignmentPortalRepository>() }
 }

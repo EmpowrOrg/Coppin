@@ -5,6 +5,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val assignmentPresentersModule = module {
-    singleOf(::RealAssignmentPresenter) { bind<AssignmentPresenter>() }
+    singleOf(::RealAssignmentApiPresenter) { bind<AssignmentApiPresenter>() }
     singleOf(::RealAssignmentPortalPresenter) { bind<AssignmentPortalPresenter>() }
 }

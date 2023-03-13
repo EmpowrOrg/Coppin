@@ -3,9 +3,7 @@ package org.empowrco.coppin.assignment.api
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
-import io.ktor.server.freemarker.FreeMarkerContent
 import io.ktor.server.request.receiveParameters
-import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -16,6 +14,8 @@ import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.SaveFeedbackRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
+import org.empowrco.coppin.utils.routing.errorRedirect
+import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
 
 
@@ -26,12 +26,16 @@ fun Application.assignmentRouting() {
             route("assignments") {
 
                 get {
-                    val assignments = presenter.getAssignments()
-                    call.respond(FreeMarkerContent("assignments.ftl", mapOf("assignments" to assignments)))
+                    presenter.getAssignments().fold({
+                        call.respondFreemarker("assignments.ftl", it)
+                    }, {
+                        call.errorRedirect(it)
+                    })
+
                 }
                 route("create") {
                     get {
-                        call.respond(FreeMarkerContent("assignment-edit.ftl", null))
+                        call.respondFreemarker("assignment-edit.ftl")
                     }
                     post {
                         val formParameters = call.receiveParameters()
@@ -42,7 +46,7 @@ fun Application.assignmentRouting() {
                         val title = formParameters["title"].toString()
                         val totalAttempts = formParameters["total-attempts"].toString().toInt()
                         val gradingType = formParameters["grading-type"].toString()
-                        val id = presenter.createAssignment(
+                        presenter.createAssignment(
                             CreateAssignmentPortalRequest(
                                 referenceId = referenceId,
                                 failureMessage = failureMessage,
@@ -52,22 +56,20 @@ fun Application.assignmentRouting() {
                                 totalAttempts = totalAttempts,
                                 gradingType = gradingType,
                             )
-                        )
-                        call.respondRedirect("/assignments/$id")
+                        ).fold({
+                            call.respondRedirect("/assignments/${it.id}")
+                        }, {
+                            call.errorRedirect(it)
+                        })
                     }
                 }
                 route("{uuid}") {
                     get {
-                        val response = presenter.getAssignment(call.parameters["uuid"]!!)
-                        call.respond(
-                            FreeMarkerContent(
-                                "assignment.ftl", mapOf(
-                                    "assignment" to response.assignment,
-                                    "codes" to response.codes,
-                                    "feedbacks" to response.feedback,
-                                )
-                            )
-                        )
+                        presenter.getAssignment(call.parameters["uuid"]!!).fold({
+                            call.respondFreemarker("assignment.ftl", it)
+                        }, {
+                            call.errorRedirect(it, "/assignments")
+                        })
                     }
                     post {
                         val formParameters = call.receiveParameters()
@@ -87,25 +89,25 @@ fun Application.assignmentRouting() {
                                 totalAttempts = totalAttempts,
                                 gradingType = gradingType
                             )
-                        )
-                        call.respondRedirect("/assignments")
-                    }
-                    post("delete") {
-                        val assignmentId = call.parameters["uuid"].toString()
-                        presenter.deleteAssignment(assignmentId)
-                        call.respondRedirect("/assignments")
+                        ).fold({
+                            call.respondRedirect("/assignments")
+                        }, {
+                            call.errorRedirect(it)
+                        })
+
                     }
                     route("/feedback/{feedbackId?}") {
                         get {
                             val feedbackId = call.parameters["feedbackId"]
                             val uuid = call.parameters["uuid"].toString()
-                            val feedback = presenter.getFeedback(feedbackId, uuid)
-                            call.respond(
-                                FreeMarkerContent(
+                            presenter.getFeedback(feedbackId, uuid).fold({
+                                call.respondFreemarker(
                                     "assignment-feedback-edit.ftl",
-                                    mapOf("feedback" to feedback)
+                                    mapOf("feedback" to it)
                                 )
-                            )
+                            }, {
+                                call.errorRedirect(it)
+                            })
                         }
                         post {
                             val uuid = call.parameters["uuid"].toString()
@@ -122,22 +124,31 @@ fun Application.assignmentRouting() {
                                     regex = regex,
                                     id = feedbackId,
                                 )
-                            )
-                            call.respondRedirect("/assignments/$uuid")
+                            ).fold({
+                                call.respondRedirect("/assignments/$uuid")
+                            }, {
+                                call.errorRedirect(it)
+                            })
                         }
                         post("delete") {
                             val uuid = call.parameters["uuid"].toString()
                             val feedbackId = call.parameters["feedbackId"].toString()
-                            presenter.deleteFeedback(feedbackId)
-                            call.respondRedirect("/assignments/$uuid")
+                            presenter.deleteFeedback(feedbackId).fold({
+                                call.respondRedirect("/assignments/$uuid")
+                            }, {
+                                call.errorRedirect(it)
+                            })
                         }
                     }
                     route("/codes/{codeId?}") {
                         get {
                             val codeId = call.parameters["codeId"]
                             val uuid = call.parameters["uuid"].toString()
-                            val code = presenter.getCode(codeId, uuid)
-                            call.respond(FreeMarkerContent("assignment-code-edit.ftl", mapOf("code" to code)))
+                            presenter.getCode(codeId, uuid).fold({
+                                call.respondFreemarker("assignment-code-edit.ftl", mapOf("code" to it))
+                            }, {
+                                call.errorRedirect(it)
+                            })
                         }
                         post {
                             val uuid = call.parameters["uuid"].toString()
@@ -158,14 +169,21 @@ fun Application.assignmentRouting() {
                                     id = codeId,
                                     assignmentId = uuid,
                                 )
-                            )
-                            call.respondRedirect("/assignments/$uuid")
+                            ).fold({
+                                call.respondRedirect("/assignments/$uuid")
+                            }, {
+                                call.errorRedirect(it)
+                            })
                         }
                         post("delete") {
                             val uuid = call.parameters["uuid"].toString()
                             val codeId = call.parameters["codeId"].toString()
-                            presenter.deleteCode(codeId)
-                            call.respondRedirect("/assignments/$uuid")
+                            presenter.deleteCode(codeId).fold({
+                                call.respondRedirect("/assignments/$uuid")
+                            }, {
+                                call.errorRedirect(it)
+                            })
+
                         }
                     }
                 }

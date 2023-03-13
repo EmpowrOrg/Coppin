@@ -16,7 +16,6 @@ interface AssignmentPortalRepository {
     suspend fun getAssignment(id: UUID): Assignment?
     suspend fun createAssignment(assignment: Assignment)
     suspend fun getLanguage(mime: String): Language?
-    suspend fun deleteAssignment(id: UUID): Boolean
     suspend fun getCode(id: UUID): AssignmentCode?
     suspend fun updateCode(code: AssignmentCode): Boolean
     suspend fun saveCode(code: AssignmentCode)
@@ -74,9 +73,6 @@ internal class RealAssignmentPortalRepository(
         return assignmentSource.createAssignment(assignment)
     }
 
-    override suspend fun deleteAssignment(id: UUID): Boolean {
-        return assignmentSource.deleteAssignment(id)
-    }
 
     override suspend fun updateCode(code: AssignmentCode): Boolean {
         return codesSource.update(code)
