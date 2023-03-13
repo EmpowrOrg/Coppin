@@ -5,6 +5,5 @@ dependencies {
     implementation(Deps.Ktor.json)
     implementation(Deps.Ktor.contentNegotiation)
     implementation(project(Deps.Utils.main))
-    implementation(project(Deps.Models.main))
     implementation(Deps.Kotlin.dateTime)
 }
