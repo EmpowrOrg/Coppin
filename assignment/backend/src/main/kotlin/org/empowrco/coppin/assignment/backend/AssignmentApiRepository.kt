@@ -24,19 +24,21 @@ import org.empowrco.coppin.sources.LanguagesSource
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-interface AssignmentRepository {
+interface AssignmentApiRepository {
     suspend fun getAssignment(referenceId: String): Assignment?
     suspend fun getAssignment(id: UUID): Assignment?
     suspend fun getLanguage(id: UUID): Language?
     suspend fun getLanguages(): List<Language>
     suspend fun runCode(language: String, code: String): AssignmentCodeResponse
     suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse
+    suspend fun deleteAssignment(id: UUID): Boolean
+
 }
 
-internal class RealAssignmentRepository(
+internal class RealAssignmentApiRepository(
     private val assignmentSource: AssignmentSource,
     private val languagesSource: LanguagesSource,
-) : AssignmentRepository {
+) : AssignmentApiRepository {
     @OptIn(ExperimentalSerializationApi::class)
     val client = HttpClient(Apache) {
         install(ContentNegotiation) {
@@ -99,6 +101,11 @@ internal class RealAssignmentRepository(
                 )
             )
         )
+    }
+
+
+    override suspend fun deleteAssignment(id: UUID): Boolean {
+        return assignmentSource.deleteAssignment(id)
     }
 
     private suspend fun executeRequest(

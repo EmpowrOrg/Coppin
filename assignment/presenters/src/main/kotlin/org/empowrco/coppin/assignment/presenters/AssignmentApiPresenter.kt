@@ -1,20 +1,28 @@
 package org.empowrco.coppin.assignment.presenters
 
 import io.ktor.server.plugins.NotFoundException
-import org.empowrco.coppin.assignment.backend.AssignmentRepository
+import org.empowrco.coppin.assignment.backend.AssignmentApiRepository
+import org.empowrco.coppin.assignment.presenters.RequestApi.DeleteAssignmentRequest
+import org.empowrco.coppin.assignment.presenters.RequestApi.GetAssignmentRequest
+import org.empowrco.coppin.assignment.presenters.RequestApi.SubmitRequest
+import org.empowrco.coppin.assignment.presenters.ResponseApi.DeleteAssignmentResponse
+import org.empowrco.coppin.assignment.presenters.ResponseApi.GetAssignmentResponse
+import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
-import org.empowrco.coppin.utils.diff.DiffUtil
+import org.empowrco.coppin.utils.InvalidUuidException
+import org.empowrco.coppin.utils.UnknownException
+import org.empowrco.coppin.utils.toUuid
 
-interface AssignmentPresenter {
+interface AssignmentApiPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
+    suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse
 }
 
-internal class RealAssignmentPresenter(
-    private val repo: AssignmentRepository,
-    private val diffUtil: DiffUtil,
-) : AssignmentPresenter {
+internal class RealAssignmentApiPresenter(
+    private val repo: AssignmentApiRepository,
+) : AssignmentApiPresenter {
 
     override suspend fun submit(request: SubmitRequest): SubmitResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
@@ -143,5 +151,14 @@ internal class RealAssignmentPresenter(
             title = assignment.title,
             assignmentCodes = assignmentCodes,
         )
+    }
+
+    override suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse {
+        val assignmentId = request.id.toUuid() ?: throw InvalidUuidException("id")
+        val result = repo.deleteAssignment(assignmentId)
+        if (!result) {
+            throw UnknownException
+        }
+        return DeleteAssignmentResponse(request.id)
     }
 }

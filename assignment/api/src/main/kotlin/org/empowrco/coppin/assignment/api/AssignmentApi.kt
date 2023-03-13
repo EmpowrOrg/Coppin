@@ -4,14 +4,16 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import org.empowrco.coppin.assignment.presenters.AssignmentPresenter
+import org.empowrco.coppin.assignment.presenters.AssignmentApiPresenter
+import org.empowrco.coppin.assignment.presenters.RequestApi.DeleteAssignmentRequest
 import org.koin.ktor.ext.inject
 
 fun Application.assignmentApi() {
-    val presenter: AssignmentPresenter by inject()
+    val presenter: AssignmentApiPresenter by inject()
     routing {
         route("/assignment") {
             post("/submit") {
@@ -19,6 +21,12 @@ fun Application.assignmentApi() {
             }
             post("/request") {
                 call.respond(presenter.get(call.receive()))
+            }
+            delete("{uuid}") {
+                val request = DeleteAssignmentRequest(
+                    id = call.parameters["uuid"].toString()
+                )
+                call.respond(presenter.deleteAssignment(request))
             }
         }
     }
