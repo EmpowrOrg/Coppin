@@ -3,23 +3,24 @@ package org.empowrco.coppin.assignment.presenters
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDateTime
-import org.empowrco.coppin.assignment.backend.fakes.FakeAssignmentRepo
+import org.empowrco.coppin.assignment.backend.AssignmentCodeResponse
+import org.empowrco.coppin.assignment.backend.fakes.FakeAssignmentRepoApi
+import org.empowrco.coppin.assignment.presenters.RequestApi.SubmitRequest
+import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
 import org.empowrco.coppin.models.Assignment
+import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Feedback
 import org.empowrco.coppin.models.Language
-import org.empowrco.coppin.utils.diff.fakes.FakeDiffUtil
 import org.empowrco.coppin.utils.now
 import java.util.UUID
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
 
 class AssignmentPresenterTest {
-    private val repo = FakeAssignmentRepo()
-    private val diffUtil = FakeDiffUtil()
-    private val presenter = RealAssignmentPresenter(repo, diffUtil)
+    private val repo = FakeAssignmentRepoApi()
+    private val presenter = RealAssignmentApiPresenter(repo)
 
     @AfterTest
     fun teardown() {
@@ -41,11 +42,10 @@ class AssignmentPresenterTest {
 
         val response = presenter.submit(request)
         assertEquals(
-            response, SubmitResponse(
+            response, ResponseApi.SubmitResponse(
                 output = assigment.failureMessage,
                 feedback = "",
                 success = false,
-                expectedOutput = assigment.expectedOutput,
                 finalAttempt = true,
                 diff = null,
             )
@@ -55,13 +55,18 @@ class AssignmentPresenterTest {
     @Test
     fun submitErrorWithFeedback(): Unit = runBlocking {
         repo.assignments.add(assigment)
-        val response = presenter.submit(submitRequest.copy(attempt = 2, output = "failure"))
+        repo.codeResponses.add(
+            AssignmentCodeResponse(
+                success = false,
+                output = "failure"
+            )
+        )
+        val response = presenter.submit(submitRequest.copy(attempt = 2))
         assertEquals(
             response, SubmitResponse(
                 output = "failure",
                 feedback = "feedback3",
                 success = false,
-                expectedOutput = assigment.expectedOutput,
                 finalAttempt = false,
                 diff = null,
             )
@@ -71,13 +76,18 @@ class AssignmentPresenterTest {
     @Test
     fun submitSuccessWithFeedback(): Unit = runBlocking {
         repo.assignments.add(assigment)
-        val response = presenter.submit(submitRequest.copy(attempt = 1, output = "code"))
+        repo.codeResponses.add(
+            AssignmentCodeResponse(
+                success = false,
+                output = "code"
+            )
+        )
+        val response = presenter.submit(submitRequest.copy(attempt = 1))
         assertEquals(
             response, SubmitResponse(
                 output = "code",
                 feedback = "feedback1",
                 success = false,
-                expectedOutput = assigment.expectedOutput,
                 finalAttempt = false,
                 diff = null,
             )
@@ -87,63 +97,28 @@ class AssignmentPresenterTest {
     @Test
     fun submitSuccess(): Unit = runBlocking {
         repo.assignments.add(assigment)
-        val response = presenter.submit(submitRequest.copy(attempt = 1, output = "Hello, World"))
+        repo.codeResponses.add(
+            AssignmentCodeResponse(
+                success = true,
+                output = "Hello, World"
+            )
+        )
+        val response = presenter.submit(submitRequest.copy(attempt = 1))
         with(response) {
-            assertEquals(output, assigment.expectedOutput)
             assertEquals(feedback, assigment.successMessage)
             assertEquals(success, true)
         }
         assertEquals(
             response, SubmitResponse(
-                output = assigment.expectedOutput,
                 feedback = assigment.successMessage,
                 success = true,
-                expectedOutput = assigment.expectedOutput,
                 finalAttempt = false,
                 diff = null,
+                output = "success"
             )
         )
     }
 
-    @Test
-    fun create(): Unit = runBlocking {
-        val language = Language(
-            id = UUID.randomUUID(),
-            name = "name",
-            mime = "mime",
-            createdAt = LocalDateTime.now(),
-            lastModifiedAt = LocalDateTime.now(),
-        )
-        repo.languages.add(language)
-        val response = presenter.create(
-            CreateAssignmentRequest(
-                instructions = assigment.instructions,
-                totalAttempts = assigment.totalAttempts,
-                failureMessage = assigment.failureMessage,
-                solution = assigment.solution,
-                successMessage = assigment.successMessage,
-                referenceId = assigment.referenceId,
-                expectedOutput = assigment.expectedOutput,
-                feedback = assigment.feedback.map {
-                    CreateAssignmentRequest.Feedback(
-                        attempt = it.attempt,
-                        feedback = it.feedback,
-                        regex = it.regexMatcher,
-                    )
-                },
-                starterCodes = listOf(
-                    CreateAssignmentRequest.StarterCode(
-                        languageId = language.id.toString(),
-                        primary = true,
-                        code = "code",
-                    )
-                ),
-                title = "title",
-            )
-        )
-        assertIs<CreateAssignmentResponse>(response)
-        assertEquals(repo.assignments.size, 1)
-    }
 
     companion object {
         val submitRequest = SubmitRequest(
@@ -152,19 +127,36 @@ class AssignmentPresenterTest {
             referenceId = "reference",
             language = "lang",
             email = "email",
-            executeSuccess = true,
-            output = "output",
         )
-        val assigment = Assignment(
+        val lang = Language(
             id = UUID.randomUUID(),
+            lastModifiedAt = LocalDateTime.now(),
+            mime = "lang-mime",
+            name = "lang",
+            url = "lang-url",
+            createdAt = LocalDateTime.now(),
+        )
+        val assignmentId = UUID.randomUUID()
+        val assignmentCode = AssignmentCode(
+            id = UUID.randomUUID(),
+            assignmentId = assignmentId,
+            starterCode = "starter-code",
+            solutionCode = "solution-code",
+            language = lang,
+            primary = true,
+            unitTest = "unit-test",
+            lastModifiedAt = LocalDateTime.now(),
+            createdAt = LocalDateTime.now(),
+        )
+
+        val assigment = Assignment(
+            id = assignmentId,
             referenceId = "reference",
-            expectedOutput = "Hello, World",
             instructions = "instructions",
             lastModifiedAt = LocalDateTime.now(),
             createdAt = LocalDateTime.now(),
             successMessage = "success",
             failureMessage = "failure",
-            solution = "solution",
             totalAttempts = 4,
             feedback = listOf(
                 Feedback(
@@ -204,7 +196,7 @@ class AssignmentPresenterTest {
                     assignmentId = UUID.randomUUID()
                 ),
             ),
-            assignmentCodes = emptyList(),
+            assignmentCodes = listOf(assignmentCode),
             title = "title",
         )
     }

@@ -10,6 +10,7 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
 
     val assignments = mutableListOf<Assignment>()
     val languages = mutableListOf<Language>()
+    val codeResponses = mutableListOf<AssignmentCodeResponse>()
 
     override suspend fun getAssignment(referenceId: String): Assignment? {
         return assignments.find { it.referenceId == referenceId }
@@ -24,11 +25,15 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
     }
 
     override suspend fun runCode(language: String, code: String): AssignmentCodeResponse {
-        TODO("Not yet implemented")
+        val response = codeResponses.first()
+        codeResponses.remove(response)
+        return response
     }
 
     override suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse {
-        TODO("Not yet implemented")
+        val response = codeResponses.first()
+        codeResponses.remove(response)
+        return response
     }
 
     override suspend fun deleteAssignment(id: UUID): Boolean {
