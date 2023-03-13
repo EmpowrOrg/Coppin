@@ -47,7 +47,6 @@
                 solutionCodeTextArea.parentNode.replaceChild(elt, solutionCodeTextArea);
             }, solution_config);
             solutionCodeCodeMirror.setSize('100%');
-            <#if code.unitTest??>
             const unit_test_config = codemirror_config
             unit_test_config.value = "${code.unitTest}"
             const unitTestTextArea = document.getElementById("unit-test-code");
@@ -55,7 +54,6 @@
                 unitTestTextArea.parentNode.replaceChild(elt, unitTestTextArea);
             }, unit_test_config);
             unitTestCodeMirror.setSize('100%');
-            </#if>
             $("#create-assignment-code").submit(function (eventObj) {
                 eventObj.preventDefault()
                 $("<input />")
@@ -68,21 +66,17 @@
                     .attr("type", "hidden")
                     .val(solutionCodeCodeMirror.getValue())
                     .appendTo(this);
-                <#if code.unitTest??>
                 $("<input />")
                     .attr("name", "unit-test-code")
                     .attr("type", "hidden")
                     .val(unitTestCodeMirror.getValue())
                     .appendTo(this);
-                </#if>
                 this.submit()
             });
             $("#language").change(function () {
                 solutionCodeCodeMirror.setOption("mode", $(this).val());
                 starterCodeCodeMirror.setOption("mode", $(this).val());
-                <#if code.unitTest??>
                 unitTestCodeMirror.setOption("mode", $(this).val());
-                </#if>
             });
             document.getElementById("delete-code-button").onclick = function () {
                 var result = confirm("Are you sure you want to delete this assignment code?");
@@ -146,18 +140,16 @@
                                                   rows="5"
                                         ></textarea>
                         </div>
-                        <#if code.unitTest??>
-                            <label for="unit-test-code">Unit Tests</label>
-                            <p>Please only include the test class.</p>
-                            <div class="input-group input-group-outline mb-3">
+                        <label for="unit-test-code">Unit Tests</label>
+                        <p>Please only include the test class.</p>
+                        <div class="input-group input-group-outline mb-3">
                                         <textarea id="unit-test-code"
                                                   name="unit-test-code"
                                                   form="create-assignment-code"
                                                   class="form-control"
                                                   rows="5"
                                         ></textarea>
-                            </div>
-                        </#if>
+                        </div>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="submit"
                                    class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
