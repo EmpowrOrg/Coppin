@@ -15,7 +15,7 @@ import org.koin.ktor.ext.inject
 fun Application.assignmentApi() {
     val presenter: AssignmentApiPresenter by inject()
     routing {
-        route("/assignment") {
+        route("/assignments") {
             post("/submit") {
                 call.respond(presenter.submit(call.receive()))
             }
