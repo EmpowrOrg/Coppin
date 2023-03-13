@@ -11,7 +11,6 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.util.url
-import org.empowrco.coppin.models.User
 
 suspend fun ApplicationCall.respondFreemarker(template: String, content: Any) {
     respondFreemarker(template, mapOf("content" to content))
@@ -19,10 +18,8 @@ suspend fun ApplicationCall.respondFreemarker(template: String, content: Any) {
 
 
 suspend fun ApplicationCall.respondFreemarker(template: String, content: Map<String, Any?> = mapOf()) {
-    val userType = sessions.get<UserSession>()?.type
-    val isAdmin = userType == User.Type.Admin
     val updatedContent = content.toMutableMap()
-    updatedContent["isAdmin"] = isAdmin
+    updatedContent["isAdmin"] = sessions.get<UserSession>()?.isAdmin ?: false
     val error = request.queryParameters["error"]
     if (error == null) {
         respond(FreeMarkerContent(template, updatedContent))
@@ -30,6 +27,10 @@ suspend fun ApplicationCall.respondFreemarker(template: String, content: Map<Str
     }
     updatedContent["error"] = error.replace('-', ' ')
     respond(FreeMarkerContent(template, updatedContent))
+}
+
+suspend fun ApplicationCall.errorRedirect(error: Throwable, path: String? = null) {
+    errorRedirect(error.localizedMessage, path)
 }
 
 suspend fun ApplicationCall.errorRedirect(error: String, path: String? = null) {
@@ -49,4 +50,4 @@ suspend fun ApplicationCall.errorRedirect(error: String, path: String? = null) {
     respondRedirect(errorUrl)
 }
 
-data class UserSession(val userId: String, val type: User.Type)
+data class UserSession(val userId: String, val isAdmin: Boolean)
