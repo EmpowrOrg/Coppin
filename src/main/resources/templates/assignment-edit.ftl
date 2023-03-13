@@ -83,7 +83,8 @@
                     <form role="form" id="create-assignment" action="/assignments/create" method="post">
                         <div class="row">
                             <div class="col-sm input-group input-group-outline mb-3">
-                                <input type="text" name="title" class="form-control" placeholder="Title">
+                                <label for="title">Title</label>
+                                <input id="title" type="text" name="title" class="form-control" placeholder="Title">
                             </div>
                             <div class="col-sm input-group input-group-outline mb-3">
                                 <input type="text" name="reference-id" class="form-control" placeholder="Reference Id">
