@@ -56,6 +56,7 @@ internal class RealUsersSource : UsersSource {
         it[Users.lastName] = user.lastName
         it[Users.isAuthorized] = user.isAuthorized
         it[Users.passwordHash] = user.passwordHash
+        it[Users.lastModifiedAt] = user.lastModifiedAt
     }
 
     override suspend fun updateUser(user: User): Boolean = dbQuery {

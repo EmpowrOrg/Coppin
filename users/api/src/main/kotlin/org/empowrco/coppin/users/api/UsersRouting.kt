@@ -1,4 +1,4 @@
-package org.empowrco.copping.users.api
+package org.empowrco.coppin.users.api
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
@@ -10,11 +10,15 @@ import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.LoginRequest
 import org.empowrco.coppin.users.presenters.PatchUserRequest
 import org.empowrco.coppin.users.presenters.RegisterRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
+import org.empowrco.coppin.utils.routing.UserSession
 import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
@@ -32,45 +36,6 @@ fun Application.usersRouting() {
                     })
                 }
 
-            }
-            route("login") {
-                get {
-                    call.respondFreemarker("login.ftl", mapOf("hideSideNav" to true))
-                }
-                post {
-                    val params = call.receiveParameters()
-                    presenter.login(
-                        LoginRequest(
-                            email = params["email"].toString(),
-                            password = params["password"].toString(),
-                        )
-                    ).fold({
-                        call.respondRedirect("/")
-                    }, {
-                        call.errorRedirect(it.localizedMessage, "/")
-                    })
-                }
-            }
-            route("register") {
-                get {
-                    call.respondFreemarker("register.ftl", mapOf("hideSideNav" to true))
-                }
-                post {
-                    val params = call.receiveParameters()
-                    presenter.register(
-                        RegisterRequest(
-                            firstName = params["firstName"].toString(),
-                            lastName = params["lastName"].toString(),
-                            email = params["email"].toString(),
-                            password = params["password"].toString(),
-                            confirmPassword = params["confirmPassword"].toString()
-                        )
-                    ).fold({
-                        call.respondRedirect("/")
-                    }, {
-                        call.errorRedirect(it.localizedMessage)
-                    })
-                }
             }
             route("user/{uuid}") {
                 get {
@@ -100,6 +65,51 @@ fun Application.usersRouting() {
                     })
                 }
             }
+        }
+        route("login") {
+            get {
+                call.respondFreemarker("login.ftl", mapOf("hideSideNav" to true))
+            }
+            post {
+                val params = call.receiveParameters()
+                presenter.login(
+                    LoginRequest(
+                        email = params["email"].toString(),
+                        password = params["password"].toString(),
+                    )
+                ).fold({
+                    call.sessions.set(UserSession(it.id, it.isAdmin))
+                    call.respondRedirect("/")
+                }, {
+                    call.errorRedirect(it.localizedMessage)
+                })
+            }
+        }
+        route("register") {
+            get {
+                call.respondFreemarker("register.ftl", mapOf("hideSideNav" to true))
+            }
+            post {
+                val params = call.receiveParameters()
+                presenter.register(
+                    RegisterRequest(
+                        firstName = params["firstName"].toString(),
+                        lastName = params["lastName"].toString(),
+                        email = params["email"].toString(),
+                        password = params["password"].toString(),
+                        confirmPassword = params["confirmPassword"].toString()
+                    )
+                ).fold({
+                    call.sessions.set(UserSession(it.id, it.isAdmin))
+                    call.respondRedirect("/")
+                }, {
+                    call.errorRedirect(it.localizedMessage)
+                })
+            }
+        }
+        get("signout") {
+            call.sessions.clear<UserSession>()
+            call.respondRedirect("/")
         }
     }
 }

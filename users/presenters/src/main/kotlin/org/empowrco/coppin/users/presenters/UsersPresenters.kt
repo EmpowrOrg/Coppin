@@ -34,8 +34,10 @@ class RealUsersPresenters(
         val passwordHash = authenticator.hash(request.password)
         if (passwordHash != user.passwordHash) {
             return failure("Incorrect password")
+        } else if (!user.isAuthorized) {
+            return failure("Your account has not been authorized. Pleased contact your administrator.")
         }
-        return LoginResponse.toResult()
+        return LoginResponse(user.id.toString(), user.type == User.Type.Admin).toResult()
     }
 
     override suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
@@ -75,7 +77,7 @@ class RealUsersPresenters(
         } catch (ex: DuplicateKeyException) {
             return failure("An account with this info already exists")
         }
-        return RegisterResponse.toResult()
+        return RegisterResponse(user.id.toString(), user.type == User.Type.Admin).toResult()
     }
 
     private fun String.isEmail(): Boolean {

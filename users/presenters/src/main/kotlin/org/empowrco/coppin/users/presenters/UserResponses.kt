@@ -1,8 +1,9 @@
 package org.empowrco.coppin.users.presenters
 
-object LoginResponse
 
-object RegisterResponse
+data class LoginResponse(val id: String, val isAdmin: Boolean)
+
+data class RegisterResponse(val id: String, val isAdmin: Boolean)
 
 data class GetUsersResponse(
     val users: List<User>,
