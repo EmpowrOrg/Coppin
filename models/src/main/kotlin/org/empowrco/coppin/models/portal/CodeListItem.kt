@@ -7,5 +7,4 @@ data class CodeListItem(
     val primary: String,
     val hasSolution: String,
     val hasStarter: String,
-    val hasUnitTests: String,
 )
