@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="assignment" type="org.empowrco.coppin.models.portal.AssignmentItem" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentPortalResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.js"
@@ -6,12 +6,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.js"
             crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
-            const codemirror_config = {
-                value: "${assignment.instructions}",
+            const baseCodeMirrorConfig = {
                 lineNumbers: true,
                 mode: "text/x-markdown",
                 lineWrapping: true,
@@ -19,10 +16,24 @@
                 lineWiseCopyCut: true,
                 autoCloseBrackets: true,
             }
+            const instructionsConfig = baseCodeMirrorConfig
+            instructionsConfig.value = "${content.assignment.instructions}"
             const instructionsTextArea = document.getElementById("instructions");
             const instructionsCodeMirror = CodeMirror(function (elt) {
                 instructionsTextArea.parentNode.replaceChild(elt, instructionsTextArea);
-            }, codemirror_config);
+            }, instructionsConfig);
+            const successConfig = baseCodeMirrorConfig
+            successConfig.value = "${content.assignment.successMessage}"
+            const successMessageTextArea = document.getElementById("success-message");
+            const successMessageCodeMirror = CodeMirror(function (elt) {
+                successMessageTextArea.parentNode.replaceChild(elt, successMessageTextArea);
+            }, successConfig);
+            const failureConfig = baseCodeMirrorConfig
+            failureConfig.value = "${content.assignment.failureMessage}"
+            const failureMessageTextArea = document.getElementById("failure-message");
+            const failureMessageCodeMirror = CodeMirror(function (elt) {
+                failureMessageTextArea.parentNode.replaceChild(elt, failureMessageTextArea);
+            }, failureConfig);
             instructionsCodeMirror.setSize('100%');
             $("#edit-assignment").submit(function (eventObj) {
                 eventObj.preventDefault()
@@ -32,20 +43,21 @@
                     .attr("type", "hidden")
                     .val(instructionsCodeMirror.getValue())
                     .appendTo(this);
+                $("<input />")
+                    .attr("name", "success-message")
+                    .attr("type", "hidden")
+                    .val(successMessageCodeMirror.getValue())
+                    .appendTo(this);
+                $("<input />")
+                    .attr("name", "failure-message")
+                    .attr("type", "hidden")
+                    .val(failureMessageCodeMirror.getValue())
+                    .appendTo(this);
                 this.submit()
             });
-            document.getElementById("delete-button").onclick = function () {
-                var result = confirm("Are you sure you want to delete this assignment?");
-
-                if (result) {
-                    $("#delete-form").submit();
-                } else {
-                    // Do nothing; they cancelled
-                }
-            };
         });
     </script>
-    <form id="delete-form" action="/assignments/${assignment.id}/delete" method="post" hidden>
+    <form id="delete-form" action="/assignments/${content.assignment.id}/delete" method="post" hidden>
     </form>
     <div class="row pb-4">
         <div class="page-header min-height-300 border-radius-xl mt-4"
@@ -53,31 +65,38 @@
             <span class="mask  bg-gradient-primary  opacity-6"></span>
         </div>
         <div class="card card-body mx-3 mx-md-4 mt-n6 pb-2">
-            <form role="form" id="edit-assignment" action="/assignments/${assignment.id}" method="post">
-                <div class="row gx-4 mb-2">
-                    <div class="col-md my-auto">
-                        <div class="h-100">
-                            <input id="title" name="title" class="mb-1" value="${assignment.title}"
-                                   style="font-weight: bold;font-size: large">
-                            <div class="form-group pt-2"
-                                 style="display:flex; flex-direction: row; justify-content: left; align-items: center">
-                                <label for="total-attempts" style="margin-right: 8px">Total Attempts: </label>
-                                <input id="total-attempts" name="total-attempts" class="mb-0 font-weight-normal text-sm"
-                                       type="number" value="${assignment.attempts}">
-                            </div>
-                            <p class="mb-0 font-weight-normal text-xs pt-2">
-                                ${assignment.referenceId}
-                            </p>
+            <form role="form" id="edit-assignment" action="/assignments/${content.assignment.id}" method="post">
+                <div class="mt-3 d-flex justify-content-center">
+                    <#include "error.ftl">
+                </div>
+                <div class="row col-lg-12">
+                    <div class="col-6">
+                        <div class="input-group input-group-outline my-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input name="title" id="title" type="text" class="form-control"
+                                   value="${content.assignment.title}">
                         </div>
                     </div>
-                    <div class="col-sm align-content-end">
-                        <button type="button" id="delete-button" class="btn bg-gradient-primary float-end"><i
-                                    class="fa fa-trash"></i>
-                        </button>
+                    <div class="col-6">
+                        <div class="input-group input-group-outline my-3">
+                            <label for="reference-id" class="form-label">Reference Id</label>
+                            <input name="reference-id" id="reference-id" type="text" class="form-control"
+                                   value="${content.assignment.referenceId}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row col-lg-3">
+                    <div class="col-6">
+                        <div class="input-group input-group-outline my-3">
+                            <label for="total-attempts" class="form-label">Total Attempts</label>
+                            <input name="total-attempts" id="total-attempts" type="number" class="form-control"
+                                   value="${content.assignment.attempts}">
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="row pt-3">
+                    <p style="font-variant: all-petite-caps">All fields below accept Markdown</p>
+                    <div class="row">
                         <label for="instructions"
                                style="font-variant: small-caps;font-weight: bolder">Instructions.</label>
                         <div class="input-group input-group-outline mb-3">
@@ -95,7 +114,7 @@
                                   name="success-message"
                                   class="w-100 form-control"
                                   form="edit-assignment"
-                                  style="resize: none">${assignment.successMessage}</textarea>
+                                  style="resize: none"></textarea>
                         </div>
                     </div>
                     <div class="row pt-3 w-100">
@@ -106,7 +125,7 @@
                                   name="failure-message"
                                   class="w-100 form-control"
                                   form="edit-assignment"
-                                  style="resize: none">${assignment.failureMessage}</textarea>
+                                  style="resize: none"></textarea>
                         </div>
                     </div>
                     <div class="col-sm input-group input-group-outline mb-3">
@@ -117,9 +136,80 @@
                     </div>
 
                 </div>
+
             </form>
+            <div class="mt-3 d-flex justify-content-center">
+                <button id="delete-assignment" onclick="$('#deleteModal').modal('show')"
+                        data-toggle="modal" data-target="#assignModal"
+                        class="btn btn-lg btn-outline-danger" style="--bs-btn-border-color: transparent;">Delete
+                </button>
+            </div>
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete Assignment</h5>
+                        </div>
+                        <div class="modal-body">
+                            By clicking delete, you will permanently delete this assignment. Any Xblock's
+                            referencing this assignment will cease to work.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close
+                            </button>
+                            <button type="submit" class="btn btn-primary"
+                                    id="delete-confirm"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <#include "assignment-codes.ftl">
     <#include "assignment-feedback.ftl">
+    <script>
+        $('#delete-confirm').on('click', async function () {
+            $('#deleteModal').modal('hide')
+            fetch('/assignments/${content.assignment.id}', {
+                method: "DELETE",
+                headers: {'Content-Type': 'application/json'},
+            }).then(async response => {
+                const body = response.body
+                const bodyString = await getTextFromStream(body)
+                try {
+                    return JSON.parse(bodyString)
+                } catch (e) {
+                    let errorMessage = 'Status: ' + response.status
+                    if (bodyString) {
+                        errorMessage = errorMessage + ', Body: ' + bodyString
+                    }
+                    throw new Error(errorMessage)
+                }
+            }).then(async res => {
+                if (res.error) {
+                    throw new Error(res.error)
+                } else {
+                    await new BsDialogs().ok('Assignment Deleted', 'Assignment was successfully deleted');
+                    window.location.replace("/assignments")
+                }
+            }).catch(async error => {
+                console.log(error.message.toString())
+                let message;
+                if (error.error) {
+                    message = error.error
+                } else if (error.message) {
+                    message = error.message
+                } else {
+                    message = error.toString()
+                }
+                await new BsDialogs().ok('Error', message);
+            });
+        });
+    </script>
 </@layout.header>
