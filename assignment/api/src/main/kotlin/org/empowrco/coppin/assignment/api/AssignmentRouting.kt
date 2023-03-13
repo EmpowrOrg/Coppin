@@ -13,7 +13,6 @@ import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.presenters.AssignmentPortalPresenter
 import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.GetAssignmentRequest
-import org.empowrco.coppin.assignment.presenters.SaveFeedbackRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -98,50 +97,6 @@ fun Application.assignmentRouting() {
                             call.errorRedirect(it)
                         })
 
-                    }
-                    route("/feedback/{feedbackId?}") {
-                        get {
-                            val feedbackId = call.parameters["feedbackId"]
-                            val uuid = call.parameters["uuid"].toString()
-                            presenter.getFeedback(feedbackId, uuid).fold({
-                                call.respondFreemarker(
-                                    "assignment-feedback-edit.ftl",
-                                    mapOf("feedback" to it)
-                                )
-                            }, {
-                                call.errorRedirect(it)
-                            })
-                        }
-                        post {
-                            val uuid = call.parameters["uuid"].toString()
-                            val feedbackId = call.parameters["feedbackId"]
-                            val formParameters = call.receiveParameters()
-                            val feedback = formParameters["feedback"].toString()
-                            val regex = formParameters["regex"].toString()
-                            val attempt = formParameters["attempt"].toString().toInt()
-                            presenter.saveFeedback(
-                                SaveFeedbackRequest(
-                                    assignmentId = uuid,
-                                    feedback = feedback,
-                                    attempt = attempt,
-                                    regex = regex,
-                                    id = feedbackId,
-                                )
-                            ).fold({
-                                call.respondRedirect("/assignments/$uuid")
-                            }, {
-                                call.errorRedirect(it)
-                            })
-                        }
-                        post("delete") {
-                            val uuid = call.parameters["uuid"].toString()
-                            val feedbackId = call.parameters["feedbackId"].toString()
-                            presenter.deleteFeedback(feedbackId).fold({
-                                call.respondRedirect("/assignments/$uuid")
-                            }, {
-                                call.errorRedirect(it)
-                            })
-                        }
                     }
                     route("/codes/{codeId?}") {
                         get {

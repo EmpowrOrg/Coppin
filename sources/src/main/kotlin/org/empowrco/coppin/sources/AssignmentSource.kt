@@ -3,7 +3,6 @@ package org.empowrco.coppin.sources
 import org.empowrco.coppin.db.Assignments
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
-import org.empowrco.coppin.models.Feedback
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
@@ -24,7 +23,6 @@ interface AssignmentSource {
 }
 
 internal class RealAssignmentSource(
-    private val feedbackSource: FeedbackSource,
     private val assignmentCodesSource: AssignmentCodesSource,
 ) : AssignmentSource {
     override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
@@ -43,9 +41,8 @@ internal class RealAssignmentSource(
 
     private suspend fun buildAssigment(result: ResultRow): Assignment {
         val assignmentId = result[Assignments.id].value
-        val feedback = feedbackSource.getFeedbackByAssignment(assignmentId)
         val starterCodes = assignmentCodesSource.getByAssigment(assignmentId)
-        return result.toAssignment(feedback, starterCodes)
+        return result.toAssignment(starterCodes)
     }
 
     override suspend fun createAssignment(assignment: Assignment) {
@@ -60,7 +57,6 @@ internal class RealAssignmentSource(
         val result = dbQuery {
             Assignments.deleteWhere { Assignments.id eq  id }
         }
-        feedbackSource.deleteByAssignment(id)
         assignmentCodesSource.deleteByAssignment(id)
         return result > 0
     }
@@ -87,12 +83,11 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment) {
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
 }
 
-private fun ResultRow.toAssignment(feedback: List<Feedback>, assignmentCodes: List<AssignmentCode>): Assignment {
+private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assignment {
     val id = this[Assignments.id].value
     return Assignment(
         id = id,
         referenceId = this[Assignments.referenceId],
-        feedback = feedback,
         assignmentCodes = assignmentCodes,
         title = this[Assignments.title],
         createdAt = this[Assignments.createdAt],

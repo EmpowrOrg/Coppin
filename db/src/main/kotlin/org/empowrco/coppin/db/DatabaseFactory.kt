@@ -10,7 +10,6 @@ object DatabaseFactory {
 
     private val tables = listOf(
         Assignments,
-        Feedbacks,
         Languages,
         AssignmentCodes,
         Users,

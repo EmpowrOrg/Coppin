@@ -7,7 +7,6 @@ import org.koin.dsl.module
 val sourcesModule = module {
     singleOf(::RealAssignmentSource) { bind<AssignmentSource>() }
     singleOf(::RealLanguageSource) { bind<LanguagesSource>() }
-    singleOf(::RealFeedbackSource) { bind<FeedbackSource>() }
     singleOf(::RealAssignmentCodesSource) { bind<AssignmentCodesSource>() }
     singleOf(::RealUsersSource) { bind<UsersSource>() }
 }

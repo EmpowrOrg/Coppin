@@ -8,7 +8,6 @@ import org.empowrco.coppin.assignment.presenters.RequestApi.SubmitRequest
 import org.empowrco.coppin.assignment.presenters.ResponseApi.DeleteAssignmentResponse
 import org.empowrco.coppin.assignment.presenters.ResponseApi.GetAssignmentResponse
 import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
-import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
 import org.empowrco.coppin.utils.InvalidUuidException
 import org.empowrco.coppin.utils.UnknownException
@@ -33,7 +32,6 @@ internal class RealAssignmentApiPresenter(
                 output = assignment.failureMessage,
                 success = false,
                 finalAttempt = true,
-                feedback = "",
                 diff = null,
             )
         }
@@ -54,21 +52,10 @@ internal class RealAssignmentApiPresenter(
 
         return if (!codeResponse.success) {
             val error = codeResponse.output
-            if (assignment.feedback.isEmpty()) {
-                return SubmitResponse(
-                    output = error,
-                    success = false,
-                    finalAttempt = isFinalAttempt,
-                    feedback = "",
-                    diff = null,
-                )
-            }
-            val feedback = getFeedback(assignment, request, error)
             SubmitResponse(
                 output = error,
                 success = false,
                 finalAttempt = isFinalAttempt,
-                feedback = feedback,
                 diff = null,
             )
         } else {
@@ -78,7 +65,6 @@ internal class RealAssignmentApiPresenter(
                     output = matches.first().value,
                     success = false,
                     finalAttempt = isFinalAttempt,
-                    feedback = matches.first().value,
                     diff = null,
                 )
             } else {
@@ -86,33 +72,12 @@ internal class RealAssignmentApiPresenter(
                     output = assignment.successMessage,
                     success = true,
                     finalAttempt = isFinalAttempt,
-                    feedback = assignment.successMessage,
                     diff = null,
                 )
             }
 
 
         }
-    }
-
-
-    private fun getFeedback(
-        assignment: Assignment,
-        request: SubmitRequest,
-        output: String,
-    ): String {
-        val validAttemptFeedback = assignment.feedback.filter {
-            it.attempt <= request.attempt
-        }.sortedByDescending { it.attempt }
-        val feedback = validAttemptFeedback.firstOrNull {
-            if (it.regexMatcher.isBlank()) {
-                return@firstOrNull false
-            }
-            it.regex.matches(output)
-        } ?: validAttemptFeedback.firstOrNull {
-            it.regexMatcher.isBlank()
-        }
-        return feedback?.feedback ?: ""
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {

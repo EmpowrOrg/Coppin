@@ -182,7 +182,6 @@
 
     <#if content.id??>
         <#include "assignment-codes.ftl">
-        <#include "assignment-feedback.ftl">
         <script>
             $('#delete-confirm').on('click', async function () {
                 $('#deleteModal').modal('hide')

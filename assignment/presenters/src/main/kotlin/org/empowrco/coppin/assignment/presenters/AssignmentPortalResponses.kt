@@ -1,7 +1,6 @@
 package org.empowrco.coppin.assignment.presenters
 
 import org.empowrco.coppin.models.portal.CodeListItem
-import org.empowrco.coppin.models.portal.FeedbackListItem
 
 data class GetAssignmentPortalResponse(
     val id: String?,
@@ -12,7 +11,6 @@ data class GetAssignmentPortalResponse(
     val attempts: Int?,
     val title: String?,
     val codes: List<CodeListItem>,
-    val feedback: List<FeedbackListItem>,
 ) {}
 
 data class GetAssignmentsResponse(val assignments: List<AssignmentListItem>) {
@@ -21,13 +19,6 @@ data class GetAssignmentsResponse(val assignments: List<AssignmentListItem>) {
 
 object UpdateAssignmentResponse
 
-data class FeedbackResponse(
-    val feedback: String,
-    val id: String,
-    val attempt: Int,
-    val regex: String,
-    val assignmentId: String,
-)
 
 data class GetCodeResponse(
     val id: String?,
@@ -49,10 +40,7 @@ data class GetCodeResponse(
 
 data class CreateAssignmentResponse(val id: String)
 
-object SaveAssignmentResponse
 object SaveCodeResponse
 
 
-object SaveFeedbackResponse
 object DeleteCodeResponse
-object DeleteFeedbackResponse

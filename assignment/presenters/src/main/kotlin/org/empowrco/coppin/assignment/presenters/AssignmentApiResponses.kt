@@ -6,7 +6,6 @@ object ResponseApi {
     @Serializable
     data class SubmitResponse(
         val output: String,
-        val feedback: String,
         val success: Boolean,
         val finalAttempt: Boolean,
         val diff: String?,

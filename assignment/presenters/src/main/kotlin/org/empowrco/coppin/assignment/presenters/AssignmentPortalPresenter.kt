@@ -5,9 +5,7 @@ import org.apache.commons.text.StringEscapeUtils
 import org.empowrco.coppin.assignment.backend.AssignmentPortalRepository
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
-import org.empowrco.coppin.models.Feedback
 import org.empowrco.coppin.models.portal.CodeListItem
-import org.empowrco.coppin.models.portal.FeedbackListItem
 import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.nonEmpty
@@ -21,11 +19,8 @@ interface AssignmentPortalPresenter {
     suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse>
     suspend fun updateAssignment(request: UpdateAssignmentPortalRequest): Result<UpdateAssignmentResponse>
     suspend fun getCode(id: String?, assignmentIdString: String): Result<GetCodeResponse>
-    suspend fun getFeedback(id: String?, assignmentId: String): Result<FeedbackResponse>
     suspend fun saveCode(request: UpdateCodePortalRequest): Result<SaveCodeResponse>
     suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse>
-    suspend fun saveFeedback(request: SaveFeedbackRequest): Result<SaveFeedbackResponse>
-    suspend fun deleteFeedback(id: String): Result<DeleteFeedbackResponse>
     suspend fun deleteCode(id: String): Result<DeleteCodeResponse>
 }
 
@@ -72,7 +67,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             instructions = request.instructions,
             totalAttempts = request.totalAttempts,
             referenceId = request.referenceId,
-            feedback = emptyList(),
             assignmentCodes = emptyList(),
             title = request.title,
             createdAt = currentTime,
@@ -93,7 +87,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 id = null,
                 instructions = null,
                 codes = emptyList(),
-                feedback = emptyList(),
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -108,15 +101,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 assignmentId = assignment.id.toString(),
             )
         }
-        val feedback = assignment.feedback.map {
-            FeedbackListItem(
-                id = it.id.toString(),
-                feedback = it.feedback.ellipsize(),
-                attempt = if (it.attempt == 0) "Any" else it.attempt.toString(),
-                regex = it.regexMatcher,
-                assignmentId = assignment.id.toString()
-            )
-        }
         return GetAssignmentPortalResponse(
             title = assignment.title,
             successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
@@ -126,7 +110,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             id = assignment.id.toString(),
             instructions = StringEscapeUtils.escapeJava(assignment.instructions),
             codes = codes,
-            feedback = feedback,
         ).toResult()
     }
 
@@ -178,24 +161,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         ).toResult()
     }
 
-    override suspend fun getFeedback(id: String?, assignmentId: String): Result<FeedbackResponse> {
-        val uuid = id?.toUuid() ?: return FeedbackResponse(
-            id = "",
-            attempt = 0,
-            feedback = "",
-            assignmentId = assignmentId,
-            regex = ""
-        ).toResult()
-        val feedback = repo.getFeedback(uuid) ?: return failure("Feedback not found")
-        return FeedbackResponse(
-            id = feedback.id.toString(),
-            feedback = feedback.feedback,
-            regex = feedback.regexMatcher,
-            assignmentId = assignmentId,
-            attempt = feedback.attempt,
-        ).toResult()
-    }
-
     override suspend fun saveCode(request: UpdateCodePortalRequest): Result<SaveCodeResponse> {
         val currentTime = LocalDateTime.now()
         val language = repo.getLanguage(request.languageMime) ?: return failure("Language not found")
@@ -240,43 +205,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             }
         }
         return SaveCodeResponse.toResult()
-    }
-
-    override suspend fun saveFeedback(request: SaveFeedbackRequest): Result<SaveFeedbackResponse> {
-        val assignmentId = request.assignmentId.toUuid() ?: return failure("No assignment found")
-        val currentTime = LocalDateTime.now()
-        val feedbackId = request.id?.toUuid()
-        feedbackId ?: run {
-            val feedback = Feedback(
-                id = UUID.randomUUID(),
-                feedback = request.feedback,
-                regexMatcher = request.regex,
-                attempt = request.attempt,
-                assignmentId = assignmentId,
-                createdAt = currentTime,
-                lastModifiedAt = currentTime,
-            )
-            repo.saveFeedback(feedback)
-            return SaveFeedbackResponse.toResult()
-        }
-        val feedback = repo.getFeedback(feedbackId) ?: return failure("Feedback not found")
-        val updateFeedback = feedback.copy(
-            feedback = request.feedback,
-            regexMatcher = request.regex,
-            attempt = request.attempt,
-            lastModifiedAt = currentTime,
-        )
-        val result = repo.updateFeedback(updateFeedback)
-        if (!result) {
-            return failure("Unknown failure")
-        }
-        return SaveFeedbackResponse.toResult()
-    }
-
-    override suspend fun deleteFeedback(id: String): Result<DeleteFeedbackResponse> {
-        val feedbackId = id.toUuid() ?: return failure("Invalid feedback id")
-        repo.deleteFeedback(feedbackId)
-        return DeleteFeedbackResponse.toResult()
     }
 
     override suspend fun deleteCode(id: String): Result<DeleteCodeResponse> {

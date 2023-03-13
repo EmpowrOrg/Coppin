@@ -6,7 +6,6 @@ import java.util.UUID
 data class Assignment(
     val id: UUID,
     val referenceId: String,
-    val feedback: List<Feedback>,
     val assignmentCodes: List<AssignmentCode>,
     val instructions: String,
     val successMessage: String,
