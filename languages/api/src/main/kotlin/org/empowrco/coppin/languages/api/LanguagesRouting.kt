@@ -9,9 +9,11 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import org.empowrco.coppin.languages.presenters.CreateLanguageRequest
+import org.empowrco.coppin.languages.presenters.DeleteLanguageRequest
+import org.empowrco.coppin.languages.presenters.GetLanguageRequest
 import org.empowrco.coppin.languages.presenters.LanguagesPresenter
-import org.empowrco.coppin.languages.presenters.UpdateLanguageRequest
+import org.empowrco.coppin.languages.presenters.UpsertLanguageRequest
+import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
 
@@ -21,38 +23,21 @@ fun Application.languagesRouting() {
         authenticate("auth-session") {
             route("languages") {
                 get {
-                    val response = presenter.getLanguages()
-                    call.respondFreemarker("languages.ftl", mapOf("languages" to response.languages))
-                }
-
-                route("create") {
-
-                    get {
-                        val language = presenter.getLanguage(null)
-                        call.respondFreemarker("language-edit.ftl", mapOf("language" to language))
-                    }
-
-                    post {
-                        val formParameters = call.receiveParameters()
-                        val name = formParameters["name"].toString()
-                        val mime = formParameters["mime"].toString()
-                        val url = formParameters["url"].toString()
-                        presenter.saveLanguage(
-                            CreateLanguageRequest(
-                                name = name,
-                                mime = mime,
-                                url = url,
-                            )
-                        )
-                        call.respondRedirect("/languages")
-                    }
+                    presenter.getLanguages().fold({
+                        call.respondFreemarker("languages.ftl", mapOf("languages" to it.languages))
+                    }, {
+                        call.errorRedirect(it)
+                    })
                 }
 
                 route("{uuid}") {
                     get {
                         val uuid = call.parameters["uuid"].toString()
-                        val language = presenter.getLanguage(uuid)
-                        call.respondFreemarker("language-edit.ftl", mapOf("language" to language))
+                        presenter.getLanguage(GetLanguageRequest(uuid)).fold({
+                            call.respondFreemarker("language-edit.ftl", mapOf("language" to it))
+                        }, {
+                            call.errorRedirect(it)
+                        })
                     }
 
                     post {
@@ -61,8 +46,8 @@ fun Application.languagesRouting() {
                         val name = formParameters["name"].toString()
                         val mime = formParameters["mime"].toString()
                         val url = formParameters["url"].toString()
-                        presenter.updateLanguage(
-                            UpdateLanguageRequest(
+                        presenter.upsertLanguage(
+                            UpsertLanguageRequest(
                                 name = name,
                                 mime = mime,
                                 url = url,
@@ -73,7 +58,11 @@ fun Application.languagesRouting() {
                     }
                     post("delete") {
                         val uuid = call.parameters["uuid"].toString()
-                        presenter.deleteLanguage(uuid)
+                        presenter.deleteLanguage(DeleteLanguageRequest(uuid)).fold({
+                            call.respondRedirect("languages")
+                        }, {
+                            call.errorRedirect(it)
+                        })
                     }
                 }
             }

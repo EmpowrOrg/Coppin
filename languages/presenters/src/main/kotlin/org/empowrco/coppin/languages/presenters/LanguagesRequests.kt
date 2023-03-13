@@ -1,21 +1,12 @@
 package org.empowrco.coppin.languages.presenters
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class CreateLanguageRequest(
-    val url: String,
-    val mime: String,
-    val name: String,
-)
-
 data class GetLanguageRequest(
     val id: String?,
 )
 
-@Serializable
-data class UpdateLanguageRequest(
-    val id: String,
+
+data class UpsertLanguageRequest(
+    val id: String?,
     val url: String,
     val mime: String,
     val name: String,

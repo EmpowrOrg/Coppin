@@ -12,7 +12,9 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import org.empowrco.coppin.assignment.presenters.AssignmentPortalPresenter
 import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
+import org.empowrco.coppin.assignment.presenters.DeleteCodeRequest
 import org.empowrco.coppin.assignment.presenters.GetAssignmentRequest
+import org.empowrco.coppin.assignment.presenters.GetCodeRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -101,8 +103,13 @@ fun Application.assignmentRouting() {
                     route("/codes/{codeId?}") {
                         get {
                             val codeId = call.parameters["codeId"]
-                            val uuid = call.parameters["uuid"].toString()
-                            presenter.getCode(codeId, uuid).fold({
+                            val assignmentId = call.parameters["uuid"].toString()
+                            presenter.getCode(
+                                GetCodeRequest(
+                                    id = codeId,
+                                    assignmentId = assignmentId
+                                )
+                            ).fold({
                                 call.respondFreemarker("assignment-code.ftl", it)
                             }, {
                                 call.errorRedirect(it)
@@ -134,10 +141,14 @@ fun Application.assignmentRouting() {
                             })
                         }
                         delete {
-                            val uuid = call.parameters["uuid"].toString()
+                            val assignmentId = call.parameters["uuid"].toString()
                             val codeId = call.parameters["codeId"].toString()
-                            presenter.deleteCode(codeId).fold({
-                                call.respondRedirect("/assignments/$uuid")
+                            presenter.deleteCode(
+                                DeleteCodeRequest(
+                                    id = codeId
+                                )
+                            ).fold({
+                                call.respondRedirect("/assignments/$assignmentId")
                             }, {
                                 call.errorRedirect(it)
                             })
