@@ -12,8 +12,7 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
-<#-- @ftlvariable name="codes" type="kotlin.collections.List<org.empowrco.coppin.models.portal.CodeListItem>" -->
-<#-- @ftlvariable name="assignment" type="org.empowrco.coppin.models.portal.AssignmentItem" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentPortalResponse" -->
 <!-- Data Tables -->
 <link rel="stylesheet" type="text/css"
       href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>
@@ -29,18 +28,14 @@
             },
             columnDefs: [
                 {
-                    target: 5,
-                    visible: false,
-                },
-                {
-                    target: 6,
+                    target: 4,
                     visible: false,
                 }
             ],
         });
         $('#assignment-codes-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
         $('#assignment-codes-table tbody').on('click', 'tr', function () {
-            var data = table.row(this).data();
+            const data = table.row(this).data();
             window.location = "/assignments/" + data[6] + "/codes/" + data[5]
         });
     });
@@ -51,7 +46,8 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3" style="display:inline-block;">Assignment Codes</h6>
-                    <a href="/assignments/${assignment.id}/codes/" class="btn btn-lg bg-gradient-dark btn-lg mb-0">Create</a>
+                    <a href="/assignments/${content.assignment.id}/codes/"
+                       class="btn btn-lg bg-gradient-dark btn-lg mb-0">Create</a>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -71,20 +67,16 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Has Solution Code
                             </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                Has Unit Tests
-                            </th>
                             <th class="text-secondary opacity-7"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <#list codes as code>
+                        <#list content.codes as code>
                             <tr>
                                 <td>${code.language}</td>
                                 <td>${code.primary}</td>
                                 <td>${code.hasStarter}</td>
                                 <td>${code.hasSolution}</td>
-                                <td>${code.hasUnitTests}</td>
                                 <td>${code.id}</td>
                                 <td>${code.assignmentId}</td>
                             </tr>
