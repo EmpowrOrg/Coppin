@@ -57,7 +57,7 @@
                                 </script>
                                 ,
                                 made by
-                                <a href="https://devezin.tech" class="font-weight-bold text-white">Devezin.Tech</a>
+                                <a href="https://empowrco.org" class="font-weight-bold text-white">Empowr</a>
                             </div>
                         </div>
                     </div>
