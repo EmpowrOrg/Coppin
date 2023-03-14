@@ -44,3 +44,4 @@ gradle-user-home
 /.run/*
 /AWS.md
 /.run/ApplicationKt.run.xml
+/coppin.pem
