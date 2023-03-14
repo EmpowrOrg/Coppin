@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <#include "error.ftl">
                     <form role="form" id="create-assignment"
-                          action="/languages/<#if content.id??>/languages/${content.id}</#if>"
+                          action="/languages/<#if content.id??>${content.id}</#if>"
                           method="post">
                         <div class="row">
                             <div class="col-sm input-group input-group-outline mb-3">
