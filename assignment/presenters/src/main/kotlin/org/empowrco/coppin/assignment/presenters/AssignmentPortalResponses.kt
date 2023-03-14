@@ -29,10 +29,10 @@ object UpdateAssignmentResponse
 
 data class GetCodeResponse(
     val id: String?,
-    val starterCode: String,
-    val solutionCode: String,
+    val starterCode: String?,
+    val solutionCode: String?,
     val assignmentId: String,
-    val unitTest: String,
+    val unitTest: String?,
     val primary: Boolean,
     val language: Language,
     val languages: List<Language>,
@@ -42,6 +42,7 @@ data class GetCodeResponse(
         val id: String,
         val url: String,
         val mime: String,
+        val selected: Boolean,
     )
 }
 

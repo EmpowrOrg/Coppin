@@ -113,7 +113,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     }
 
     override suspend fun getCode(request: GetCodeRequest): Result<GetCodeResponse> {
-
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         val existingLanguageIds = repo.getAssignmentCodes(assignmentId).map { it.language.id }
@@ -126,23 +125,32 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 id = it.id.toString(),
                 url = it.url,
                 mime = it.mime,
+                selected = false,
             )
-        }
+        }.toMutableList()
         if (request.id == null) {
             return GetCodeResponse(
-                id = "",
+                id = null,
                 starterCode = "",
                 solutionCode = "",
                 assignmentId = assignment.id.toString(),
                 unitTest = "",
                 language = selectableLanguages.first(),
-                primary = false,
+                primary = existingLanguageIds.isEmpty(), //Should be primary if there are now existing languages
                 languages = selectableLanguages,
-
-                ).toResult()
+            ).toResult()
         }
         val assignmentCodeId = request.id.toUuid() ?: return failure("Invalid id")
         val code = repo.getCode(assignmentCodeId) ?: return failure("Code not found")
+        selectableLanguages.add(
+            GetCodeResponse.Language(
+                name = code.language.name,
+                id = code.language.id.toString(),
+                url = code.language.url,
+                mime = code.language.mime,
+                selected = true,
+            )
+        )
         return GetCodeResponse(
             id = code.id.toString(),
             primary = code.primary,
@@ -155,6 +163,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 id = code.language.id.toString(),
                 mime = code.language.mime,
                 url = code.language.url,
+                selected = true,
             ),
             languages = selectableLanguages,
         ).toResult()

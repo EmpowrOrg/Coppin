@@ -11,8 +11,7 @@
             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
-            const codemirror_config = {
-                value: "${content.starterCode}",
+            const codeMirrorConfig = {
                 lineNumbers: true,
                 mode: "${content.language.mime}",
                 lineWrapping: true,
@@ -20,24 +19,31 @@
                 lineWiseCopyCut: true,
                 autoCloseBrackets: true,
             }
+            <#if content.starterCode??>
+            codeMirrorConfig.value = "${content.starterCode}"
+            </#if>
             const starterCodeTextArea = document.getElementById("starter-code");
             const starterCodeCodeMirror = CodeMirror(function (elt) {
                 starterCodeTextArea.parentNode.replaceChild(elt, starterCodeTextArea);
-            }, codemirror_config);
+            }, codeMirrorConfig);
             starterCodeCodeMirror.setSize('100%');
-            const solution_config = codemirror_config
-            solution_config.value = "${content.solutionCode}"
+            const solutionConfig = codeMirrorConfig
+            <#if content.solutionCode??>
+            solutionConfig.value = "${content.solutionCode}"
+            </#if>
             const solutionCodeTextArea = document.getElementById("solution-code");
             const solutionCodeCodeMirror = CodeMirror(function (elt) {
                 solutionCodeTextArea.parentNode.replaceChild(elt, solutionCodeTextArea);
-            }, solution_config);
+            }, solutionConfig);
             solutionCodeCodeMirror.setSize('100%');
-            const unit_test_config = codemirror_config
-            unit_test_config.value = "${content.unitTest}"
+            const unitTestConfig = codeMirrorConfig
+            <#if content.unitTest??>
+            unitTestConfig.value = "${content.unitTest}"
+            </#if>
             const unitTestTextArea = document.getElementById("unit-test-code");
             const unitTestCodeMirror = CodeMirror(function (elt) {
                 unitTestTextArea.parentNode.replaceChild(elt, unitTestTextArea);
-            }, unit_test_config);
+            }, unitTestConfig);
             unitTestCodeMirror.setSize('100%');
             $("#create-assignment-code").submit(function (eventObj) {
                 eventObj.preventDefault()
@@ -65,9 +71,11 @@
             });
         });
     </script>
-    <form id="delete-code-form" action="/assignments/${content.assignmentId}/codes/${content.id}/delete"
-          method="post" hidden>
-    </form>
+    <#if content.id??>
+        <form id="delete-code-form" action="/assignments/${content.assignmentId}/codes/${content.id}/delete"
+              method="post" hidden>
+        </form>
+    </#if>
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="col-12">
             <div class="card">
@@ -78,7 +86,7 @@
                 </div>
                 <div class="card-body">
                     <form role="form" id="create-assignment-code"
-                          action="/assignments/${content.assignmentId}/codes/${content.id}"
+                          action="/assignments/${content.assignmentId}/codes/<#if content.id??>${content.id}</#if>"
                           method="post">
                         <div class="row col-lg-12 align-items-center mb-3">
                             <#if content.languages?has_content>
@@ -88,7 +96,8 @@
                                         <select class="d-inline-block form-select" id="language" name="language"
                                                 style="width: auto; min-width: 200px" form="create-assignment-code">
                                             <#list content.languages as language>
-                                                <option value="${language.mime}">${language.name}</option>
+                                                <option value="${language.mime}"
+                                                        <#if language.selected>selected</#if>>${language.name}</option>
                                             </#list>
                                         </select>
                                     </div>
@@ -177,24 +186,27 @@
             </div>
         </div>
     </div>
-    <script>
-        $('#delete-confirm').on('click', async function () {
-            $('#deleteModal').modal('hide')
-            fetch('/assignments/${content.assignmentId}/codes/${content.id}', {
-                method: "DELETE",
-                headers: {'Content-Type': 'application/json'},
-            }).then(async response => {
-                return await parseResponse(response);
-            }).then(async res => {
-                if (res.error) {
-                    throw new Error(res.error)
-                } else {
-                    await new BsDialogs().ok('Code Deleted', 'Code was successfully deleted');
-                    window.location.replace("/assignments/${content.assignmentId}")
-                }
-            }).catch(async error => {
-                await showError(error);
+    <#if content.id??>
+        <script>
+            $('#delete-confirm').on('click', async function () {
+                $('#deleteModal').modal('hide')
+                fetch('/assignments/${content.assignmentId}/codes/${content.id}', {
+                    method: "DELETE",
+                    headers: {'Content-Type': 'application/json'},
+                }).then(async response => {
+                    return await parseResponse(response);
+                }).then(async res => {
+                    if (res.error) {
+                        throw new Error(res.error)
+                    } else {
+                        await new BsDialogs().ok('Code Deleted', 'Code was successfully deleted');
+                        window.location.replace("/assignments/${content.assignmentId}")
+                    }
+                }).catch(async error => {
+                    await showError(error);
+                });
             });
-        });
-    </script>
+        </script>
+    </#if>
+
 </@layout.header>
