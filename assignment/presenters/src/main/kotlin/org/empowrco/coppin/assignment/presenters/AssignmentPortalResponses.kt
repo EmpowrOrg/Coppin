@@ -17,6 +17,7 @@ data class GetAssignmentPortalResponse(
         val primary: String,
         val hasSolution: String,
         val hasStarter: String,
+        val injectable: String,
     )
 }
 
@@ -34,6 +35,7 @@ data class GetCodeResponse(
     val assignmentId: String,
     val unitTest: String?,
     val primary: Boolean,
+    val injectable: Boolean,
     val language: Language,
     val languages: List<Language>,
 ) {
@@ -48,7 +50,7 @@ data class GetCodeResponse(
 
 data class CreateAssignmentResponse(val id: String)
 
-object SaveCodeResponse
+object UpdateCodeResponse
 
 
 object DeleteCodeResponse

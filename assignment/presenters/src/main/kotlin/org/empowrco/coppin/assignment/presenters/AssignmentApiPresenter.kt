@@ -48,7 +48,12 @@ internal class RealAssignmentApiPresenter(
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
-        val codeResponse = repo.testCode(request.language, request.code, assignmentCode.unitTest)
+        val code = if (assignmentCode.injectable) {
+            assignmentCode.starterCode.replace("{{code}}", request.code)
+        } else {
+            request.code
+        }
+        val codeResponse = repo.testCode(request.language, code, assignmentCode.unitTest)
 
         return if (!codeResponse.success) {
             val error = codeResponse.output
@@ -87,10 +92,15 @@ internal class RealAssignmentApiPresenter(
             if (shouldFilter && !request.supportedLanguageMimes.contains(it.language.mime)) {
                 return@mapNotNull null
             }
+            val starterCode = if (it.injectable) {
+                ""
+            } else {
+                it.starterCode
+            }
             GetAssignmentResponse.AssignmentCode(
                 displayName = it.language.name,
                 mime = it.language.mime,
-                starterCode = it.starterCode,
+                starterCode = starterCode,
                 primary = it.primary,
                 solutionCode = it.solutionCode
             )

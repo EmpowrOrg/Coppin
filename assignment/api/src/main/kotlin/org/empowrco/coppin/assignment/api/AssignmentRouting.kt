@@ -124,7 +124,8 @@ fun Application.assignmentRouting() {
                             val starterCode = formParameters["starter-code"]
                             val solutionCode = formParameters["solution-code"]
                             val unitTest = formParameters["unit-test-code"]
-                            presenter.saveCode(
+                            val injectable = formParameters["injectable"].toString()
+                            presenter.updateCode(
                                 UpdateCodePortalRequest(
                                     languageMime = languageId,
                                     primary = primary,
@@ -132,6 +133,7 @@ fun Application.assignmentRouting() {
                                     unitTest = unitTest,
                                     solutionCode = solutionCode,
                                     id = codeId,
+                                    injectable = injectable,
                                     assignmentId = uuid,
                                 )
                             ).fold({

@@ -13,11 +13,11 @@
             },
             columnDefs: [
                 {
-                    target: 4,
+                    target: 5,
                     visible: false,
                 },
                 {
-                    target: 5,
+                    target: 6,
                     visible: false,
                 }
             ],
@@ -25,7 +25,7 @@
         $('#assignment-codes-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
         $('#assignment-codes-table tbody').on('click', 'tr', function () {
             const data = table.row(this).data();
-            window.location = "/assignments/" + data[5] + "/codes/" + data[4]
+            window.location = "/assignments/" + data[6] + "/codes/" + data[5]
         });
     });
 </script>
@@ -54,6 +54,9 @@
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                 Has Solution Code
                             </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                Is Injectable
+                            </th>
                             <th class="text-secondary opacity-7"></th>
                         </tr>
                         </thead>
@@ -64,6 +67,7 @@
                                 <td>${code.primary}</td>
                                 <td>${code.hasStarter}</td>
                                 <td>${code.hasSolution}</td>
+                                <td>${code.injectable}</td>
                                 <td>${code.id}</td>
                                 <td>${code.assignmentId}</td>
                             </tr>

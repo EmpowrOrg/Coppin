@@ -5,6 +5,7 @@ import org.apache.commons.text.StringEscapeUtils
 import org.empowrco.coppin.assignment.backend.AssignmentPortalRepository
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
+import org.empowrco.coppin.utils.capitalize
 import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.nonEmpty
@@ -18,7 +19,7 @@ interface AssignmentPortalPresenter {
     suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse>
     suspend fun updateAssignment(request: UpdateAssignmentPortalRequest): Result<UpdateAssignmentResponse>
     suspend fun getCode(request: GetCodeRequest): Result<GetCodeResponse>
-    suspend fun saveCode(request: UpdateCodePortalRequest): Result<SaveCodeResponse>
+    suspend fun updateCode(request: UpdateCodePortalRequest): Result<UpdateCodeResponse>
     suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse>
     suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse>
 }
@@ -135,6 +136,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 solutionCode = "",
                 assignmentId = assignment.id.toString(),
                 unitTest = "",
+                injectable = false,
                 language = selectableLanguages.first(),
                 primary = existingLanguageIds.isEmpty(), //Should be primary if there are now existing languages
                 languages = selectableLanguages,
@@ -165,14 +167,19 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 url = code.language.url,
                 selected = true,
             ),
+            injectable = code.injectable,
             languages = selectableLanguages,
         ).toResult()
     }
 
-    override suspend fun saveCode(request: UpdateCodePortalRequest): Result<SaveCodeResponse> {
+    override suspend fun updateCode(request: UpdateCodePortalRequest): Result<UpdateCodeResponse> {
         val currentTime = LocalDateTime.now()
         val language = repo.getLanguage(request.languageMime) ?: return failure("Language not found")
         var primary = request.primary == "on"
+        val injectable = request.injectable == "on"
+        if (injectable && (request.starterCode.isNullOrBlank() || !request.starterCode.contains("{{code}}"))) {
+            return failure("Injectable assignments must contain {{code}} placeholder")
+        }
         // new assignment code
         val assignmentId = request.assignmentId.toUuid() ?: return failure("No assignment found for this id")
         val codeIdString = request.id?.nonEmpty()
@@ -189,6 +196,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 starterCode = request.starterCode ?: "",
                 solutionCode = request.solutionCode ?: "",
                 unitTest = request.unitTest ?: "",
+                injectable = injectable,
                 createdAt = currentTime,
                 lastModifiedAt = currentTime,
             )
@@ -204,6 +212,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 solutionCode = request.solutionCode ?: "",
                 language = language,
                 primary = primary,
+                injectable = injectable,
                 unitTest = request.unitTest ?: "",
                 lastModifiedAt = currentTime,
             )
@@ -212,7 +221,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 return failure("Unknown error")
             }
         }
-        return SaveCodeResponse.toResult()
+        return UpdateCodeResponse.toResult()
     }
 
     override suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse> {

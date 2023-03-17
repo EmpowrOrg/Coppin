@@ -40,6 +40,7 @@ data class UpdateCodePortalRequest(
     val starterCode: String?,
     val solutionCode: String?,
     val primary: String,
+    val injectable: String,
     val assignmentId: String,
     val unitTest: String?,
 )

@@ -104,13 +104,28 @@
                                     </div>
                                 </div>
                             </#if>
-                            <div class="col-2">
+                            <div class="col">
                                 <div class="align-items-center ">
                                     <div class="d-inline-block form-check-label">Primary Language</div>
                                     <div class="ms-2 form-check form-switch d-inline-block align-items-center">
                                         <input class="form-check-input mt-2 d-inline-block" type="checkbox" id="primary"
                                                name="primary" ${content.primary?string('checked','')}>
                                         <label class="form-check-label" for="primary"></label>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col align-middle">
+                                <div class="align-items-center align-middle">
+                                    <a class="align-middle">
+                                        <span class="material-icons align-middle">info</span>
+                                    </a>
+                                    <div class="d-inline-block form-check-label align-middle">Injectable</div>
+                                    <div class="ms-2 form-check form-switch d-inline-block align-items-center">
+                                        <input class="form-check-input mt-2 d-inline-block" type="checkbox"
+                                               id="injectable"
+                                               name="injectable" ${content.injectable?string('checked','')}>
+                                        <label class="form-check-label" for="injectable"></label>
                                     </div>
 
                                 </div>

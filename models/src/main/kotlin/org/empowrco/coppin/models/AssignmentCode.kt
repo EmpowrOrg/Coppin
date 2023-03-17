@@ -11,6 +11,7 @@ data class AssignmentCode(
     val language: Language,
     val assignmentId: UUID,
     val primary: Boolean,
+    val injectable: Boolean,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 )
