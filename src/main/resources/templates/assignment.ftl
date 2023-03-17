@@ -186,7 +186,7 @@
         <script>
             $('#delete-confirm').on('click', async function () {
                 $('#deleteModal').modal('hide')
-                fetch('/assignments/${content.id}', {
+                fetch('/assignment/${content.id}', {
                     method: "DELETE",
                     headers: {'Content-Type': 'application/json'},
                 }).then(async response => {
