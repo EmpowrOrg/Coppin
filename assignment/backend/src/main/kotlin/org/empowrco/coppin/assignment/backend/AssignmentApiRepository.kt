@@ -97,7 +97,7 @@ internal class RealAssignmentApiRepository(
                 mapOf(
                     "language" to JsonPrimitive(language),
                     "code" to JsonPrimitive(code),
-                    "tests" to JsonPrimitive(tests),
+                    "unitTests" to JsonPrimitive(tests),
                 )
             )
         )
