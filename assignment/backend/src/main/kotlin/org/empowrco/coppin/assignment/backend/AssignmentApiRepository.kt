@@ -112,7 +112,8 @@ internal class RealAssignmentApiRepository(
         path: String,
         body: JsonObject,
     ): AssignmentCodeResponse {
-        val response = client.post("http://localhost:8080/$path") {
+        val url = System.getenv("DOCTOR_URL")
+        val response = client.post("$url$path") {
             contentType(ContentType.Application.Json)
             setBody(body)
         }
