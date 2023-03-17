@@ -84,6 +84,7 @@
                         <h6 class="text-white text-capitalize ps-3">Create Assignment Code</h6>
                     </div>
                 </div>
+                <#include "error.ftl">
                 <div class="card-body">
                     <form role="form" id="create-assignment-code"
                           action="/assignments/${content.assignmentId}/codes/<#if content.id??>${content.id}</#if>"
