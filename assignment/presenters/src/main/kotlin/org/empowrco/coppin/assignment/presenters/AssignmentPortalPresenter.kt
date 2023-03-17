@@ -105,7 +105,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         return GetAssignmentPortalResponse(
             title = assignment.title,
             successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
-            referenceId = "Reference Id: ${assignment.referenceId}",
+            referenceId = assignment.referenceId,
             failureMessage = StringEscapeUtils.escapeJava(assignment.failureMessage),
             attempts = assignment.totalAttempts,
             id = assignment.id.toString(),
