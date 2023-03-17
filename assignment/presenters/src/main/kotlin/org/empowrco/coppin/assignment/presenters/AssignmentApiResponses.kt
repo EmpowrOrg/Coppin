@@ -12,6 +12,12 @@ object ResponseApi {
     )
 
     @Serializable
+    data class RunResponse(
+        val output: String,
+        val success: Boolean = true,
+    )
+
+    @Serializable
     data class DeleteAssignmentResponse(val id: String)
 
     @Serializable

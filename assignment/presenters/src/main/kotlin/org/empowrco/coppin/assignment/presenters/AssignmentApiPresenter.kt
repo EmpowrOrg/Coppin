@@ -1,19 +1,26 @@
 package org.empowrco.coppin.assignment.presenters
 
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.empowrco.coppin.assignment.backend.AssignmentApiRepository
 import org.empowrco.coppin.assignment.presenters.RequestApi.DeleteAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.RequestApi.GetAssignmentRequest
+import org.empowrco.coppin.assignment.presenters.RequestApi.RunRequest
 import org.empowrco.coppin.assignment.presenters.RequestApi.SubmitRequest
 import org.empowrco.coppin.assignment.presenters.ResponseApi.DeleteAssignmentResponse
 import org.empowrco.coppin.assignment.presenters.ResponseApi.GetAssignmentResponse
+import org.empowrco.coppin.assignment.presenters.ResponseApi.RunResponse
 import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
+import org.empowrco.coppin.models.Assignment
+import org.empowrco.coppin.models.AssignmentCode
+import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
 import org.empowrco.coppin.utils.InvalidUuidException
 import org.empowrco.coppin.utils.UnknownException
 import org.empowrco.coppin.utils.toUuid
 
 interface AssignmentApiPresenter {
+    suspend fun run(request: RunRequest): RunResponse
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
     suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse
@@ -22,6 +29,37 @@ interface AssignmentApiPresenter {
 internal class RealAssignmentApiPresenter(
     private val repo: AssignmentApiRepository,
 ) : AssignmentApiPresenter {
+
+    override suspend fun run(request: RunRequest): RunResponse {
+        repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
+        val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
+        if (request.code.isBlank()) {
+            throw BadRequestException("The code is not blank")
+        }
+
+        val response = repo.runCode(language.mime, request.code)
+        return RunResponse(response.output, true)
+    }
+
+    private suspend fun getLanguage(language: String): Language? {
+        return repo.getLanguages().firstOrNull {
+            (it.name.equals(language, ignoreCase = true) ||
+                    it.mime.equals(language, ignoreCase = true))
+        }
+    }
+
+    private fun getAssignmentCode(
+        assignment: Assignment,
+        languageName: String,
+    ): AssignmentCode {
+        val assignmentCode =
+            assignment.assignmentCodes.find {
+                it.language.name.equals(languageName, ignoreCase = true)
+            } ?: run {
+                throw AssignmentLanguageSupportException(languageName)
+            }
+        return assignmentCode
+    }
 
     override suspend fun submit(request: SubmitRequest): SubmitResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
@@ -35,16 +73,8 @@ internal class RealAssignmentApiPresenter(
                 diff = null,
             )
         }
-
-        val assignmentCode =
-            assignment.assignmentCodes.find {
-                it.language.mime.equals(
-                    request.language,
-                    ignoreCase = true
-                ) || it.language.name.equals(request.language, ignoreCase = true)
-            } ?: run {
-                throw AssignmentLanguageSupportException(request.language)
-            }
+        val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
+        val assignmentCode = getAssignmentCode(assignment, language.name)
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
@@ -53,7 +83,7 @@ internal class RealAssignmentApiPresenter(
         } else {
             request.code
         }
-        val codeResponse = repo.testCode(request.language, code, assignmentCode.unitTest)
+        val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         return if (matches.isNotEmpty()) {

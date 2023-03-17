@@ -2,6 +2,7 @@ package org.empowrco.coppin.assignment.api
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
@@ -22,12 +23,18 @@ fun Application.assignmentApi() {
             post("/request") {
                 call.respond(presenter.get(call.receive()))
             }
-            delete("{uuid}") {
-                val request = DeleteAssignmentRequest(
-                    id = call.parameters["uuid"].toString()
-                )
-                call.respond(presenter.deleteAssignment(request))
+            post("/run") {
+                call.respond(presenter.run(call.receive()))
             }
+            authenticate("auth-session") {
+                delete("{uuid}") {
+                    val request = DeleteAssignmentRequest(
+                        id = call.parameters["uuid"].toString()
+                    )
+                    call.respond(presenter.deleteAssignment(request))
+                }
+            }
+
         }
     }
 }
