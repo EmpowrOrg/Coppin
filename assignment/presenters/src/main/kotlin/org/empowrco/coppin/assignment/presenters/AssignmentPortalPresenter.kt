@@ -95,9 +95,10 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             GetAssignmentPortalResponse.Code(
                 id = it.id.toString(),
                 language = it.language.name,
-                primary = if (it.primary) "True" else "",
-                hasSolution = if (it.solutionCode.isNotBlank()) "True" else "",
-                hasStarter = if (it.starterCode.isNotBlank()) "True" else "",
+                primary = it.primary.toString().capitalize(),
+                hasSolution = it.solutionCode.isNotBlank().toString().capitalize(),
+                hasStarter = it.starterCode.isNotBlank().toString().capitalize(),
+                injectable = it.injectable.toString().capitalize(),
                 assignmentId = assignment.id.toString(),
             )
         }
