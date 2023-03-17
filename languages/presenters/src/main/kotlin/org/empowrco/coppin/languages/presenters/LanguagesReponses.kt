@@ -12,6 +12,7 @@ data class GetLanguageResponse(
     val name: String?,
     val url: String?,
     val mime: String?,
+    val unitTestRegex: String?,
 )
 
 @Serializable

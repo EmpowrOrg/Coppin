@@ -21,15 +21,33 @@
                     <form role="form" id="create-assignment"
                           action="/languages/<#if content.id??>${content.id}</#if>"
                           method="post">
-                        <div class="row">
-                            <div class="col-sm input-group input-group-outline mb-3">
-                                <input type="text" name="name" class="form-control" placeholder="Name"
-                                       <#if content.name??>value="${content.name}" </#if>>
+                        <div class="row col-lg-12">
+                            <div class="col-4">
+                                <div class="input-group input-group-outline mb-3">
+                                    <input type="text" name="name" class="form-control" placeholder="Name"
+                                           <#if content.name??>value="${content.name}" </#if>>
+                                </div>
                             </div>
-                            <div class="col-sm input-group input-group-outline mb-3">
-                                <input type="text" name="mime" class="form-control" placeholder="Mime"
-                                       <#if content.mime??>value="${content.mime}" </#if>>
+                            <div class="col-4">
+                                <div class="input-group input-group-outline mb-3">
+                                    <input type="text" name="mime" class="form-control" placeholder="Mime"
+                                           <#if content.mime??>value="${content.mime}" </#if>>
+                                </div>
                             </div>
+                            <div class="col-4">
+                                <div class="input-group input-group-outline mb-3">
+                                    <div class="input-group-prepend m-1">
+                                        <a class="align-middle">
+                                            <span class="material-icons align-middle">info</span>
+                                        </a>
+                                    </div>
+                                    <input id="unitTestRegex" type="text" name="unitTestRegex" class="form-control"
+                                           placeholder="Unit Test Regex"
+                                           <#if content.unitTestRegex??>value="${content.unitTestRegex}" </#if>>
+                                </div>
+                            </div>
+
+
                         </div>
                         <div class="col-sm input-group input-group-outline mb-3">
                             <input type="text" name="url" class="form-control" placeholder="CodeMirror Url"

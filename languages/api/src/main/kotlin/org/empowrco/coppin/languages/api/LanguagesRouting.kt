@@ -45,12 +45,14 @@ fun Application.languagesRouting() {
                         val name = formParameters["name"].toString()
                         val mime = formParameters["mime"].toString()
                         val url = formParameters["url"].toString()
+                        val unitTestRegex = formParameters["unitTestRegex"].toString()
                         presenter.upsertLanguage(
                             UpsertLanguageRequest(
                                 name = name,
                                 mime = mime,
                                 url = url,
                                 id = uuid,
+                                unitTestRegex = unitTestRegex,
                             )
                         )
                         call.respondRedirect("/languages")

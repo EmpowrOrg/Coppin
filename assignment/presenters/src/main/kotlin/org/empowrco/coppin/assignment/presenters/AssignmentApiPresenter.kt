@@ -54,35 +54,25 @@ internal class RealAssignmentApiPresenter(
             request.code
         }
         val codeResponse = repo.testCode(request.language, code, assignmentCode.unitTest)
-
-        return if (!codeResponse.success) {
-            val error = codeResponse.output
+        val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
+        val matches = languageRegex.findAll(codeResponse.output).toList()
+        return if (matches.isNotEmpty()) {
             SubmitResponse(
-                output = error,
+                output = matches.first().value,
                 success = false,
                 finalAttempt = isFinalAttempt,
                 diff = null,
             )
         } else {
-            val matches = "(?<=XCTAssertEqual failed:).*\\n".toRegex().findAll(codeResponse.output).toList()
-            return if (matches.isNotEmpty()) {
-                SubmitResponse(
-                    output = matches.first().value,
-                    success = false,
-                    finalAttempt = isFinalAttempt,
-                    diff = null,
-                )
-            } else {
-                SubmitResponse(
-                    output = assignment.successMessage,
-                    success = true,
-                    finalAttempt = isFinalAttempt,
-                    diff = null,
-                )
-            }
-
-
+            SubmitResponse(
+                output = assignment.successMessage,
+                success = true,
+                finalAttempt = isFinalAttempt,
+                diff = null,
+            )
         }
+
+
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {

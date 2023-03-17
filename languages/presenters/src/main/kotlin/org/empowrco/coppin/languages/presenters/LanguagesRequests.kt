@@ -9,6 +9,7 @@ data class UpsertLanguageRequest(
     val url: String,
     val mime: String,
     val name: String,
+    val unitTestRegex: String,
 )
 
 data class DeleteLanguageRequest(

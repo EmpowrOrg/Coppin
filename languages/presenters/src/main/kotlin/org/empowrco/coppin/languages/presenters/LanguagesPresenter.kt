@@ -31,19 +31,27 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
     }
 
     override suspend fun getLanguage(request: GetLanguageRequest): Result<GetLanguageResponse> {
-        request.id ?: return GetLanguageResponse(null, null, null, null).toResult()
+        request.id ?: return GetLanguageResponse(null, null, null, null, null).toResult()
         val uuid = request.id.toUuid() ?: return failure("Invalid id")
         val language = repo.getLanguage(uuid) ?: return failure("No language found")
         return GetLanguageResponse(
             id = language.id.toString(),
             name = language.name,
             mime = language.mime,
-            url = language.url
+            url = language.url,
+            unitTestRegex = language.unitTestRegex,
         ).toResult()
     }
 
     override suspend fun upsertLanguage(request: UpsertLanguageRequest): Result<UpsertLanguageResponse> {
         val currentTime = LocalDateTime.now()
+        if (request.mime.isBlank()) {
+            return failure("Mime cannot be blank")
+        } else if (request.name.isBlank()) {
+            return failure("Name cannot be blank")
+        } else if (request.unitTestRegex.isBlank()) {
+            return failure("Regex cannot be blank")
+        }
         if (request.id.nonEmpty() == null) {
             try {
                 URL(request.url).toURI()
@@ -55,6 +63,7 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
                 url = request.url,
                 mime = request.mime,
                 name = request.name,
+                unitTestRegex = request.unitTestRegex,
                 createdAt = currentTime,
                 lastModifiedAt = currentTime,
             )
@@ -67,6 +76,7 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
             url = request.url,
             mime = request.mime,
             name = request.name,
+            unitTestRegex = request.unitTestRegex,
             lastModifiedAt = currentTime,
         )
         repo.updateLanguage(updatedLanguage)

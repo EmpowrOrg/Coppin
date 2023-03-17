@@ -8,6 +8,7 @@ data class Language(
     val name: String,
     val mime: String,
     val url: String,
+    val unitTestRegex: String,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 )
