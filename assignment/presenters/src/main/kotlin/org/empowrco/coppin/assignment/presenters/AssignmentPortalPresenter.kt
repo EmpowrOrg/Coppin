@@ -52,7 +52,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         )
         val result = repo.updateAssignment(updatedAssignment)
         if (!result) {
-            return failure("Unknown error")
+            return failure("There was an error updating the assignment")
         }
         return UpdateAssignmentResponse.toResult()
     }
