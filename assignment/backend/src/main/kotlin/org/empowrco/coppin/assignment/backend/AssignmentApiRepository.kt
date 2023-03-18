@@ -4,12 +4,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -48,13 +46,6 @@ internal class RealAssignmentApiRepository(
                 explicitNulls = false
                 encodeDefaults = true
             })
-        }
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    BearerTokens("password", "")
-                }
-            }
         }
         install(HttpTimeout) {
             val timeout = TimeUnit.MINUTES.toMillis(1)
@@ -116,6 +107,10 @@ internal class RealAssignmentApiRepository(
         val response = client.post("$url$path") {
             contentType(ContentType.Application.Json)
             setBody(body)
+        }
+        if (System.getenv("DEBUG").toBoolean()) {
+            val responseText = response.bodyAsText()
+            println(responseText)
         }
         return response.body()
     }
