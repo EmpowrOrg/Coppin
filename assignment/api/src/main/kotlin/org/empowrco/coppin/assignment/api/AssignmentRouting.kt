@@ -83,6 +83,7 @@ fun Application.assignmentRouting() {
                         val title = formParameters["title"].toString()
                         val totalAttempts = formParameters["total-attempts"].toString().toInt()
                         val gradingType = formParameters["grading-type"].toString()
+                        val referenceId = formParameters["reference-id"].toString()
                         presenter.updateAssignment(
                             UpdateAssignmentPortalRequest(
                                 id = call.parameters["uuid"],
@@ -91,7 +92,8 @@ fun Application.assignmentRouting() {
                                 instructions = instructions,
                                 title = title,
                                 totalAttempts = totalAttempts,
-                                gradingType = gradingType
+                                gradingType = gradingType,
+                                referenceId = referenceId,
                             )
                         ).fold({
                             call.respondRedirect("/assignments")

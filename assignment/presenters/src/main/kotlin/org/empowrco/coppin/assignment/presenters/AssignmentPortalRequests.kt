@@ -30,6 +30,7 @@ data class UpdateAssignmentPortalRequest(
     val failureMessage: String,
     val totalAttempts: Int,
     val title: String,
+    val referenceId: String,
     val gradingType: String,
 )
 

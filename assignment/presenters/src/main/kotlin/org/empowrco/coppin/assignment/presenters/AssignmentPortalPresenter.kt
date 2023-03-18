@@ -47,6 +47,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             instructions = request.instructions,
             totalAttempts = request.totalAttempts,
             title = request.title,
+            referenceId = request.referenceId,
             lastModifiedAt = currentTime,
         )
         val result = repo.updateAssignment(updatedAssignment)
