@@ -1,5 +1,6 @@
 package org.empowrco.plugins
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -30,7 +31,7 @@ fun Application.configureRouting() {
         }
 
         get("/health") {
-            call.respond("Hello, World")
+            call.respond(HttpStatusCode.OK)
         }
         static("/") {
             staticBasePackage = "files"
