@@ -38,7 +38,7 @@ internal class RealAssignmentApiPresenter(
         }
 
         val response = repo.runCode(language.mime, request.code)
-        return RunResponse(response.output, true)
+        return RunResponse(response.output, response.success ?: true)
     }
 
     private suspend fun getLanguage(language: String): Language? {
