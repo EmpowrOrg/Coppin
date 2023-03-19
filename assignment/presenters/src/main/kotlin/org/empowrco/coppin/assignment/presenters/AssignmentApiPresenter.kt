@@ -93,6 +93,13 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 diff = null,
             )
+        } else if (codeResponse.success == false) {
+            SubmitResponse(
+                output = codeResponse.output,
+                success = false,
+                finalAttempt = isFinalAttempt,
+                diff = null,
+            )
         } else {
             SubmitResponse(
                 output = assignment.successMessage,
@@ -101,8 +108,6 @@ internal class RealAssignmentApiPresenter(
                 diff = null,
             )
         }
-
-
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
