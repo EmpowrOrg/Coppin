@@ -63,7 +63,11 @@ internal class RealAssignmentApiPresenter(
 
     override suspend fun submit(request: SubmitRequest): SubmitResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
-        val isFinalAttempt = request.attempt >= assignment.totalAttempts
+        val isFinalAttempt = if (assignment.totalAttempts == 0) {
+            false
+        } else {
+            request.attempt >= assignment.totalAttempts
+        }
 
         if (assignment.totalAttempts > 0 && request.attempt > assignment.totalAttempts) {
             return SubmitResponse(
