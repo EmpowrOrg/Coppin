@@ -7,7 +7,6 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -19,6 +18,7 @@ import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.utils.logs.logDebug
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -108,10 +108,8 @@ internal class RealAssignmentApiRepository(
             contentType(ContentType.Application.Json)
             setBody(body)
         }
-        if (System.getenv("DEBUG").toBoolean()) {
-            val responseText = response.bodyAsText()
-            println(responseText)
-        }
-        return response.body()
+        val code = response.body<AssignmentCodeResponse>()
+        logDebug(code.toString())
+        return code
     }
 }

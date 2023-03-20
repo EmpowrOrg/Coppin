@@ -45,6 +45,7 @@ object Deps {
         val main by lazy { ":utils" }
         val files by lazy { ":utils:files" }
         val authenticator by lazy { ":utils:authenticator" }
+        val logs by lazy { ":utils:logs" }
 
         object Diff {
             val main by lazy { ":utils:diff" }

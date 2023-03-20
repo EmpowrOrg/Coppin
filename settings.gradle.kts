@@ -52,3 +52,5 @@ include("dashboard:backend")
 findProject(":dashboard:backend")?.name = "backend"
 include("dashboard:presenters")
 findProject(":dashboard:presenters")?.name = "presenters"
+include("utils:logs")
+findProject(":utils:logs")?.name = "logs"
