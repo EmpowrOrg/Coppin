@@ -70,7 +70,7 @@
         </#if>
     </form>
     <div class="row pb-4">
-        <div class="page-header min-height-300 border-radius-xl mt-4"
+        <div class="page-header min-height-300 border-radius-xl"
              style="background-image: url('https://images.squarespace-cdn.com/content/v1/6115c8568ff9bd2eb31a6119/1629002711131-NZ8AN12RKLYEPOC56PXL/unsplash-image-AQ908FfdAMw.jpg&auto=format&fit=crop&w=1920&q=80');">
             <span class="mask  bg-gradient-primary  opacity-6"></span>
         </div>

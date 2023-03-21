@@ -28,14 +28,14 @@
                 integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     </head>
 
-    <body class="g-sidenav-show  bg-gray-200 p-0 m-0">
+    <body class="g-sidenav-show  bg-gray-200 p-0 me-3">
     <#if hideSideNav??>
     <#else>
         <#include "sidenav.ftl">
     </#if>
 
-    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <div class="container-fluid" style="padding-right: 0; padding-left: 0;">
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg me-3">
+        <div class="container-fluid ms-3 mt-3 mb-1" style="padding-right: 0; padding-left: 0;">
             <#nested>
         </div>
     </main>
