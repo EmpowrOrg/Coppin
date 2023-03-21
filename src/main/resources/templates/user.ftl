@@ -17,22 +17,23 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form role="form" class="text-start" method="post" action="/users/manage/${content.id}">
+                        <#include "error.ftl">
+                        <form role="form" class="text-start" method="post" action="/user/${content.id}">
                             <div class="row">
                                 <div class="input-group input-group-static my-3 col">
                                     <label class="form-label">First Name</label>
                                     <input name="firstName" type="text" class="form-control"
-                                           value="${content.firstName}" disabled>
+                                           value="${content.firstName}" readonly>
                                 </div>
                                 <div class="input-group input-group-static my-3 col">
                                     <label class="form-label">Last Name</label>
                                     <input name="lastName" type="text" class="form-control"
-                                           value="${content.lastName}" disabled>
+                                           value="${content.lastName}" readonly>
                                 </div>
                                 <div class="input-group input-group-static my-3 col">
                                     <label class="form-label">Email</label>
                                     <input name="email" type="email" class="form-control"
-                                           value="${content.email}" disabled>
+                                           value="${content.email}" readonly>
                                 </div>
                             </div>
                             <div class="row">
@@ -53,14 +54,14 @@
                                         <option value="Admin"
                                                 <#if content.type == "Admin">selected</#if>>Admin
                                         </option>
-                                        <option value="Counselor"
-                                                <#if content.type == "Counselor">selected</#if>>Counselor
+                                        <option value="Teacher"
+                                                <#if content.type == "Teacher">selected</#if>>Teacher
                                         </option>
                                     </select>
                                 </div>
                             </div>
 
-                            <#include "error.ftl">
+
                             <#if content.id??>
                                 <input type="hidden" name="id" value="${content.id}">
                             </#if>

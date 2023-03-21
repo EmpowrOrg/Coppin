@@ -6,7 +6,6 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
-import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -48,7 +47,7 @@ fun Application.usersRouting() {
                         call.errorRedirect(it.localizedMessage)
                     })
                 }
-                patch {
+                post {
                     val params = call.receiveParameters()
                     val request = PatchUserRequest(
                         id = call.parameters["uuid"].toString(),
