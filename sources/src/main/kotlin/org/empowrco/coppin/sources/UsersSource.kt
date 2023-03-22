@@ -60,7 +60,7 @@ internal class RealUsersSource : UsersSource {
     }
 
     override suspend fun updateUser(user: User): Boolean = dbQuery {
-        Users.update {
+        Users.update({ Users.id eq user.id }) {
             insert(it, user, false)
         } > 0
     }

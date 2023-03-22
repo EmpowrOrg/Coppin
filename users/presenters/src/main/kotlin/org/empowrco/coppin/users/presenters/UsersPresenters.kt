@@ -117,7 +117,7 @@ class RealUsersPresenters(
         val type = try {
             User.Type.valueOf(request.type.capitalize())
         } catch (ex: Exception) {
-            return failure("Invalid type")
+            return failure("Invalid User Type")
         }
         val updatedUser = user.copy(
             firstName = user.firstName,
