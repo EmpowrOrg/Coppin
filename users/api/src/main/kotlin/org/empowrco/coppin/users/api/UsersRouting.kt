@@ -13,6 +13,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.CreateAccessKey
@@ -40,6 +41,13 @@ fun Application.usersRouting() {
                     })
                 }
 
+            }
+            get("user") {
+                val userId = call.sessions.get<UserSession>()?.userId ?: run {
+                    call.errorRedirect("User Id Not Found", "/login")
+                    return@get
+                }
+                call.respondRedirect("/user/$userId")
             }
             route("user/{uuid}") {
                 get {
