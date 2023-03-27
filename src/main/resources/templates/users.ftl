@@ -1,5 +1,5 @@
 
-<#-- @ftlvariable name="content" type="tech.devezin.users.presenters.GetUsersResponse" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.users.presenters.GetUsersResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <script>
