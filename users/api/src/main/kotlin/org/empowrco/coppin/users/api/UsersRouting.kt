@@ -3,8 +3,11 @@ package org.empowrco.coppin.users.api
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
 import io.ktor.server.request.receiveParameters
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -12,10 +15,12 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
+import org.empowrco.coppin.users.presenters.CreateAccessKey
+import org.empowrco.coppin.users.presenters.DeleteAccessKey
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.LoginRequest
-import org.empowrco.coppin.users.presenters.PatchUserRequest
 import org.empowrco.coppin.users.presenters.RegisterRequest
+import org.empowrco.coppin.users.presenters.UpdateUserRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
 import org.empowrco.coppin.utils.routing.UserSession
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -39,7 +44,7 @@ fun Application.usersRouting() {
             route("user/{uuid}") {
                 get {
                     val request = GetUserRequest(
-                        id = call.parameters["uuid"].toString()
+                        id = call.parameters["uuid"].toString(),
                     )
                     presenter.getUser(request).fold({
                         call.respondFreemarker("user.ftl", it)
@@ -49,7 +54,7 @@ fun Application.usersRouting() {
                 }
                 post {
                     val params = call.receiveParameters()
-                    val request = PatchUserRequest(
+                    val request = UpdateUserRequest(
                         id = call.parameters["uuid"].toString(),
                         email = params["email"].toString(),
                         firstName = params["firstName"].toString(),
@@ -62,6 +67,24 @@ fun Application.usersRouting() {
                     }, {
                         call.errorRedirect(it.localizedMessage)
                     })
+                }
+                route("keys/{keyId?}") {
+                    post {
+                        val request = call.receive<CreateAccessKey>()
+                        presenter.createKey(request).fold({
+                            call.respond(it)
+                        }, {
+                            call.errorRedirect(it, "/user/${call.parameters["uuid"]}")
+                        })
+                    }
+                    delete {
+                        val request = call.receive<DeleteAccessKey>()
+                        presenter.deleteKey(request).fold({
+                            call.respond(it)
+                        }, {
+                            call.errorRedirect(it, "/user/${call.parameters["uuid"]}")
+                        })
+                    }
                 }
             }
         }

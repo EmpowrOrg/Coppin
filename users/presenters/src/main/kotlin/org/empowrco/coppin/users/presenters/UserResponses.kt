@@ -1,5 +1,7 @@
 package org.empowrco.coppin.users.presenters
 
+import kotlinx.serialization.Serializable
+
 
 data class LoginResponse(val id: String, val isAdmin: Boolean)
 
@@ -24,6 +26,17 @@ data class GetUserResponse(
     val type: String,
     val firstName: String,
     val lastName: String,
-)
+    val hasKeys: Boolean,
+    val keys: List<Key>?,
+) {
+    data class Key(val key: String, val id: String)
+}
+
 
 object PatchUserResponse
+
+@Serializable
+data class CreateKeyResponse(val key: String)
+
+@Serializable
+object DeleteKeyResponse

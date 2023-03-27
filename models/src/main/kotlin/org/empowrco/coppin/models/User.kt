@@ -11,6 +11,7 @@ data class User(
     val passwordHash: String,
     val type: Type,
     val isAuthorized: Boolean,
+    val keys: List<UserAccessKey>,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 ) {

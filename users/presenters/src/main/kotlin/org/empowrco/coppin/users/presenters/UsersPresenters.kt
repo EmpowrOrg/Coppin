@@ -2,6 +2,7 @@ package org.empowrco.coppin.users.presenters
 
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.models.User
+import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.users.backend.UsersRepository
 import org.empowrco.coppin.utils.DuplicateKeyException
 import org.empowrco.coppin.utils.authenticator.Authenticator
@@ -10,6 +11,8 @@ import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
+import java.security.SecureRandom
+import java.util.Base64
 import java.util.UUID
 
 interface UsersPresenters {
@@ -17,7 +20,9 @@ interface UsersPresenters {
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun getUsers(): Result<GetUsersResponse>
     suspend fun getUser(request: GetUserRequest): Result<GetUserResponse>
-    suspend fun updateUser(request: PatchUserRequest): Result<PatchUserResponse>
+    suspend fun updateUser(request: UpdateUserRequest): Result<PatchUserResponse>
+    suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse>
+    suspend fun deleteKey(request: DeleteAccessKey): Result<DeleteKeyResponse>
 }
 
 class RealUsersPresenters(
@@ -68,6 +73,7 @@ class RealUsersPresenters(
             email = request.email,
             type = User.Type.Teacher,
             isAuthorized = false,
+            keys = emptyList(),
             passwordHash = passwordHash,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
@@ -99,7 +105,7 @@ class RealUsersPresenters(
     }
 
     override suspend fun getUser(request: GetUserRequest): Result<GetUserResponse> {
-        val userId = request.id.toUuid() ?: return failure("No user found")
+        val userId = request.id.toUuid() ?: return failure("Invalid User Id")
         val user = repo.getUser(userId) ?: return failure("No user found")
         return GetUserResponse(
             id = user.id.toString(),
@@ -108,10 +114,17 @@ class RealUsersPresenters(
             authorized = user.isAuthorized,
             email = user.email,
             type = user.type.name,
+            keys = user.keys.map {
+                GetUserResponse.Key(
+                    id = it.id.toString(),
+                    key = it.key,
+                )
+            },
+            hasKeys = user.keys.isNotEmpty()
         ).toResult()
     }
 
-    override suspend fun updateUser(request: PatchUserRequest): Result<PatchUserResponse> {
+    override suspend fun updateUser(request: UpdateUserRequest): Result<PatchUserResponse> {
         val userId = request.id.toUuid() ?: return failure("No user found")
         val user = repo.getUser(userId) ?: return failure("No user found")
         val type = try {
@@ -131,5 +144,55 @@ class RealUsersPresenters(
             return failure("Something went wrong")
         }
         return PatchUserResponse.toResult()
+    }
+
+    override suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse> {
+        val userId = request.id.toUuid() ?: return failure("Invalid User Id")
+        val user = repo.getUser(userId) ?: return failure("User Not Found")
+        val passwordHash = authenticator.hash(request.password)
+        if (user.passwordHash != passwordHash) {
+            return failure("Invalid password")
+        }
+        val randomKey = generateRandomPassword()
+        val keyId = UUID.randomUUID()
+        val prefix = Base64.getEncoder().encodeToString(keyId.toString().toByteArray(Charsets.UTF_8))
+        val suffix = Base64.getEncoder().encodeToString(randomKey.toByteArray(Charsets.UTF_8))
+        val key = "$prefix.$suffix"
+        val currentTime = LocalDateTime.now()
+        val accessKey = UserAccessKey(
+            userId = userId,
+            id = keyId,
+            key = key,
+            createdAt = currentTime,
+            lastModifiedAt = currentTime,
+        )
+        repo.createKey(accessKey)
+        return CreateKeyResponse(key).toResult()
+    }
+
+    private fun generateRandomPassword(): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        val random = SecureRandom();
+        val sb = StringBuilder();
+        for (i in 0 until 32) {
+            val randomIndex = random.nextInt(chars.length)
+            sb.append(chars[randomIndex])
+        }
+        return sb.toString();
+    }
+
+    override suspend fun deleteKey(request: DeleteAccessKey): Result<DeleteKeyResponse> {
+        val userId = request.userId.toUuid() ?: return failure("Invalid user id")
+        val keyId = request.id.toUuid() ?: return failure("Invalid key id")
+        val user = repo.getUser(userId) ?: return failure("User not found")
+        val passwordHash = authenticator.hash(request.password)
+        if (passwordHash != user.passwordHash) {
+            return failure("Invalid password")
+        }
+        val result = repo.deleteKey(keyId)
+        if (!result) {
+            return failure("Error deleting key")
+        }
+        return DeleteKeyResponse.toResult()
     }
 }
