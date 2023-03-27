@@ -13,6 +13,7 @@ object DatabaseFactory {
         Languages,
         AssignmentCodes,
         Users,
+        UserAccessKeys,
     ).toTypedArray()
 
     fun init() {
