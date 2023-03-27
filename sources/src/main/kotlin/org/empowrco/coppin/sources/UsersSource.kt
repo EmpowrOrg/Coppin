@@ -1,7 +1,9 @@
 package org.empowrco.coppin.sources
 
+import org.empowrco.coppin.db.UserAccessKeys
 import org.empowrco.coppin.db.Users
 import org.empowrco.coppin.models.User
+import org.empowrco.coppin.models.UserAccessKey
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
@@ -19,6 +21,11 @@ interface UsersSource {
     suspend fun updateUser(user: User): Boolean
     suspend fun deleteUser(id: UUID): Boolean
     suspend fun getUsers(): List<User>
+    suspend fun deleteKey(id: UUID): Boolean
+    suspend fun createKey(key: UserAccessKey)
+    suspend fun getKey(id: UUID): UserAccessKey?
+    suspend fun getKeyByValue(value: String): UserAccessKey?
+    suspend fun getKeysForUser(userId: UUID): List<UserAccessKey>
 }
 
 internal class RealUsersSource : UsersSource {
@@ -65,21 +72,61 @@ internal class RealUsersSource : UsersSource {
         } > 0
     }
 
+    override suspend fun deleteKey(id: UUID): Boolean = dbQuery {
+        UserAccessKeys.deleteWhere { UserAccessKeys.id eq id } > 0
+    }
+
+    override suspend fun createKey(key: UserAccessKey) = dbQuery {
+        UserAccessKeys.insert {
+            it[UserAccessKeys.id] = key.id
+            it[UserAccessKeys.user] = key.userId
+            it[UserAccessKeys.key] = key.key
+            it[UserAccessKeys.createdAt] = key.createdAt
+            it[UserAccessKeys.lastModifiedAt] = key.lastModifiedAt
+        }
+        Unit
+    }
+
     override suspend fun deleteUser(id: UUID): Boolean = dbQuery {
         Users.deleteWhere { Users.id eq id } > 0
     }
 
+    override suspend fun getKey(id: UUID): UserAccessKey? = dbQuery {
+        UserAccessKeys.select { UserAccessKeys.id eq id }.map { it.toUserAccessKey() }.firstOrNull()
+    }
+
+    override suspend fun getKeysForUser(userId: UUID): List<UserAccessKey> = dbQuery {
+        UserAccessKeys.select { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
+    }
+
+    override suspend fun getKeyByValue(value: String): UserAccessKey? = dbQuery {
+        UserAccessKeys.select { UserAccessKeys.key eq value }.firstNotNullOfOrNull { it.toUserAccessKey() }
+    }
+
     private fun ResultRow.toUser(): User {
+        val userId = this[Users.id].value
+        val keys = UserAccessKeys.select { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
         return User(
-            id = this[Users.id].value,
+            id = userId,
             firstName = this[Users.firstName],
             lastName = this[Users.lastName],
             email = this[Users.email],
             passwordHash = this[Users.passwordHash],
             type = this[Users.type],
             isAuthorized = this[Users.isAuthorized],
+            keys = keys,
             createdAt = this[Users.createdAt],
             lastModifiedAt = this[Users.lastModifiedAt]
+        )
+    }
+
+    private fun ResultRow.toUserAccessKey(): UserAccessKey {
+        return UserAccessKey(
+            userId = this[UserAccessKeys.user].value,
+            key = this[UserAccessKeys.key],
+            id = this[UserAccessKeys.id].value,
+            createdAt = this[UserAccessKeys.createdAt],
+            lastModifiedAt = this[UserAccessKeys.lastModifiedAt],
         )
     }
 }
