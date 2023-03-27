@@ -54,8 +54,12 @@ fun Application.languagesRouting() {
                                 id = uuid,
                                 unitTestRegex = unitTestRegex,
                             )
-                        )
-                        call.respondRedirect("/languages")
+                        ).fold({
+                            call.respondRedirect("/languages")
+                        }, {
+                            call.errorRedirect(it)
+                        })
+
                     }
                 }
             }
