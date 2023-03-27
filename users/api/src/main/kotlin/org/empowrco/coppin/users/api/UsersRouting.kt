@@ -51,8 +51,10 @@ fun Application.usersRouting() {
             }
             route("user/{uuid}") {
                 get {
+                    val currentUserId = call.sessions.get<UserSession>()?.userId.toString()
                     val request = GetUserRequest(
                         id = call.parameters["uuid"].toString(),
+                        currentUserId = currentUserId
                     )
                     presenter.getUser(request).fold({
                         call.respondFreemarker("user.ftl", it)
