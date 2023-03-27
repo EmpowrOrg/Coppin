@@ -97,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row col-lg-3">
+                <div class="row col-lg-4">
                     <div class="col-6">
                         <div class="input-group input-group-outline my-3">
                             <label for="total-attempts" class="form-label">Total Attempts</label>
