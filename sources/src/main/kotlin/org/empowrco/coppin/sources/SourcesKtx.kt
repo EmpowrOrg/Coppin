@@ -18,7 +18,7 @@ internal suspend fun <T> dbQuery(block: suspend () -> T): T =
                 block()
             } catch (ex: ExposedSQLException) {
                 if (ex.message?.contains("duplicate key") == true) {
-                    throw DuplicateKeyException(ex)
+                    throw DuplicateKeyException()
                 }
                 throw ex
             }

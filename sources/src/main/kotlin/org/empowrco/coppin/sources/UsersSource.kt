@@ -79,7 +79,7 @@ internal class RealUsersSource : UsersSource {
     override suspend fun createKey(key: UserAccessKey) = dbQuery {
         UserAccessKeys.insert {
             it[UserAccessKeys.id] = key.id
-            it[UserAccessKeys.user] = key.userId
+            it[user] = key.userId
             it[UserAccessKeys.key] = key.key
             it[UserAccessKeys.createdAt] = key.createdAt
             it[UserAccessKeys.lastModifiedAt] = key.lastModifiedAt

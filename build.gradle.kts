@@ -70,7 +70,6 @@ dependencies {
     implementation(project(Deps.Languages.api))
     implementation(project(Deps.Languages.presenters))
     implementation(project(Deps.Sources.main))
-    implementation(project(Deps.Command.main))
     implementation(project(Deps.Db.main))
     implementation(project(Deps.Models.main))
     implementation(project(Deps.Users.api))

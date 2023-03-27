@@ -21,7 +21,7 @@
             });
             $('#languages-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
             $('#languages-table tbody').on('click', 'tr', function () {
-                var data = table.row(this).data();
+                const data = table.row(this).data();
                 window.location = "/languages/" + data[2]
             });
         });

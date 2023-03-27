@@ -1,8 +1,7 @@
 object Deps {
 
-    object Command {
-        val main by lazy { ":command" }
-        val fakes by lazy { ":command:fakes" }
+    object Apache {
+        val commonsText by lazy { "org.apache.commons:commons-text:1.10.0" }
     }
 
     object Assignment {
@@ -46,18 +45,12 @@ object Deps {
         val files by lazy { ":utils:files" }
         val authenticator by lazy { ":utils:authenticator" }
         val logs by lazy { ":utils:logs" }
-
-        object Diff {
-            val main by lazy { ":utils:diff" }
-            val fakes by lazy { ":utils:diff:fakes" }
-        }
     }
 
     object Exposed {
         val core by lazy { "org.jetbrains.exposed:exposed-core:${Versions.exposed}" }
         val jdbc by lazy { "org.jetbrains.exposed:exposed-jdbc:${Versions.exposed}" }
         val dateTime by lazy { "org.jetbrains.exposed:exposed-kotlin-datetime:${Versions.exposed}" }
-        val javaDateTime by lazy { "org.jetbrains.exposed:exposed-java-time:${Versions.exposed}" }
     }
 
     object Hikari {
@@ -65,7 +58,7 @@ object Deps {
     }
 
     object Postgresql {
-        val main by lazy { "org.postgresql:postgresql:42.3.1" }
+        val main by lazy { "org.postgresql:postgresql:42.6.0" }
     }
 
     object Models {
@@ -83,7 +76,6 @@ object Deps {
 
     object Koin {
         val main by lazy { "io.insert-koin:koin-ktor:${Versions.koin}" }
-        val logger by lazy { "io.insert-koin:koin-logger-slf4j:${Versions.koin}" }
     }
 
     object Kotlin {
@@ -123,9 +115,4 @@ object Deps {
     object Logback {
         val main by lazy { "ch.qos.logback:logback-classic:${Versions.logback}" }
     }
-
-    object Archiver {
-        val main by lazy { "org.rauschig:jarchivelib:1.2.0" }
-    }
-
 }

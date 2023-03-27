@@ -1,29 +1,33 @@
 "use strict";
 (function() {
-  var isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
+    const isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
 
   if (isWindows) {
     // if we are on windows OS we activate the perfectScrollbar function
     if (document.getElementsByClassName('main-content')[0]) {
-      var mainpanel = document.querySelector('.main-content');
-      var ps = new PerfectScrollbar(mainpanel);
-    };
+      const mainpanel = document.querySelector('.main-content');
+      const ps = new PerfectScrollbar(mainpanel);
+    }
+    ;
 
     if (document.getElementsByClassName('sidenav')[0]) {
-      var sidebar = document.querySelector('.sidenav');
-      var ps1 = new PerfectScrollbar(sidebar);
-    };
+      const sidebar = document.querySelector('.sidenav');
+      const ps1 = new PerfectScrollbar(sidebar);
+    }
+    ;
 
     if (document.getElementsByClassName('navbar-collapse')[0]) {
       var fixedplugin = document.querySelector('.navbar:not(.navbar-expand-lg) .navbar-collapse');
-      var ps2 = new PerfectScrollbar(fixedplugin);
+      const ps2 = new PerfectScrollbar(fixedplugin);
     };
 
     if (document.getElementsByClassName('fixed-plugin')[0]) {
       var fixedplugin = document.querySelector('.fixed-plugin');
-      var ps3 = new PerfectScrollbar(fixedplugin);
-    };
-  };
+      const ps3 = new PerfectScrollbar(fixedplugin);
+    }
+    ;
+  }
+  ;
 })();
 
 // Verify navbar blur on scroll
@@ -32,10 +36,10 @@ if (document.getElementById('navbarBlur')) {
 }
 
 // initialization of Tooltips
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
-})
+});
 
 // when input is focused add focused class for style
 function focused(el) {
@@ -60,7 +64,7 @@ function setAttributes(el, options) {
 
 // adding on inputs attributes for calling the focused and defocused functions
 if (document.querySelectorAll('.input-group').length != 0) {
-  var allInputs = document.querySelectorAll('input.form-control');
+  const allInputs = document.querySelectorAll('input.form-control');
   allInputs.forEach(el => setAttributes(el, {
     "onfocus": "focused(this)",
     "onfocusout": "defocused(this)"
@@ -73,15 +77,15 @@ if (document.querySelectorAll('.input-group').length != 0) {
 if (document.querySelector('.fixed-plugin')) {
   var fixedPlugin = document.querySelector('.fixed-plugin');
   var fixedPlugin = document.querySelector('.fixed-plugin');
-  var fixedPluginButton = document.querySelector('.fixed-plugin-button');
-  var fixedPluginButtonNav = document.querySelector('.fixed-plugin-button-nav');
-  var fixedPluginCard = document.querySelector('.fixed-plugin .card');
-  var fixedPluginCloseButton = document.querySelectorAll('.fixed-plugin-close-button');
+  const fixedPluginButton = document.querySelector('.fixed-plugin-button');
+  const fixedPluginButtonNav = document.querySelector('.fixed-plugin-button-nav');
+  const fixedPluginCard = document.querySelector('.fixed-plugin .card');
+  const fixedPluginCloseButton = document.querySelectorAll('.fixed-plugin-close-button');
   var navbar = document.getElementById('navbarBlur');
-  var buttonNavbarFixed = document.getElementById('navbarFixed');
+  const buttonNavbarFixed = document.getElementById('navbarFixed');
 
   if (fixedPluginButton) {
-    fixedPluginButton.onclick = function() {
+    fixedPluginButton.onclick = function () {
       if (!fixedPlugin.classList.contains('show')) {
         fixedPlugin.classList.add('show');
       } else {
@@ -122,8 +126,8 @@ if (document.querySelector('.fixed-plugin')) {
 
 //Set Sidebar Color
 function sidebarColor(a) {
-  var parent = document.querySelector(".nav-link.active");
-  var color = a.getAttribute("data-color");
+  const parent = document.querySelector(".nav-link.active");
+  const color = a.getAttribute("data-color");
 
   if (parent.classList.contains('bg-gradient-primary')) {
     parent.classList.remove('bg-gradient-primary');
@@ -148,13 +152,13 @@ function sidebarColor(a) {
 
 // Set Sidebar Type
 function sidebarType(a) {
-  var parent = a.parentElement.children;
-  var color = a.getAttribute("data-class");
-  var body = document.querySelector("body");
-  var bodyWhite = document.querySelector("body:not(.dark-version)");
-  var bodyDark = body.classList.contains('dark-version');
+  const parent = a.parentElement.children;
+  const color = a.getAttribute("data-class");
+  const body = document.querySelector("body");
+  const bodyWhite = document.querySelector("body:not(.dark-version)");
+  const bodyDark = body.classList.contains('dark-version');
 
-  var colors = [];
+  const colors = [];
 
   for (var i = 0; i < parent.length; i++) {
     parent[i].classList.remove('active');
@@ -167,7 +171,7 @@ function sidebarType(a) {
     a.classList.remove('active');
   }
 
-  var sidebar = document.querySelector('.sidenav');
+  const sidebar = document.querySelector('.sidenav');
 
   for (var i = 0; i < colors.length; i++) {
     sidebar.classList.remove(colors[i]);
@@ -178,7 +182,7 @@ function sidebarType(a) {
 
   // Remove text-white/text-dark classes
   if (color == 'bg-transparent' || color == 'bg-white') {
-    var textWhites = document.querySelectorAll('.sidenav .text-white');
+    const textWhites = document.querySelectorAll('.sidenav .text-white');
     for (let i = 0; i < textWhites.length; i++) {
       textWhites[i].classList.remove('text-white');
       textWhites[i].classList.add('text-dark');
@@ -250,7 +254,7 @@ function navbarFixed(el) {
 
 // Set Navbar Minimized
 function navbarMinimize(el) {
-  var sidenavShow = document.getElementsByClassName('g-sidenav-show')[0];
+  const sidenavShow = document.getElementsByClassName('g-sidenav-show')[0];
 
   if (!el.getAttribute("checked")) {
     sidenavShow.classList.remove('g-sidenav-pinned');
@@ -280,17 +284,17 @@ function navbarBlurOnScroll(id) {
       }
     }, 10);
   } else {
-    window.onscroll = debounce(function() {
+    window.onscroll = debounce(function () {
       transparentNavbar();
     }, 10);
   }
 
-  var isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
+  const isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
 
   if (isWindows) {
-    var content = document.querySelector('.main-content');
+    const content = document.querySelector('.main-content');
     if (navbarScrollActive == 'true') {
-      content.addEventListener('ps-scroll-y', debounce(function() {
+      content.addEventListener('ps-scroll-y', debounce(function () {
         if (content.scrollTop > scrollDistance) {
           blurNavbar();
         } else {
@@ -298,7 +302,7 @@ function navbarBlurOnScroll(id) {
         }
       }, 10));
     } else {
-      content.addEventListener('ps-scroll-y', debounce(function() {
+      content.addEventListener('ps-scroll-y', debounce(function () {
         transparentNavbar();
       }, 10));
     }
@@ -348,15 +352,15 @@ function navbarBlurOnScroll(id) {
 // N milliseconds. If `immediate` is passed, trigger the function on the
 // leading edge, instead of the trailing.
 function debounce(func, wait, immediate) {
-  var timeout;
-  return function() {
-    var context = this,
-      args = arguments;
-    var later = function() {
+  let timeout;
+  return function () {
+    const context = this,
+        args = arguments;
+    const later = function () {
       timeout = null;
       if (!immediate) func.apply(context, args);
     };
-    var callNow = immediate && !timeout;
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
@@ -365,20 +369,20 @@ function debounce(func, wait, immediate) {
 
 // initialization of Toasts
 document.addEventListener("DOMContentLoaded", function() {
-  var toastElList = [].slice.call(document.querySelectorAll(".toast"));
+  const toastElList = [].slice.call(document.querySelectorAll(".toast"));
 
-  var toastList = toastElList.map(function(toastEl) {
+  const toastList = toastElList.map(function (toastEl) {
     return new bootstrap.Toast(toastEl);
   });
 
-  var toastButtonList = [].slice.call(document.querySelectorAll(".toast-btn"));
+  const toastButtonList = [].slice.call(document.querySelectorAll(".toast-btn"));
 
-  toastButtonList.map(function(toastButtonEl) {
-    toastButtonEl.addEventListener("click", function() {
-      var toastToTrigger = document.getElementById(toastButtonEl.dataset.target);
+  toastButtonList.map(function (toastButtonEl) {
+    toastButtonEl.addEventListener("click", function () {
+      const toastToTrigger = document.getElementById(toastButtonEl.dataset.target);
 
       if (toastToTrigger) {
-        var toast = bootstrap.Toast.getInstance(toastToTrigger);
+        const toast = bootstrap.Toast.getInstance(toastToTrigger);
         toast.show();
       }
     });
@@ -387,20 +391,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Tabs navigation
 
-var total = document.querySelectorAll('.nav-pills');
+const total = document.querySelectorAll('.nav-pills');
 
 function initNavs() {
   total.forEach(function(item, i) {
-    var moving_div = document.createElement('div');
-    var first_li = item.querySelector('li:first-child .nav-link');
-    var tab = first_li.cloneNode();
+    let moving_div = document.createElement('div');
+    const first_li = item.querySelector('li:first-child .nav-link');
+    const tab = first_li.cloneNode();
     tab.innerHTML = "-";
 
     moving_div.classList.add('moving-tab', 'position-absolute', 'nav-link');
     moving_div.appendChild(tab);
     item.appendChild(moving_div);
 
-    var list_length = item.getElementsByTagName("li").length;
+    const list_length = item.getElementsByTagName("li").length;
 
     moving_div.style.padding = '0px';
     moving_div.style.width = item.querySelector('li:nth-child(1)').offsetWidth + 'px';
@@ -444,8 +448,8 @@ setTimeout(function() {
 window.addEventListener('resize', function(event) {
   total.forEach(function(item, i) {
     item.querySelector('.moving-tab').remove();
-    var moving_div = document.createElement('div');
-    var tab = item.querySelector(".nav-link.active").cloneNode();
+    const moving_div = document.createElement('div');
+    const tab = item.querySelector(".nav-link.active").cloneNode();
     tab.innerHTML = "-";
 
     moving_div.classList.add('moving-tab', 'position-absolute', 'nav-link');
@@ -490,10 +494,10 @@ window.addEventListener('resize', function(event) {
         let nodes = Array.from(li.closest('ul').children); // get array
         let index = nodes.indexOf(li) + 1;
         let sum = 0;
-        for (var j = 1; j <= nodes.indexOf(li); j++) {
+        for (let j = 1; j <= nodes.indexOf(li); j++) {
           sum += item.querySelector('li:nth-child(' + j + ')').offsetHeight;
         }
-        var moving_div = document.querySelector('.moving-tab');
+        const moving_div = document.querySelector('.moving-tab');
         moving_div.style.width = item.querySelector('li:nth-child(1)').offsetWidth + 'px';
         moving_div.style.transform = 'translate3d(0px,' + sum + 'px, 0px)';
 
@@ -508,10 +512,10 @@ window.addEventListener('resize', function(event) {
         let nodes = Array.from(li.closest('ul').children); // get array
         let index = nodes.indexOf(li) + 1;
         let sum = 0;
-        for (var j = 1; j <= nodes.indexOf(li); j++) {
+        for (let j = 1; j <= nodes.indexOf(li); j++) {
           sum += item.querySelector('li:nth-child(' + j + ')').offsetWidth;
         }
-        var moving_div = document.querySelector('.moving-tab');
+        const moving_div = document.querySelector('.moving-tab');
         moving_div.style.transform = 'translate3d(' + sum + 'px, 0px, 0px)';
         moving_div.style.width = item.querySelector('li:nth-child(' + index + ')').offsetWidth + 'px';
       }
@@ -538,14 +542,14 @@ function getEventTarget(e) {
 
 window.onload = function() {
   // Material Design Input function
-  var inputs = document.querySelectorAll('input');
+  const inputs = document.querySelectorAll('input');
 
   for (var i = 0; i < inputs.length; i++) {
-    inputs[i].addEventListener('focus', function(e) {
+    inputs[i].addEventListener('focus', function (e) {
       this.parentElement.classList.add('is-focused');
     }, false);
 
-    inputs[i].onkeyup = function(e) {
+    inputs[i].onkeyup = function (e) {
       if (this.value != "") {
         this.parentElement.classList.add('is-filled');
       } else {
@@ -562,12 +566,12 @@ window.onload = function() {
   }
 
   // Ripple Effect
-  var ripples = document.querySelectorAll('.btn');
+  const ripples = document.querySelectorAll('.btn');
 
   for (var i = 0; i < ripples.length; i++) {
-    ripples[i].addEventListener('click', function(e) {
-      var targetEl = e.target;
-      var rippleDiv = targetEl.querySelector('.ripple');
+    ripples[i].addEventListener('click', function (e) {
+      const targetEl = e.target;
+      let rippleDiv = targetEl.querySelector('.ripple');
 
       rippleDiv = document.createElement('span');
       rippleDiv.classList.add('ripple');
@@ -577,7 +581,7 @@ window.onload = function() {
       rippleDiv.style.left = (e.offsetX - rippleDiv.offsetWidth / 2) + 'px';
       rippleDiv.style.top = (e.offsetY - rippleDiv.offsetHeight / 2) + 'px';
       rippleDiv.classList.add('ripple');
-      setTimeout(function() {
+      setTimeout(function () {
         rippleDiv.parentElement.removeChild(rippleDiv);
       }, 600);
     }, false);

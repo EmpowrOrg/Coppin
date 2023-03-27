@@ -24,12 +24,12 @@ interface AssignmentCodesSource {
 }
 
 internal class RealAssignmentCodesSource(private val languagesSource: LanguagesSource) : AssignmentCodesSource {
-    override suspend fun create(assignmentCodes: List<org.empowrco.coppin.models.AssignmentCode>) = dbQuery {
+    override suspend fun create(assignmentCodes: List<AssignmentCode>) = dbQuery {
         AssignmentCodes.batchInsert(assignmentCodes) { this.build(it) }
         Unit
     }
 
-    override suspend fun getByAssigment(assignmentId: UUID): List<org.empowrco.coppin.models.AssignmentCode> = dbQuery {
+    override suspend fun getByAssigment(assignmentId: UUID): List<AssignmentCode> = dbQuery {
         AssignmentCodes.select { AssignmentCodes.assignment eq assignmentId }.map {
             val languageId = it[AssignmentCodes.language].value
             val language = languagesSource.getLanguage(languageId)!!
@@ -54,10 +54,10 @@ internal class RealAssignmentCodesSource(private val languagesSource: LanguagesS
     }
 
     override suspend fun deleteByAssignment(assignmentId: UUID): Boolean = dbQuery {
-        AssignmentCodes.deleteWhere { AssignmentCodes.assignment eq assignmentId } > 0
+        AssignmentCodes.deleteWhere { assignment eq assignmentId } > 0
     }
 
-    override suspend fun update(assignmentCode: org.empowrco.coppin.models.AssignmentCode): Boolean = dbQuery {
+    override suspend fun update(assignmentCode: AssignmentCode): Boolean = dbQuery {
         AssignmentCodes.update({ AssignmentCodes.id eq assignmentCode.id }) {
             it.build(assignmentCode)
         } > 0

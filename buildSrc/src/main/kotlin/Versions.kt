@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.provideDelegate
-
 object Versions {
     const val jwt = "4.2.2"
     const val kotlin = "1.7.20"

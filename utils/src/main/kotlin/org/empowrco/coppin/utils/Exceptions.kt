@@ -11,7 +11,7 @@ class AssignmentLanguageSupportException(language: String) :
 
 class InvalidUuidException(property: String) : RuntimeException("Invalid uuid specified for property $property")
 
-data class DuplicateKeyException(val throwable: Throwable) : RuntimeException() {
+class DuplicateKeyException : RuntimeException() {
     val duplicateKeyError: String?
         get() {
             val keyInfo = message?.substringAfter("Detail: Key ") ?: return null

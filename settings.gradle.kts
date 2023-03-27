@@ -1,6 +1,4 @@
 rootProject.name = "Coppin"
-include("command")
-include("command:fakes")
 findProject(":command:fakes")?.name = "fakes"
 include("models")
 include("assignment")
@@ -21,12 +19,8 @@ include("assignment:backend:fakes")
 findProject(":assignment:backend:fakes")?.name = "fakes"
 include("sources:fakes")
 findProject(":sources:fakes")?.name = "fakes"
-include("utils:diff")
-findProject(":utils:diff")?.name = "diff"
 include("utils:files")
 findProject(":utils:files")?.name = "files"
-include("utils:diff:fakes")
-findProject(":utils:diff:fakes")?.name = "fakes"
 include("languages")
 include("languages:api")
 findProject(":languages:api")?.name = "api"

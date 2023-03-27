@@ -36,17 +36,17 @@
   }
 }(function($) {
   // Create the defaults once
-  var defaults = {
-    element: 'body',
-    position: null,
-    type: "info",
-    allow_dismiss: true,
-    allow_duplicates: true,
-    newest_on_top: false,
-    showProgressbar: false,
-    placement: {
-      from: "top",
-      align: "right"
+  let defaults = {
+      element: 'body',
+      position: null,
+      type: "info",
+      allow_dismiss: true,
+      allow_duplicates: true,
+      newest_on_top: false,
+      showProgressbar: false,
+      placement: {
+          from: "top",
+          align: "right"
     },
     offset: 20,
     spacing: 10,
@@ -69,35 +69,35 @@
   };
 
   String.format = function() {
-    var args = arguments;
-    var str = arguments[0];
-    return str.replace(/(\{\{\d\}\}|\{\d\})/g, function(str) {
-      if (str.substring(0, 2) === "{{") return str;
-      var num = parseInt(str.match(/\d/)[0]);
-      return args[num + 1];
-    });
+      const args = arguments;
+      const str = arguments[0];
+      return str.replace(/(\{\{\d\}\}|\{\d\})/g, function (str) {
+          if (str.substring(0, 2) === "{{") return str;
+          const num = parseInt(str.match(/\d/)[0]);
+          return args[num + 1];
+      });
   };
 
   function isDuplicateNotification(notification) {
-    var isDupe = false;
+      let isDupe = false;
 
     $('[data-notify="container"]').each(function(i, el) {
-      var $el = $(el);
-      var title = $el.find('[data-notify="title"]').html().trim();
-      var message = $el.find('[data-notify="message"]').html().trim();
+        const $el = $(el);
+        const title = $el.find('[data-notify="title"]').html().trim();
+        const message = $el.find('[data-notify="message"]').html().trim();
 
-      // The input string might be different than the actual parsed HTML string!
-      // (<br> vs <br /> for example)
-      // So we have to force-parse this as HTML here!
-      var isSameTitle = title === $("<div>" + notification.settings.content.title + "</div>").html().trim();
-      var isSameMsg = message === $("<div>" + notification.settings.content.message + "</div>").html().trim();
-      var isSameType = $el.hasClass('alert-' + notification.settings.type);
+        // The input string might be different than the actual parsed HTML string!
+        // (<br> vs <br /> for example)
+        // So we have to force-parse this as HTML here!
+        const isSameTitle = title === $("<div>" + notification.settings.content.title + "</div>").html().trim();
+        const isSameMsg = message === $("<div>" + notification.settings.content.message + "</div>").html().trim();
+        const isSameType = $el.hasClass('alert-' + notification.settings.type);
 
-      if (isSameTitle && isSameMsg && isSameType) {
-        //we found the dupe. Set the var and stop checking.
-        isDupe = true;
-      }
-      return !isDupe;
+        if (isSameTitle && isSameMsg && isSameType) {
+            //we found the dupe. Set the var and stop checking.
+            isDupe = true;
+        }
+        return !isDupe;
     });
 
     return isDupe;
@@ -105,15 +105,15 @@
 
   function Notify(element, content, options) {
     // Setup Content of Notify
-    var contentObj = {
-      content: {
-        message: typeof content === 'object' ? content.message : content,
-        title: content.title ? content.title : '',
-        icon: content.icon ? content.icon : '',
-        url: content.url ? content.url : '#',
-        target: content.target ? content.target : '-'
-      }
-    };
+      const contentObj = {
+          content: {
+              message: typeof content === 'object' ? content.message : content,
+              title: content.title ? content.title : '',
+              icon: content.icon ? content.icon : '',
+              url: content.url ? content.url : '#',
+              target: content.target ? content.target : '-'
+          }
+      };
 
     options = $.extend(true, {}, contentObj, options);
     this.settings = $.extend(true, {}, defaults, options);
@@ -141,7 +141,7 @@
 
   $.extend(Notify.prototype, {
     init: function() {
-      var self = this;
+        const self = this;
 
       this.buildNotify();
       if (this.settings.content.icon) {
@@ -157,23 +157,23 @@
       this.notify = {
         $ele: this.$ele,
         update: function(command, update) {
-          var commands = {};
+            let commands = {};
           if (typeof command === "string") {
             commands[command] = update;
           } else {
             commands = command;
           }
-          for (var cmd in commands) {
-            switch (cmd) {
-              case "type":
-                this.$ele.removeClass('alert-' + self.settings.type);
-                this.$ele.find('[data-notify="progressbar"] > .progress-bar').removeClass('progress-bar-' + self.settings.type);
-                self.settings.type = commands[cmd];
-                this.$ele.addClass('alert-' + commands[cmd]).find('[data-notify="progressbar"] > .progress-bar').addClass('progress-bar-' + commands[cmd]);
-                break;
-              case "icon":
-                var $icon = this.$ele.find('[data-notify="icon"]');
-                if (self.settings.icon_type.toLowerCase() === 'class') {
+            for (let cmd in commands) {
+                switch (cmd) {
+                    case "type":
+                        this.$ele.removeClass('alert-' + self.settings.type);
+                        this.$ele.find('[data-notify="progressbar"] > .progress-bar').removeClass('progress-bar-' + self.settings.type);
+                        self.settings.type = commands[cmd];
+                        this.$ele.addClass('alert-' + commands[cmd]).find('[data-notify="progressbar"] > .progress-bar').addClass('progress-bar-' + commands[cmd]);
+                        break;
+                    case "icon":
+                        const $icon = this.$ele.find('[data-notify="icon"]');
+                        if (self.settings.icon_type.toLowerCase() === 'class') {
                   $icon.removeClass(self.settings.content.icon).addClass(commands[cmd]);
                 } else {
                   if (!$icon.is('img')) {
@@ -184,7 +184,7 @@
                 self.settings.content.icon = commands[command];
                 break;
               case "progress":
-                var newDelay = self.settings.delay - (self.settings.delay * (commands[cmd] / 100));
+                  const newDelay = self.settings.delay - (self.settings.delay * (commands[cmd] / 100));
                 this.$ele.data('notify-delay', newDelay);
                 this.$ele.find('[data-notify="progressbar"] > div').attr('aria-valuenow', commands[cmd]).css('width', commands[cmd] + '%');
                 break;
@@ -198,7 +198,7 @@
                 this.$ele.find('[data-notify="' + cmd + '"]').html(commands[cmd]);
             }
           }
-          var posX = this.$ele.outerHeight() + parseInt(self.settings.spacing) + parseInt(self.settings.offset.y);
+            const posX = this.$ele.outerHeight() + parseInt(self.settings.spacing) + parseInt(self.settings.offset.y);
           self.reposition(posX);
         },
         close: function() {
@@ -208,7 +208,7 @@
 
     },
     buildNotify: function() {
-      var content = this.settings.content;
+        const content = this.settings.content;
       this.$ele = $(String.format(this.settings.template, this.settings.type, content.title, content.message, content.url, content.target));
       this.$ele.attr('data-notify-position', this.settings.placement.from + '-' + this.settings.placement.align);
       if (!this.settings.allow_dismiss) {
@@ -252,27 +252,27 @@
       });
     },
     placement: function() {
-      var self = this,
-        offsetAmt = this.settings.offset.y,
-        css = {
-          display: 'inline-block',
-          margin: '0px auto',
-          position: this.settings.position ? this.settings.position : (this.settings.element === 'body' ? 'fixed' : 'absolute'),
-          transition: 'all .5s ease-in-out',
-          zIndex: this.settings.z_index
-        },
-        hasAnimation = false,
-        settings = this.settings;
+        const self = this;
+        let offsetAmt = this.settings.offset.y;
+        const css = {
+            display: 'inline-block',
+            margin: '0px auto',
+            position: this.settings.position ? this.settings.position : (this.settings.element === 'body' ? 'fixed' : 'absolute'),
+            transition: 'all .5s ease-in-out',
+            zIndex: this.settings.z_index
+        };
+        let hasAnimation = false;
+        const settings = this.settings;
 
-      $('[data-notify-position="' + this.settings.placement.from + '-' + this.settings.placement.align + '"]:not([data-closing="true"])').each(function() {
-        offsetAmt = Math.max(offsetAmt, parseInt($(this).css(settings.placement.from)) + parseInt($(this).outerHeight()) + parseInt(settings.spacing));
-      });
-      if (this.settings.newest_on_top === true) {
-        offsetAmt = this.settings.offset.y;
-      }
-      css[this.settings.placement.from] = offsetAmt + 'px';
+        $('[data-notify-position="' + this.settings.placement.from + '-' + this.settings.placement.align + '"]:not([data-closing="true"])').each(function () {
+            offsetAmt = Math.max(offsetAmt, parseInt($(this).css(settings.placement.from)) + parseInt($(this).outerHeight()) + parseInt(settings.spacing));
+        });
+        if (this.settings.newest_on_top === true) {
+            offsetAmt = this.settings.offset.y;
+        }
+        css[this.settings.placement.from] = offsetAmt + 'px';
 
-      switch (this.settings.placement.align) {
+        switch (this.settings.placement.align) {
         case "left":
         case "right":
           css[this.settings.placement.align] = this.settings.offset.x + 'px';
@@ -316,7 +316,7 @@
       }, 600);
     },
     bind: function() {
-      var self = this;
+        const self = this;
 
       this.$ele.find('[data-notify="dismiss"]').on('click', function() {
         self.close();
@@ -338,35 +338,35 @@
       this.$ele.data('data-hover', "false");
 
       if (this.settings.delay > 0) {
-        self.$ele.data('notify-delay', self.settings.delay);
-        var timer = setInterval(function() {
-          var delay = parseInt(self.$ele.data('notify-delay')) - self.settings.timer;
-          if ((self.$ele.data('data-hover') === 'false' && self.settings.mouse_over === "pause") || self.settings.mouse_over != "pause") {
-            var percent = ((self.settings.delay - delay) / self.settings.delay) * 100;
-            self.$ele.data('notify-delay', delay);
-            self.$ele.find('[data-notify="progressbar"] > div').attr('aria-valuenow', percent).css('width', percent + '%');
-          }
-          if (delay <= -(self.settings.timer)) {
-            clearInterval(timer);
-            self.close();
-          }
-        }, self.settings.timer);
+          self.$ele.data('notify-delay', self.settings.delay);
+          const timer = setInterval(function () {
+              const delay = parseInt(self.$ele.data('notify-delay')) - self.settings.timer;
+              if ((self.$ele.data('data-hover') === 'false' && self.settings.mouse_over === "pause") || self.settings.mouse_over != "pause") {
+                  const percent = ((self.settings.delay - delay) / self.settings.delay) * 100;
+                  self.$ele.data('notify-delay', delay);
+                  self.$ele.find('[data-notify="progressbar"] > div').attr('aria-valuenow', percent).css('width', percent + '%');
+              }
+              if (delay <= -(self.settings.timer)) {
+                  clearInterval(timer);
+                  self.close();
+              }
+          }, self.settings.timer);
       }
     },
     close: function() {
-      var self = this,
-        posX = parseInt(this.$ele.css(this.settings.placement.from)),
-        hasAnimation = false;
+        const self = this,
+            posX = parseInt(this.$ele.css(this.settings.placement.from));
+        let hasAnimation = false;
 
-      this.$ele.attr('data-closing', 'true').addClass(this.settings.animate.exit);
-      self.reposition(posX);
+        this.$ele.attr('data-closing', 'true').addClass(this.settings.animate.exit);
+        self.reposition(posX);
 
-      if ($.isFunction(self.settings.onClose)) {
-        self.settings.onClose.call(this.$ele);
-      }
+        if ($.isFunction(self.settings.onClose)) {
+            self.settings.onClose.call(this.$ele);
+        }
 
-      this.$ele.one(this.animations.start, function() {
-        hasAnimation = true;
+        this.$ele.one(this.animations.start, function () {
+            hasAnimation = true;
       }).one(this.animations.end, function() {
         $(this).remove();
         if ($.isFunction(self.settings.onClosed)) {
@@ -384,21 +384,21 @@
       }, 600);
     },
     reposition: function(posX) {
-      var self = this,
-        notifies = '[data-notify-position="' + this.settings.placement.from + '-' + this.settings.placement.align + '"]:not([data-closing="true"])',
-        $elements = this.$ele.nextAll(notifies);
-      if (this.settings.newest_on_top === true) {
-        $elements = this.$ele.prevAll(notifies);
-      }
-      $elements.each(function() {
-        $(this).css(self.settings.placement.from, posX);
-        posX = (parseInt(posX) + parseInt(self.settings.spacing)) + $(this).outerHeight();
-      });
+        const self = this,
+            notifies = '[data-notify-position="' + this.settings.placement.from + '-' + this.settings.placement.align + '"]:not([data-closing="true"])';
+        let $elements = this.$ele.nextAll(notifies);
+        if (this.settings.newest_on_top === true) {
+            $elements = this.$ele.prevAll(notifies);
+        }
+        $elements.each(function () {
+            $(this).css(self.settings.placement.from, posX);
+            posX = (parseInt(posX) + parseInt(self.settings.spacing)) + $(this).outerHeight();
+        });
     }
   });
 
   $.notify = function(content, options) {
-    var plugin = new Notify(this, content, options);
+      const plugin = new Notify(this, content, options);
     return plugin.notify;
   };
   $.notifyDefaults = function(options) {

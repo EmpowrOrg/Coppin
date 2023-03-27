@@ -1,6 +1,6 @@
 # AWS
 
-We recommend hosting the server on AWS Elastic Beanstalk but you can use hosting service that supports Jar files.
+We recommend hosting the server on AWS Elastic Beanstalk, but you can use hosting service that supports Jar files.
 
 1. First go to Releases and download the latest .jar file
 2. Upload the .jar file to your service of choice.
