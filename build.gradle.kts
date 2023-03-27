@@ -75,6 +75,7 @@ dependencies {
     implementation(project(Deps.Models.main))
     implementation(project(Deps.Users.api))
     implementation(project(Deps.Users.main))
+    implementation(project(Deps.Users.presenters))
     implementation(project(Deps.Utils.routing))
     implementation(project(Deps.Utils.authenticator))
     implementation(Deps.Ktor.auth)
