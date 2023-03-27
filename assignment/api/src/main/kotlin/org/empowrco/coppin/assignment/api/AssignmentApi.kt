@@ -17,14 +17,16 @@ fun Application.assignmentApi() {
     val presenter: AssignmentApiPresenter by inject()
     routing {
         route("/assignment") {
-            post("/submit") {
-                call.respond(presenter.submit(call.receive()))
-            }
-            post("/request") {
-                call.respond(presenter.get(call.receive()))
-            }
-            post("/run") {
-                call.respond(presenter.run(call.receive()))
+            authenticate("key") {
+                post("/submit") {
+                    call.respond(presenter.submit(call.receive()))
+                }
+                post("/request") {
+                    call.respond(presenter.get(call.receive()))
+                }
+                post("/run") {
+                    call.respond(presenter.run(call.receive()))
+                }
             }
             authenticate("auth-session") {
                 delete("{uuid}") {
