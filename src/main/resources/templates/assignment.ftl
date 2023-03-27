@@ -45,7 +45,6 @@
             failureMessageCodeMirror.setSize('100%');
             $("#edit-assignment").submit(function (eventObj) {
                 eventObj.preventDefault()
-                console.log('intercept')
                 $("<input />")
                     .attr("name", "instructions")
                     .attr("type", "hidden")

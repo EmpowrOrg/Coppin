@@ -64,12 +64,10 @@
             let nextChunk;
 
             let resultStr = '';
-            console.log('starting read')
             while (!(nextChunk = await reader.read()).done) {
                 let partialData = nextChunk.value;
                 resultStr += utf8Decoder.decode(partialData);
             }
-            console.log('finishing read')
             return resultStr;
         }
 
