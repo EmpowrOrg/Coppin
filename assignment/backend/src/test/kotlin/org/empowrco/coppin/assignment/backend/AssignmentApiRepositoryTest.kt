@@ -19,7 +19,6 @@ class AssignmentApiRepositoryTest {
     fun getAssignment() = runBlocking {
         val assignment = Assignment(
             id = UUID.randomUUID(),
-            feedback = emptyList(),
             lastModifiedAt = LocalDateTime.Companion.now(),
             createdAt = LocalDateTime.Companion.now(),
             successMessage = "success",

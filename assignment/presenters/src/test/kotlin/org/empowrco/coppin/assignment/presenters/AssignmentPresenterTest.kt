@@ -9,7 +9,6 @@ import org.empowrco.coppin.assignment.presenters.RequestApi.SubmitRequest
 import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
-import org.empowrco.coppin.models.Feedback
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.utils.now
 import java.util.UUID
@@ -42,9 +41,8 @@ class AssignmentPresenterTest {
 
         val response = presenter.submit(request)
         assertEquals(
-            response, ResponseApi.SubmitResponse(
+            response, SubmitResponse(
                 output = assigment.failureMessage,
-                feedback = "",
                 success = false,
                 finalAttempt = true,
                 diff = null,
@@ -61,11 +59,11 @@ class AssignmentPresenterTest {
                 output = "failure"
             )
         )
+        repo.languages.add(lang)
         val response = presenter.submit(submitRequest.copy(attempt = 2))
         assertEquals(
             response, SubmitResponse(
                 output = "failure",
-                feedback = "feedback3",
                 success = false,
                 finalAttempt = false,
                 diff = null,
@@ -82,11 +80,11 @@ class AssignmentPresenterTest {
                 output = "code"
             )
         )
+        repo.languages.add(lang)
         val response = presenter.submit(submitRequest.copy(attempt = 1))
         assertEquals(
             response, SubmitResponse(
                 output = "code",
-                feedback = "feedback1",
                 success = false,
                 finalAttempt = false,
                 diff = null,
@@ -103,14 +101,13 @@ class AssignmentPresenterTest {
                 output = "Hello, World"
             )
         )
+        repo.languages.add(lang)
         val response = presenter.submit(submitRequest.copy(attempt = 1))
         with(response) {
-            assertEquals(feedback, assigment.successMessage)
-            assertEquals(success, true)
+            assertEquals(true, success)
         }
         assertEquals(
             response, SubmitResponse(
-                feedback = assigment.successMessage,
                 success = true,
                 finalAttempt = false,
                 diff = null,
@@ -135,6 +132,7 @@ class AssignmentPresenterTest {
             name = "lang",
             url = "lang-url",
             createdAt = LocalDateTime.now(),
+            unitTestRegex = "XCAssert"
         )
         val assignmentId = UUID.randomUUID()
         val assignmentCode = AssignmentCode(
@@ -145,6 +143,7 @@ class AssignmentPresenterTest {
             language = lang,
             primary = true,
             unitTest = "unit-test",
+            injectable = false,
             lastModifiedAt = LocalDateTime.now(),
             createdAt = LocalDateTime.now(),
         )
@@ -158,44 +157,6 @@ class AssignmentPresenterTest {
             successMessage = "success",
             failureMessage = "failure",
             totalAttempts = 4,
-            feedback = listOf(
-                Feedback(
-                    id = UUID.randomUUID(),
-                    regexMatcher = "code",
-                    createdAt = LocalDateTime.now(),
-                    lastModifiedAt = LocalDateTime.now(),
-                    feedback = "feedback1",
-                    attempt = 1,
-                    assignmentId = UUID.randomUUID()
-                ),
-                Feedback(
-                    id = UUID.randomUUID(),
-                    regexMatcher = "regex",
-                    createdAt = LocalDateTime.now(),
-                    lastModifiedAt = LocalDateTime.now(),
-                    feedback = "feedback2",
-                    attempt = 2,
-                    assignmentId = UUID.randomUUID()
-                ),
-                Feedback(
-                    id = UUID.randomUUID(),
-                    regexMatcher = "",
-                    createdAt = LocalDateTime.now(),
-                    lastModifiedAt = LocalDateTime.now(),
-                    feedback = "feedback3",
-                    attempt = 2,
-                    assignmentId = UUID.randomUUID()
-                ),
-                Feedback(
-                    id = UUID.randomUUID(),
-                    regexMatcher = "hello",
-                    createdAt = LocalDateTime.now(),
-                    lastModifiedAt = LocalDateTime.now(),
-                    feedback = "feedback4",
-                    attempt = 3,
-                    assignmentId = UUID.randomUUID()
-                ),
-            ),
             assignmentCodes = listOf(assignmentCode),
             title = "title",
         )

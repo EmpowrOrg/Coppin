@@ -33,4 +33,8 @@ class FakeAssignmentSource : AssignmentSource {
         }
         return result
     }
+
+    override suspend fun getAssignments(): List<Assignment> {
+        return assignments
+    }
 }
