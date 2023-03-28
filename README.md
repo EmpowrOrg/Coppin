@@ -23,14 +23,12 @@ The number one way to support this project is by donating to [Empowr](https://em
 inclined and would like to submit code, then feel free to contribute to any area on the following list.
 
 - Front-End Development. There are some needed User Experience improvements. Some ideas are:
-  - Find better location of delete buttons
   - Ensure consistent input styling on text and number inputs.
-  - Fix styling on checkboxes
   - Create common error pages (404, 401, etc)
-  - Add authentication pages (Login, Create Account)
+  - Snapshot testing
 - Back-End Development.
   - We wish to add more integrity checks to data when it's saved
-  - Adding authentication
+  - Unit Testing
 - Bugs & Features. We are open to adding new features. So if you have a cool idea, create it!
 
 ___
