@@ -8,7 +8,6 @@ object ResponseApi {
         val output: String,
         val success: Boolean,
         val finalAttempt: Boolean,
-        val diff: String?,
     )
 
     @Serializable

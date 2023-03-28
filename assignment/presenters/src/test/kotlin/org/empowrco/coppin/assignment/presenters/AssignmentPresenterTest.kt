@@ -45,7 +45,6 @@ class AssignmentPresenterTest {
                 output = assigment.failureMessage,
                 success = false,
                 finalAttempt = true,
-                diff = null,
             )
         )
     }
@@ -66,7 +65,6 @@ class AssignmentPresenterTest {
                 output = "failure",
                 success = false,
                 finalAttempt = false,
-                diff = null,
             )
         )
     }
@@ -87,7 +85,6 @@ class AssignmentPresenterTest {
                 output = "code",
                 success = false,
                 finalAttempt = false,
-                diff = null,
             )
         )
     }
@@ -110,7 +107,6 @@ class AssignmentPresenterTest {
             response, SubmitResponse(
                 success = true,
                 finalAttempt = false,
-                diff = null,
                 output = "success"
             )
         )

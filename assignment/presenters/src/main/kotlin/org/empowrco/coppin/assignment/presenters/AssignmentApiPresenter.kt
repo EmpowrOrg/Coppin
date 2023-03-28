@@ -74,7 +74,6 @@ internal class RealAssignmentApiPresenter(
                 output = assignment.failureMessage,
                 success = false,
                 finalAttempt = true,
-                diff = null,
             )
         }
         val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
@@ -95,21 +94,18 @@ internal class RealAssignmentApiPresenter(
                 output = matches.first().value,
                 success = false,
                 finalAttempt = isFinalAttempt,
-                diff = null,
             )
         } else if (codeResponse.success == false) {
             SubmitResponse(
                 output = codeResponse.output,
                 success = false,
                 finalAttempt = isFinalAttempt,
-                diff = null,
             )
         } else {
             SubmitResponse(
                 output = assignment.successMessage,
                 success = true,
                 finalAttempt = isFinalAttempt,
-                diff = null,
             )
         }
     }
