@@ -41,6 +41,17 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val uuid = request.id?.toUuid() ?: return failure("Invalid id")
         val assignment = repo.getAssignment(uuid) ?: return failure("Assignment not found")
         val currentTime = LocalDateTime.now()
+        if (request.title.isBlank()) {
+            return failure("Please specify a title")
+        } else if (request.referenceId.isBlank()) {
+            return failure("Please specify a referenceId")
+        } else if (request.instructions.isBlank()) {
+            return failure("Please include instructions")
+        } else if (request.successMessage.isBlank()) {
+            return failure("Please include a success message")
+        } else if (request.failureMessage.isBlank()) {
+            return failure("Please include a failure message")
+        }
         val updatedAssignment = assignment.copy(
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
