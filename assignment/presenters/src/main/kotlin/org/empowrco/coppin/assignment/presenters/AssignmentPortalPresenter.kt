@@ -60,6 +60,17 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     override suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse> {
         val currentTime = LocalDateTime.now()
         val id = UUID.randomUUID()
+        if (request.title.isBlank()) {
+            return failure("Please specify a title")
+        } else if (request.referenceId.isBlank()) {
+            return failure("Please specify a referenceId")
+        } else if (request.instructions.isBlank()) {
+            return failure("Please include instructions")
+        } else if (request.successMessage.isBlank()) {
+            return failure("Please include a success message")
+        } else if (request.failureMessage.isBlank()) {
+            return failure("Please include a failure message")
+        }
 
         val assignment = Assignment(
             id = id,
