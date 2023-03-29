@@ -152,7 +152,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 mime = it.mime,
                 selected = false,
             )
-        }.toMutableList()
+        }.sortedBy { it.name }.toMutableList()
         if (request.id == null) {
             return GetCodeResponse(
                 id = null,
