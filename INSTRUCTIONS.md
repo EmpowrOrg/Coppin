@@ -16,8 +16,12 @@ We recommend hosting the server on AWS Elastic Beanstalk, but you can use hostin
 | DATABASE_PORT   | Port of the database                                                                   |
 | DATABASE_SERVER | Server url of the database                                                             |
 | PORT            | Port that the server will attach to                                                    |
-| RUN_API_KEY     | Api Key that server will authenticate against                                          |
 | SECRET_KEY      | Key used to generate user passwords                                                    |
 | DOCTOR_URL      | Url for Doctor Server                                                                  |
 
+4. Ensure you have the database created before you first run the server
+5. Manually insert an admin user into users table of the database. Be sure to account for the password hash
+6. Run the coppin server!
+
+You should be able to login to Coppin and begin making assignments.
 
