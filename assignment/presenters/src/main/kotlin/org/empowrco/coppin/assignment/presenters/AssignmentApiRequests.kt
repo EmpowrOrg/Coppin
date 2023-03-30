@@ -23,7 +23,6 @@ object RequestApi {
     @Serializable
     data class GetAssignmentRequest(
         val referenceId: String,
-        val supportedLanguageMimes: List<String>,
     )
 
     @Serializable

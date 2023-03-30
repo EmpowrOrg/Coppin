@@ -112,11 +112,7 @@ internal class RealAssignmentApiPresenter(
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException()
-        val shouldFilter = request.supportedLanguageMimes.isNotEmpty()
         val assignmentCodes = assignment.assignmentCodes.mapNotNull {
-            if (shouldFilter && !request.supportedLanguageMimes.contains(it.language.mime)) {
-                return@mapNotNull null
-            }
             val starterCode = if (it.injectable) {
                 ""
             } else {
@@ -127,14 +123,12 @@ internal class RealAssignmentApiPresenter(
                 mime = it.language.mime,
                 starterCode = starterCode,
                 primary = it.primary,
-                solutionCode = it.solutionCode
+                solutionCode = it.solutionCode,
+                url = it.language.url,
             )
         }.toMutableList()
         if (assignmentCodes.isEmpty()) {
             repo.getLanguages().forEachIndexed { index, language ->
-                if (shouldFilter && !request.supportedLanguageMimes.contains(language.mime)) {
-                    return@forEachIndexed
-                }
                 assignmentCodes.add(
                     GetAssignmentResponse.AssignmentCode(
                         displayName = language.name,
@@ -142,6 +136,7 @@ internal class RealAssignmentApiPresenter(
                         starterCode = "",
                         primary = index == 0,
                         solutionCode = "",
+                        url = language.url,
                     )
                 )
             }
