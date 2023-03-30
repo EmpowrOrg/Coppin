@@ -48,7 +48,7 @@ internal class RealAssignmentSource(
     override suspend fun createAssignment(assignment: Assignment) {
         dbQuery {
             Assignments.insert {
-                it.build(assignment)
+                it.build(assignment, true)
             }
         }
     }
@@ -64,22 +64,24 @@ internal class RealAssignmentSource(
     override suspend fun updateAssignment(assignment: Assignment): Boolean {
         val result = dbQuery {
             Assignments.update({ Assignments.id eq assignment.id }) {
-                it.build(assignment)
+                it.build(assignment, false)
             }
         }
         return result > 0
     }
 }
 
-internal fun UpdateBuilder<*>.build(assignment: Assignment) {
-    this[Assignments.id] = assignment.id
+internal fun UpdateBuilder<*>.build(assignment: Assignment, isCreate: Boolean) {
+    if (isCreate) {
+        this[Assignments.id] = assignment.id
+        this[Assignments.createdAt] = assignment.createdAt
+    }
     this[Assignments.title] = assignment.title
     this[Assignments.referenceId] = assignment.referenceId
     this[Assignments.successMessage] = assignment.successMessage
     this[Assignments.failureMessage] = assignment.failureMessage
     this[Assignments.instructions] = assignment.instructions
     this[Assignments.totalAttempts] = assignment.totalAttempts
-    this[Assignments.createdAt] = assignment.createdAt
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
 }
 
