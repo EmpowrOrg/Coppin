@@ -27,7 +27,7 @@ interface AssignmentPortalPresenter {
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
     override suspend fun getAssignments(): Result<GetAssignmentsResponse> {
         return GetAssignmentsResponse(repo.getAssignments().map {
-            val createdDate = it.createdAt
+            val createdDate = it.lastModifiedAt
             GetAssignmentsResponse.AssignmentListItem(
                 referenceId = it.referenceId,
                 id = it.id.toString(),
