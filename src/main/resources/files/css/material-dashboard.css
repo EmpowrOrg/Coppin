@@ -9446,6 +9446,10 @@ fieldset:disabled .btn {
   margin-top: 10rem !important;
 }
 
+.mt-4-5 {
+  margin-top: 1.75rem !important;
+}
+
 .mt-10 {
   margin-top: 12rem !important;
 }
@@ -16597,6 +16601,11 @@ fieldset:disabled .btn {
     display: inline-block !important;
   }
 
+  @media (max-width: 1199px) {
+    .d-xl-show {
+      display: none !important;
+    }
+  }
   .d-xl-block {
     display: block !important;
   }
@@ -23496,7 +23505,7 @@ hr.horizontal.gray-light {
 .navbar-vertical.navbar-expand-xs .navbar-collapse {
   display: block;
   overflow: auto;
-  height: calc(100vh - 360px);
+  height: calc(100vh - 150px);
 }
 
 .navbar-vertical.navbar-expand-xs>[class*="container"] {
@@ -23870,6 +23879,10 @@ hr.horizontal.gray-light {
 }
 
 @media (min-width: 1200px) {
+  .navbar-vertical.navbar-expand-xs .navbar-collapse {
+    height: calc(100vh - 90px);
+  }
+
   .navbar-vertical.navbar-expand-xl {
     display: block;
     position: fixed;
@@ -23913,7 +23926,6 @@ hr.horizontal.gray-light {
   .navbar-vertical.navbar-expand-xl.fixed-end {
     right: 0;
   }
-
   .navbar-vertical.navbar-expand-xl .navbar-nav .nav-link {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
@@ -24224,11 +24236,11 @@ hr.horizontal.gray-light {
   }
 
   .sidenav.fixed-start+.main-content {
-    margin-left: 17.125rem;
+    margin-left: 16.125rem;
   }
 
   .sidenav.fixed-end+.main-content {
-    margin-right: 17.125rem;
+    margin-right: 16.125rem;
   }
 }
 
@@ -24260,7 +24272,7 @@ body:not(.dark-version) .sidenav.bg-transparent .collapse .nav-item .nav-link.ac
 }
 
 .sidenav-header {
-  height: 4.875rem;
+  height: 2.875rem;
 }
 
 .sidenav-footer .card.card-background:after {

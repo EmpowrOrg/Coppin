@@ -35,7 +35,30 @@
     </#if>
 
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg me-3">
-        <div class="container-fluid ms-3 mt-3 mb-1" style="padding-right: 0; padding-left: 0;">
+        <nav
+                class="navbar navbar-main navbar-expand-lg px-0 me-4 shadow-none border-radius-xl"
+                id="navbarBlur"
+                data-scroll="true"
+        >
+            <div class="container-fluid py-1 px-3">
+                <div
+                        class="nav-item d-xl-none ps-2 d-flex align-items-center me-sm-6"
+                >
+                    <a
+                            href="javascript:;"
+                            class="nav-link text-body p-0"
+                            id="iconNavbarSidenav"
+                    >
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid ms-3 mt-3 mb-1" id="body-content" style="padding-right: 0; padding-left: 0;">
             <#nested>
         </div>
     </main>
