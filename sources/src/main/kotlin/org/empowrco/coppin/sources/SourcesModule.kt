@@ -9,6 +9,7 @@ val sourcesModule = module {
     singleOf(::RealLanguageSource) { bind<LanguagesSource>() }
     singleOf(::RealAssignmentCodesSource) { bind<AssignmentCodesSource>() }
     singleOf(::RealUsersSource) { bind<UsersSource>() }
+    singleOf(::RealSubmissionSource) { bind<SubmissionSource>() }
     single {
         if (System.getenv("DEBUG").toBoolean()) {
             DebugCache()
