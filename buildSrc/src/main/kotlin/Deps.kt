@@ -109,6 +109,10 @@ object Deps {
         }
     }
 
+    object Lettuce {
+        val main by lazy { "io.lettuce:lettuce-core:${Versions.lettuce}" }
+    }
+
     object Sources {
         val main by lazy { ":sources" }
         val fakes by lazy { ":sources:fakes" }
