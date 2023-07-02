@@ -45,6 +45,7 @@ object Deps {
         val files by lazy { ":utils:files" }
         val authenticator by lazy { ":utils:authenticator" }
         val logs by lazy { ":utils:logs" }
+        val serialization by lazy { ":utils:serialization" }
     }
 
     object Exposed {
@@ -97,6 +98,7 @@ object Deps {
         val callLogging by lazy { "io.ktor:ktor-server-call-logging:${Versions.ktor}" }
         val sessions by lazy { "io.ktor:ktor-server-sessions:${Versions.ktor}" }
         val freeMarker by lazy { "io.ktor:ktor-server-freemarker:${Versions.ktor}" }
+        val serialization by lazy { "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}" }
 
         object Client {
             val core by lazy { "io.ktor:ktor-client-core:${Versions.ktor}" }

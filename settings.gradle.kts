@@ -48,3 +48,5 @@ include("dashboard:presenters")
 findProject(":dashboard:presenters")?.name = "presenters"
 include("utils:logs")
 findProject(":utils:logs")?.name = "logs"
+include("utils:serialization")
+findProject(":utils:serialization")?.name = "serialization"

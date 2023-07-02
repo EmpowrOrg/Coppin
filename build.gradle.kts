@@ -92,6 +92,7 @@ dependencies {
     implementation(Deps.Ktor.freeMarker)
     implementation(Deps.Logback.main)
     implementation(project(Deps.Utils.main))
+    implementation(project(Deps.Utils.serialization))
 }
 
 

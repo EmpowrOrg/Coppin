@@ -15,5 +15,6 @@ dependencies {
     testImplementation(project(Deps.Sources.fakes))
     testImplementation(Deps.Kotlin.dateTime)
     testImplementation(project(Deps.Utils.main))
+    implementation(project(Deps.Utils.serialization))
 }
 

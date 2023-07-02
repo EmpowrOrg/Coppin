@@ -40,12 +40,7 @@ internal class RealAssignmentApiRepository(
     @OptIn(ExperimentalSerializationApi::class)
     val client = HttpClient(Apache) {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                explicitNulls = false
-                encodeDefaults = true
-            })
+            json(org.empowrco.coppin.utils.serialization.json)
         }
         install(HttpTimeout) {
             val timeout = TimeUnit.MINUTES.toMillis(1)
