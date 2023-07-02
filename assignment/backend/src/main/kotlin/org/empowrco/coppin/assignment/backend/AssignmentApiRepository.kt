@@ -11,13 +11,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
+import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.sources.SubmissionSource
 import org.empowrco.coppin.utils.logs.logDebug
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -30,12 +31,15 @@ interface AssignmentApiRepository {
     suspend fun runCode(language: String, code: String): AssignmentCodeResponse
     suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse
     suspend fun deleteAssignment(id: UUID): Boolean
+    suspend fun saveSubmission(submission: Submission)
+    suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission>
 
 }
 
 internal class RealAssignmentApiRepository(
     private val assignmentSource: AssignmentSource,
     private val languagesSource: LanguagesSource,
+    private val submissionSource: SubmissionSource,
 ) : AssignmentApiRepository {
     @OptIn(ExperimentalSerializationApi::class)
     val client = HttpClient(Apache) {
@@ -92,6 +96,14 @@ internal class RealAssignmentApiRepository(
 
     override suspend fun deleteAssignment(id: UUID): Boolean {
         return assignmentSource.deleteAssignment(id)
+    }
+
+    override suspend fun saveSubmission(submission: Submission) {
+        submissionSource.saveSubmission(submission)
+    }
+
+    override suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission> {
+        return submissionSource.getSubmissionsForAssignment(assignmentID, studentId)
     }
 
     private suspend fun executeRequest(

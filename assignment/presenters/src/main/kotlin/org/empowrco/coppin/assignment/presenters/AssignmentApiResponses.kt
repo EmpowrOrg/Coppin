@@ -33,6 +33,7 @@ object ResponseApi {
             val primary: Boolean,
             val solutionCode: String?,
             val url: String,
+            val userCode: String?,
         )
     }
 }
