@@ -9,6 +9,8 @@ fun LocalDateTime.Companion.now(): LocalDateTime {
         month = time.month,
         dayOfMonth = time.dayOfMonth,
         hour = time.hour,
-        minute = time.minute
+        minute = time.minute,
+        second = time.second,
+        nanosecond = time.nano,
     )
 }
