@@ -9,6 +9,7 @@ object RequestApi {
         val code: String,
         val language: String,
         val referenceId: String,
+        val studentId: String,
     )
 
     @Serializable
@@ -16,8 +17,8 @@ object RequestApi {
         val code: String,
         val referenceId: String,
         val language: String,
-        val email: String,
         val attempt: Int,
+        val studentId: String,
     )
 
     @Serializable

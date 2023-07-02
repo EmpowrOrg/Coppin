@@ -2,6 +2,7 @@ package org.empowrco.coppin.assignment.presenters
 
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.assignment.backend.AssignmentApiRepository
 import org.empowrco.coppin.assignment.presenters.RequestApi.DeleteAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.RequestApi.GetAssignmentRequest
@@ -14,10 +15,13 @@ import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
+import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
 import org.empowrco.coppin.utils.InvalidUuidException
 import org.empowrco.coppin.utils.UnknownException
+import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toUuid
+import java.util.UUID
 
 interface AssignmentApiPresenter {
     suspend fun run(request: RunRequest): RunResponse
@@ -89,6 +93,19 @@ internal class RealAssignmentApiPresenter(
         val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
+        val currentTime = LocalDateTime.now()
+        val submission = Submission(
+            id = UUID.randomUUID(),
+            code = request.code,
+            assignmentId = assignment.id,
+            languageId = language.id,
+            studentId = request.studentId,
+            attempt = request.attempt,
+            createdAt = currentTime,
+            correct = matches.isEmpty() && codeResponse.success != false,
+            lastModifiedAt = currentTime,
+        )
+        repo.saveSubmission(submission)
         return if (matches.isNotEmpty()) {
             SubmitResponse(
                 output = matches.first().value,
