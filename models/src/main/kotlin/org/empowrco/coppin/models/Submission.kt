@@ -1,5 +1,6 @@
 package org.empowrco.coppin.models
 
+import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
 data class Submission(
@@ -8,6 +9,7 @@ data class Submission(
     val correct: Boolean,
     val code: String,
     val attempt: Int,
-    val studentEmail: String,
     val studentId: String,
+    val createdAt: LocalDateTime,
+    val lastModifiedAt: LocalDateTime,
 )
