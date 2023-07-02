@@ -70,7 +70,9 @@ private class DatabaseSubmissionsSource : SubmissionSource {
 
     override suspend fun saveSubmission(submission: Submission) = dbQuery {
         Submissions.insert {
-            it[Submissions.assignment] = submission.assignmentID
+            it[Submissions.id] = submission.id
+            it[Submissions.assignment] = submission.assignmentId
+            it[Submissions.language] = submission.languageId
             it[Submissions.code] = submission.code
             it[Submissions.attempt] = submission.attempt
             it[Submissions.studentId] = submission.studentId
@@ -84,7 +86,8 @@ private class DatabaseSubmissionsSource : SubmissionSource {
     private fun ResultRow.toSubmission(): Submission {
         return Submission(
             id = this[Submissions.id].value,
-            assignmentID = this[Submissions.assignment].value,
+            assignmentId = this[Submissions.assignment].value,
+            languageId = this[Submissions.language].value,
             code = this[Submissions.code],
             attempt = this[Submissions.attempt],
             studentId = this[Submissions.studentId],
