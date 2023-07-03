@@ -9,11 +9,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object DatabaseFactory {
 
     private val tables = listOf(
-        Assignments,
-        Languages,
         AssignmentCodes,
-        Users,
+        Assignments,
+        Courses,
+        Languages,
+        Submissions,
         UserAccessKeys,
+        Users,
     ).toTypedArray()
 
     fun init() {
