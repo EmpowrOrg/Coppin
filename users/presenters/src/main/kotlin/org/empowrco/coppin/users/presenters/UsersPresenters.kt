@@ -168,6 +168,7 @@ class RealUsersPresenters(
             userId = userId,
             id = keyId,
             key = key,
+            name = request.name,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
         )

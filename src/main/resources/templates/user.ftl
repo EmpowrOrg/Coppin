@@ -186,6 +186,10 @@
                          <div>Access Keys allow applications (Xblocks) to talk to the server.
                          </div>
                          <div class="input-group input-group-outline mt-3">
+                             <input data-name="name" name="name" id="name" type="text"
+                                    class="form-control" placeholder="Key Name" required>
+                         </div>
+                         <div class="input-group input-group-outline mt-3">
                              <input data-name="password" name="password" id="password" type="password"
                                     class="form-control" placeholder="Password" required>
                          </div>
@@ -199,7 +203,8 @@
         const password = result.password
         const body = JSON.stringify({
             password: password,
-            id: '${content.id}'
+            id: '${content.id}',
+            name: result.name,
         })
         fetch('/user/${content.id}/keys', {
             method: "POST",
