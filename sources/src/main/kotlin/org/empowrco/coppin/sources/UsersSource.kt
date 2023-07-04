@@ -80,6 +80,7 @@ internal class RealUsersSource : UsersSource {
         UserAccessKeys.insert {
             it[UserAccessKeys.id] = key.id
             it[user] = key.userId
+            it[UserAccessKeys.name] = key.name
             it[UserAccessKeys.key] = key.key
             it[UserAccessKeys.createdAt] = key.createdAt
             it[UserAccessKeys.lastModifiedAt] = key.lastModifiedAt
@@ -125,6 +126,7 @@ internal class RealUsersSource : UsersSource {
             userId = this[UserAccessKeys.user].value,
             key = this[UserAccessKeys.key],
             id = this[UserAccessKeys.id].value,
+            name = this[UserAccessKeys.name],
             createdAt = this[UserAccessKeys.createdAt],
             lastModifiedAt = this[UserAccessKeys.lastModifiedAt],
         )
