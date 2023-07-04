@@ -66,6 +66,9 @@ internal class RealAssignmentApiPresenter(
     }
 
     override suspend fun submit(request: SubmitRequest): SubmitResponse {
+        if (request.code.isBlank()) {
+            throw RuntimeException("Please do not submit an empty assignment")
+        }
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
         val isFinalAttempt = if (assignment.totalAttempts == 0) {
             false
