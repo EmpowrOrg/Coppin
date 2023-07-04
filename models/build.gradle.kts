@@ -5,4 +5,5 @@ plugins {
 dependencies {
     implementation(Deps.Ktor.json)
     implementation(Deps.Kotlin.dateTime)
+    implementation(project(Deps.Utils.serialization))
 }
