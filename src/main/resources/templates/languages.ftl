@@ -26,75 +26,61 @@
             });
         });
     </script>
-    <style>
-        .dataTables_info {
-            padding-left: 16px;
-            padding-right: 16px;
-        }
+<style>
+    #languages-container {
+        border-radius: 1rem;
+        border: 0.125rem solid #DEE2E8;
+        background: #FFF
+    }
 
-        .dataTables_filter {
-            padding-left: 16px;
-            padding-right: 16px;
-        }
+    #languages-header {
+        display: flex;
+        padding: 12px 24px;
+        align-items: flex-start;
+        gap: 8px;
+    }
 
-        .dataTables_wrapper .dataTables_filter input {
-            margin-left: 8px;
-        }
+    .language-item {
+        display: flex;
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        align-self: stretch;
+        border-radius: 16px;
+        background: #F8F9FA;
+    }
 
-        .dataTables_length {
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-    </style>
-    <div class="row">
-        <div class="col-12">
-            <div class="card my-4">
-                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                        <h6 class="text-white text-capitalize ps-3">Languages</h6>
-                    </div>
-                </div>
-                <div class="card-body px-0 pb-2">
-                    <#include "error.ftl">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0" id="languages-table">
-                            <thead>
-                            <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Name
-                                </th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                    Mime
-                                </th>
-                                <th class="text-secondary opacity-7"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <#list content.languages as language>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div class="d-flex flex-column">
-                                                <p class="mb-0 text-sm font-weight-bold">${language.name}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="text-md mb-0">${language.mime}</p>
-                                    </td>
-                                    <td >${language.id}</td>
-                                </tr>
-                            </#list>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    .language-detail {
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        line-height: 1.25rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+</style>
+<div id="languages-container" class="row m-4 pb-4">
+    <div id="languages-header" class="m-2 justify-content-between">
+        <h6>All languages (${content.languagesCount})</h6>
+        <a href="/languages/" class="btn btn-primary">+ ADD A LANGUAGE</a>
+    </div>
+    <div>
+        <#list content.languages as language>
+            <div class="language-item mt-2">
+                <h6>Name: ${language.name}</h6>
+                <p class="language-detail">
+                    <b>Lasted edited:</b> ${language.lastModifiedDate}
+                </p>
+                <p class="language-detail">
+                    <b>Mirror url:</b> ${language.url}
+                </p>
+                <p class="language-detail">
+                    <b>Mime:</b> ${language.mime}
+                </p>
             </div>
-        </div>
+        </#list>
     </div>
     <div class="fixed-plugin">
         <a href="/languages/" class="fixed-plugin-button text-dark position-fixed px-3 py-2">
             <i class="material-icons py-2">add</i>
         </a>
     </div>
-</@layout.header>
+    </@layout.header>

@@ -19,14 +19,18 @@ interface LanguagesPresenter {
 
 internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : LanguagesPresenter {
     override suspend fun getLanguages(): Result<GetLanguagesResponse> {
+        val languages = repo.getLanguages()
         return GetLanguagesResponse(
-            languages = repo.getLanguages().map {
+            languages = languages.map {
                 GetLanguagesResponse.Language(
                     id = it.id.toString(),
                     mime = it.mime,
                     name = it.name,
+                    lastModifiedDate = it.lastModifiedAt.date.toString(),
+                    url = it.url,
                 )
-            }
+            },
+            languagesCount = languages.size,
         ).toResult()
     }
 
