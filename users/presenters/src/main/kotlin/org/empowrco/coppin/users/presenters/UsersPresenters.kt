@@ -91,16 +91,16 @@ class RealUsersPresenters(
     }
 
     override suspend fun getUsers(): Result<GetUsersResponse> {
+        val users = repo.getUsers()
         return GetUsersResponse(
-            users = repo.getUsers().map {
+            users = users.map {
                 GetUsersResponse.User(
                     id = it.id.toString(),
-                    email = it.email,
                     name = it.fullName,
                     authorized = it.isAuthorized,
-                    type = it.type.name,
                 )
-            }
+            },
+            usersCount = users.size,
         ).toResult()
     }
 
