@@ -3,6 +3,7 @@ package org.empowrco.plugins
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.empowrco.coppin.assignment.assignmentModule
+import org.empowrco.coppin.courses.coursesModules
 import org.empowrco.coppin.languages.languagesModule
 import org.empowrco.coppin.sources.sourcesModule
 import org.empowrco.coppin.users.usersModule
@@ -12,6 +13,9 @@ import org.koin.ktor.plugin.Koin
 
 fun Application.configureKoin() {
     install(Koin) {
-        modules(assignmentModule + authenticatorModule + sourcesModule + utilsModule + languagesModule + usersModule)
+        modules(
+            assignmentModule + authenticatorModule + coursesModules + sourcesModule + utilsModule + languagesModule +
+                    usersModule
+        )
     }
 }
