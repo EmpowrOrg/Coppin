@@ -27,7 +27,7 @@ fun Application.configureStatusPages() {
         exception<AssignmentLanguageSupportException> { call, cause ->
             respond(call, cause, HttpStatusCode.NotFound)
         }
-        exception<InvalidUuidException> {call, cause ->
+        exception<InvalidUuidException> { call, cause ->
             respond(call, cause, HttpStatusCode.BadRequest)
         }
         exception<CannotTransformContentToTypeException> { call, cause ->
