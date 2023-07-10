@@ -25,6 +25,7 @@ object RequestApi {
     data class GetAssignmentRequest(
         val referenceId: String,
         val studentId: String,
+        val blockId: String,
     )
 
     @Serializable

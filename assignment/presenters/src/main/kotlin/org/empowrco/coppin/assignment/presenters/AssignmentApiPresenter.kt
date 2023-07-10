@@ -164,6 +164,9 @@ internal class RealAssignmentApiPresenter(
                 )
             }
         }
+        if (assignment.blockId != request.blockId) {
+            repo.updateAssignment(assignment.copy(blockId = request.blockId))
+        }
         return GetAssignmentResponse(
             instructions = assignment.instructions,
             title = assignment.title,

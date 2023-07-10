@@ -32,6 +32,7 @@ interface AssignmentApiRepository {
     suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse
     suspend fun deleteAssignment(id: UUID): Boolean
     suspend fun saveSubmission(submission: Submission)
+    suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission>
 
 }
@@ -56,6 +57,10 @@ internal class RealAssignmentApiRepository(
 
     override suspend fun getAssignment(id: UUID): Assignment? {
         return assignmentSource.getAssignment(id)
+    }
+
+    override suspend fun updateAssignment(assignment: Assignment): Boolean {
+        return assignmentSource.updateAssignment(assignment)
     }
 
     override suspend fun getLanguages(): List<Language> {
