@@ -6,7 +6,9 @@ import kotlinx.coroutines.withContext
 import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.responses.EdxCourse
+import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.toResult
+import org.empowrco.coppin.utils.toUuid
 
 interface CoursesPortalPresenter {
     suspend fun getCourses(): Result<GetCoursesResponse>
@@ -79,6 +81,35 @@ internal class RealCoursesPortalPresenter(
     }
 
     override suspend fun getCourse(request: GetCourseRequest): Result<GetCourseResponse> {
-        TODO("Not yet implemented")
+        val courseId = request.id.toUuid() ?: return failure("Invalid Course Id")
+        val course = repo.getCourse(courseId) ?: return failure("Course Not Found")
+        val assignments = repo.getAssignmentsForCourse(course.id)
+        val studentResponse = repo.getStudentsForCourse(course.edxId)
+        val students = studentResponse.getOrNull()?.results ?: return failure(
+            "Could not " +
+                    "retrieve student info for the course"
+        )
+        val responseAssignments = assignments.map { assignment ->
+            val submissions = repo.getLastStudentSubmissionForAssignment(assignment.id)
+            val successes = submissions.filter { it.correct }
+            val successRate = successes.size.toDouble() / submissions.size.toDouble()
+            val successPercent = successRate * 100
+
+            val completionRate = submissions.size.toDouble() / students.size.toDouble()
+            val completionPercent = completionRate * 100
+            GetCourseResponse.Assignment(
+                id = assignment.id.toString(),
+                title = assignment.title,
+                successRate = "${successPercent.toInt()}%",
+                completionRate = "${completionPercent.toInt()}%",
+                lastModified = assignment.lastModifiedAt.toString()
+            )
+        }
+        return GetCourseResponse(
+            id = course.id.toString(),
+            name = course.title,
+            referenceId = course.edxId,
+            assignments = responseAssignments,
+        ).toResult()
     }
 }
