@@ -92,6 +92,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             referenceId = request.referenceId,
             assignmentCodes = emptyList(),
             title = request.title,
+            blockId = null,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
         )
