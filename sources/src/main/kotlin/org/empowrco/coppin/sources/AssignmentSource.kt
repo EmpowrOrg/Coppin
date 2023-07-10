@@ -20,6 +20,7 @@ interface AssignmentSource {
     suspend fun deleteAssignment(id: UUID): Boolean
     suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getAssignments(): List<Assignment>
+    suspend fun getAssignmentsForCourse(id: UUID): List<Assignment>
 }
 
 internal class RealAssignmentSource(
@@ -31,6 +32,10 @@ internal class RealAssignmentSource(
 
     override suspend fun getAssignments(): List<Assignment> = dbQuery {
         Assignments.selectAll().map { buildAssigment(it) }
+    }
+
+    override suspend fun getAssignmentsForCourse(id: UUID) = dbQuery {
+        Assignments.select { Assignments.courseId eq id }.map { buildAssigment(it) }
     }
 
     override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
