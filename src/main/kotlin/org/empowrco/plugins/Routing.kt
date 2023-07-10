@@ -28,7 +28,7 @@ fun Application.configureRouting() {
     routing {
         authenticate("auth-session") {
             get("/") {
-                call.respondRedirect("/assignments")
+                call.respondRedirect("/courses")
             }
         }
 
