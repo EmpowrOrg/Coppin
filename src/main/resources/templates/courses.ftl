@@ -43,6 +43,7 @@
                                 <td>${course.number}</td>
                                 <td>${course.startDate}</td>
                                 <td>${course.endDate}</td>
+                                <td style="display: none;">${course.id}</td>
                             </tr>
                         </#list>
 
