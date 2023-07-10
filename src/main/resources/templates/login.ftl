@@ -37,7 +37,6 @@
                         <button id="sign-in-button" type="submit" class="btn btn-primary my-4 mb-2">Sign In
                         </button>
                     </form>
-                    <a href="/forgot-password" class="mt-3">Forgot your password? <b>Reset your password</b> </a>
                     <a href="/register" class="mt-2">Don't have an account? <b>Sign Up!</b></a>
                 </div>
             </div>
