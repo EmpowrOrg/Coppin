@@ -133,7 +133,10 @@ fun Application.usersRouting() {
                     )
                 ).fold({
                     call.sessions.set(UserSession(it.id, it.isAdmin))
-                    call.respondRedirect("/")
+                    call.errorRedirect(
+                        "Your account was created but must be authorized by your Administrator",
+                        "/login"
+                    )
                 }, {
                     call.errorRedirect(it.localizedMessage)
                 })
