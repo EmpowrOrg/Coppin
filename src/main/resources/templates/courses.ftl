@@ -2,6 +2,33 @@
 <#-- @ftlvariable name="content" type="org.empowrco.coppin.courses.presenters.GetCoursesResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
+    <script>
+        function addRowHandlers() {
+            const table = document.getElementById("courses-table").getElementsByTagName("tbody")[0];
+            const rows = table.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                const currentRow = rows[i];
+                const createClickHandler =
+                    function (row) {
+                        return function () {
+                            const elements = row.getElementsByTagName("td")
+                            if (elements.length !== 5) {
+                                return
+                            }
+                            const cell = row.getElementsByTagName("td")[4];
+                            const id = cell.innerHTML;
+                            window.location = '/courses/' + id
+                        };
+                    };
+
+                currentRow.onclick = createClickHandler(currentRow);
+            }
+        }
+
+        $(document).ready(function () {
+            addRowHandlers()
+        });
+    </script>
     <style>
         #courses-container {
             border-radius: 1rem;
