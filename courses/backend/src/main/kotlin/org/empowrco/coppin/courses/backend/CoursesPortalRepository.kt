@@ -1,35 +1,27 @@
 package org.empowrco.coppin.courses.backend
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.request.get
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
+import org.empowrco.coppin.models.responses.EdxGradeResponse
 import org.empowrco.coppin.sources.CoursesSource
+import org.empowrco.coppin.sources.EdxSource
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 interface CoursesPortalRepository {
     suspend fun getCourses(): List<Course>
     suspend fun createCourse(course: Course)
     suspend fun updateCourse(course: Course): Boolean
     suspend fun deleteCourse(id: UUID): Boolean
+    suspend fun getCourse(id: UUID): Course?
+    suspend fun getEdxCourse(id: String): Result<EdxCourse>
     suspend fun getEdxCourses(): Result<EdxCoursesResponse>
+    suspend fun getGrades(id: String): Result<EdxGradeResponse>
 }
 
 internal class RealCoursesPortalRepository(
     private val coursesSource: CoursesSource,
+    private val edxSource: EdxSource,
 ) : CoursesPortalRepository {
 
     override suspend fun getCourses(): List<Course> {
@@ -49,40 +41,20 @@ internal class RealCoursesPortalRepository(
     }
 
     override suspend fun getEdxCourses(): Result<EdxCoursesResponse> {
-        return executeRequest("courses/v1/courses/?page_size=100")
+        return edxSource.getCourses()
     }
 
-    private val client = HttpClient(Apache) {
-        install(ContentNegotiation) {
-            json(org.empowrco.coppin.utils.serialization.json)
-        }
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.ALL
-        }
-        install(HttpTimeout) {
-            val timeout = TimeUnit.MINUTES.toMillis(1)
-            requestTimeoutMillis = timeout
-            socketTimeoutMillis = timeout
-            connectTimeoutMillis = timeout
-        }
+    override suspend fun getEdxCourse(id: String): Result<EdxCourse> {
+        return edxSource.getCourse(id)
     }
 
-    private suspend fun executeRequest(
-        path: String,
-    ): Result<EdxCoursesResponse> {
-        val url = System.getenv("EDX_API_URL")
-        val response = client.get("$url$path") {
-            contentType(ContentType.Application.Json)
-        }
-        return if (response.status == HttpStatusCode.OK) {
-            try {
-                Result.success(response.body<EdxCoursesResponse>())
-            } catch (ex: Exception) {
-                Result.failure(ex)
-            }
-        } else {
-            Result.failure(Exception(response.body<String>()))
-        }
+    override suspend fun getCourse(id: UUID): Course? {
+        return coursesSource.getCourse(id)
     }
+
+    override suspend fun getGrades(id: String): Result<EdxGradeResponse> {
+        return edxSource.getGrades(id)
+    }
+
+
 }
