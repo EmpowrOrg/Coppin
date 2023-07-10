@@ -83,6 +83,7 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment, isCreate: Boolean) {
     this[Assignments.instructions] = assignment.instructions
     this[Assignments.totalAttempts] = assignment.totalAttempts
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
+    this[Assignments.blockId] = assignment.blockId
 }
 
 private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assignment {
@@ -98,6 +99,7 @@ private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assig
         successMessage = this[Assignments.successMessage],
         instructions = this[Assignments.instructions],
         totalAttempts = this[Assignments.totalAttempts],
+        blockId = this[Assignments.blockId]
     )
 }
 
