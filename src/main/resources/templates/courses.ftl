@@ -25,8 +25,9 @@
                     <h6 class="mt-3 mb-3">Your courses (${content.coursesCount})</h6>
                     <button class="btn btn-primary">+ Link Course</button>
                 </div>
-                <div>
-                    <table class="table-striped new-table table-striped">
+                <#include "error.ftl">
+                <div class="table-responsive">
+                    <table id="courses-table" class="new-table">
                         <thead>
                         <tr>
                             <th>COURSE NAME</th>
