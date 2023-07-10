@@ -1,11 +1,15 @@
 package org.empowrco.coppin.courses.backend
 
+import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
-import org.empowrco.coppin.models.responses.EdxGradeResponse
+import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
+import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.EdxSource
+import org.empowrco.coppin.sources.SubmissionSource
 import java.util.UUID
 
 interface CoursesPortalRepository {
@@ -16,12 +20,16 @@ interface CoursesPortalRepository {
     suspend fun getCourse(id: UUID): Course?
     suspend fun getEdxCourse(id: String): Result<EdxCourse>
     suspend fun getEdxCourses(): Result<EdxCoursesResponse>
-    suspend fun getGrades(id: String): Result<EdxGradeResponse>
+    suspend fun getAssignmentsForCourse(courseId: UUID): List<Assignment>
+    suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission>
+    suspend fun getStudentsForCourse(edxId: String): Result<EdxEnrollmentsResponse>
 }
 
 internal class RealCoursesPortalRepository(
     private val coursesSource: CoursesSource,
     private val edxSource: EdxSource,
+    private val assignmentSource: AssignmentSource,
+    private val submissionSource: SubmissionSource,
 ) : CoursesPortalRepository {
 
     override suspend fun getCourses(): List<Course> {
@@ -40,6 +48,10 @@ internal class RealCoursesPortalRepository(
         return coursesSource.deleteCourse(id)
     }
 
+    override suspend fun getAssignmentsForCourse(courseId: UUID): List<Assignment> {
+        return assignmentSource.getAssignments()
+    }
+
     override suspend fun getEdxCourses(): Result<EdxCoursesResponse> {
         return edxSource.getCourses()
     }
@@ -52,8 +64,12 @@ internal class RealCoursesPortalRepository(
         return coursesSource.getCourse(id)
     }
 
-    override suspend fun getGrades(id: String): Result<EdxGradeResponse> {
-        return edxSource.getGrades(id)
+    override suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission> {
+        return submissionSource.getLastStudentSubmissionForAssignment(id)
+    }
+
+    override suspend fun getStudentsForCourse(edxId: String): Result<EdxEnrollmentsResponse> {
+        return edxSource.getStudentsForCourse(edxId)
     }
 
 
