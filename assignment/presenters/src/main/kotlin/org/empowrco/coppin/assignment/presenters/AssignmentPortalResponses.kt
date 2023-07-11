@@ -1,8 +1,11 @@
 package org.empowrco.coppin.assignment.presenters
 
+import kotlinx.serialization.Serializable
+
 data class GetAssignmentPortalResponse(
     val id: String?,
     val referenceId: String?,
+    val courseId: String,
     val instructions: String?,
     val successMessage: String?,
     val failureMessage: String?,
@@ -25,7 +28,7 @@ data class GetAssignmentsResponse(val assignments: List<AssignmentListItem>) {
     data class AssignmentListItem(val referenceId: String, val id: String, val title: String, val createdAt: String)
 }
 
-object UpdateAssignmentResponse
+data class UpdateAssignmentResponse(val courseId: String)
 
 
 data class GetCodeResponse(
@@ -33,6 +36,7 @@ data class GetCodeResponse(
     val starterCode: String?,
     val solutionCode: String?,
     val assignmentId: String,
+    val courseId: String,
     val unitTest: String?,
     val primary: Boolean,
     val injectable: Boolean,
@@ -50,7 +54,10 @@ data class GetCodeResponse(
 
 data class CreateAssignmentResponse(val id: String)
 
-object UpdateCodeResponse
+data class UpdateCodeResponse(val courseId: String)
 
+@Serializable
+data class ArchiveAssignmentResponse(val courseId: String)
 
-object DeleteCodeResponse
+@Serializable
+data class DeleteCodeResponse(val courseId: String)

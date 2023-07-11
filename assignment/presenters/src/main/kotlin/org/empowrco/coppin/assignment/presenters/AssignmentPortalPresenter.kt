@@ -22,6 +22,7 @@ interface AssignmentPortalPresenter {
     suspend fun updateCode(request: UpdateCodePortalRequest): Result<UpdateCodeResponse>
     suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse>
     suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse>
+    suspend fun archiveAssignment(request: ArchiveAssignmentRequest): Result<ArchiveAssignmentResponse>
 }
 
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
@@ -65,7 +66,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         if (!result) {
             return failure("There was an error updating the assignment")
         }
-        return UpdateAssignmentResponse.toResult()
+        return UpdateAssignmentResponse(updatedAssignment.courseId.toString()).toResult()
     }
 
     override suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse> {
@@ -81,18 +82,24 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("Please include a success message")
         } else if (request.failureMessage.isBlank()) {
             return failure("Please include a failure message")
+        } else if (request.totalAttempts.toIntOrNull() == null) {
+            return failure("Please specify total attempts")
         }
+        val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        val course = repo.getCourse(courseId) ?: return failure("Course not found")
 
         val assignment = Assignment(
             id = id,
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
             instructions = request.instructions,
-            totalAttempts = request.totalAttempts,
+            totalAttempts = request.totalAttempts.toInt(),
             referenceId = request.referenceId,
             assignmentCodes = emptyList(),
             title = request.title,
             blockId = null,
+            archived = false,
+            courseId = course.id,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
         )
@@ -109,6 +116,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 failureMessage = null,
                 attempts = null,
                 id = null,
+                courseId = request.courseId,
                 instructions = null,
                 codes = emptyList(),
             ).toResult()
@@ -130,6 +138,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             title = assignment.title,
             successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
             referenceId = assignment.referenceId,
+            courseId = assignment.courseId.toString(),
             failureMessage = StringEscapeUtils.escapeJava(assignment.failureMessage),
             attempts = assignment.totalAttempts,
             id = assignment.id.toString(),
@@ -162,6 +171,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 assignmentId = assignment.id.toString(),
                 unitTest = "",
                 injectable = false,
+                courseId = assignment.courseId.toString(),
                 language = selectableLanguages.first(),
                 primary = existingLanguageIds.isEmpty(), //Should be primary if there are now existing languages
                 languages = selectableLanguages,
@@ -184,6 +194,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             starterCode = StringEscapeUtils.escapeJava(code.starterCode),
             solutionCode = StringEscapeUtils.escapeJava(code.solutionCode),
             assignmentId = code.assignmentId.toString(),
+            courseId = assignment.courseId.toString(),
             unitTest = StringEscapeUtils.escapeJava(code.unitTest),
             language = GetCodeResponse.Language(
                 name = code.language.name,
@@ -206,7 +217,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("Injectable assignments must contain {{code}} placeholder")
         }
         // new assignment code
-        val assignmentId = request.assignmentId.toUuid() ?: return failure("No assignment found for this id")
+        val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
+        val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         val codeIdString = request.id?.nonEmpty()
         if (codeIdString == null) {
             val codes = repo.getAssignmentCodes(assignmentId)
@@ -246,12 +258,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 return failure("Unknown error")
             }
         }
-        return UpdateCodeResponse.toResult()
+        return UpdateCodeResponse(assignment.courseId.toString()).toResult()
     }
 
     override suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse> {
         val uuid = request.id.toUuid() ?: return failure("Invalid code id")
         val code = repo.getCode(uuid) ?: return failure("Code not found")
+        val assignment = repo.getAssignment(code.assignmentId) ?: return failure("Assignment not found")
         repo.deleteCode(uuid)
         if (code.primary) {
             val codes = repo.getAssignmentCodes(code.assignmentId)
@@ -259,6 +272,17 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 repo.updateCode(codes.first().copy(primary = true))
             }
         }
-        return DeleteCodeResponse.toResult()
+        return DeleteCodeResponse(assignment.courseId.toString()).toResult()
+    }
+
+    override suspend fun archiveAssignment(request: ArchiveAssignmentRequest): Result<ArchiveAssignmentResponse> {
+        val uuid = request.id.toUuid() ?: return failure("Invalid assignment id")
+        val assignment = repo.getAssignment(uuid) ?: return failure("Assignment could not be found")
+        val updatedAssignment = assignment.copy(archived = false)
+        val result = repo.updateAssignment(updatedAssignment)
+        if (!result) {
+            return failure("Unknown error")
+        }
+        return ArchiveAssignmentResponse(assignment.courseId.toString()).toResult()
     }
 }

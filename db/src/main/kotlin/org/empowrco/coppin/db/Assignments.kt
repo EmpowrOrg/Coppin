@@ -9,4 +9,5 @@ object Assignments : BaseTable() {
     val title = text("title")
     val courseId = reference("course_id", Courses.id)
     val blockId = text("block_id").nullable()
+    val archived = bool("archived")
 }

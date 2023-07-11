@@ -17,8 +17,6 @@ import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
-import org.empowrco.coppin.utils.InvalidUuidException
-import org.empowrco.coppin.utils.UnknownException
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
@@ -175,11 +173,13 @@ internal class RealAssignmentApiPresenter(
     }
 
     override suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse {
-        val assignmentId = request.id.toUuid() ?: throw InvalidUuidException("id")
-        val result = repo.deleteAssignment(assignmentId)
+        val uuid = request.id.toUuid() ?: throw Exception("Invalid assignment id")
+        val assignment = repo.getAssignment(uuid) ?: throw Exception("Assignment could not be found")
+        val updatedAssignment = assignment.copy(archived = false)
+        val result = repo.updateAssignment(updatedAssignment)
         if (!result) {
-            throw UnknownException
+            throw Exception("Unknown error")
         }
-        return DeleteAssignmentResponse(request.id)
+        return DeleteAssignmentResponse(assignment.courseId.toString())
     }
 }

@@ -2,9 +2,11 @@ package org.empowrco.coppin.assignment.backend
 
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
+import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.sources.AssignmentCodesSource
 import org.empowrco.coppin.sources.AssignmentSource
+import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.LanguagesSource
 import java.util.UUID
 
@@ -22,12 +24,14 @@ interface AssignmentPortalRepository {
     suspend fun deleteCode(id: UUID)
     suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
     suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode>
+    suspend fun getCourse(id: UUID): Course?
 }
 
 internal class RealAssignmentPortalRepository(
     private val assignmentSource: AssignmentSource,
     private val languagesSource: LanguagesSource,
     private val codesSource: AssignmentCodesSource,
+    private val coursesSource: CoursesSource,
 ) : AssignmentPortalRepository {
 
     override suspend fun getAssignments(): List<Assignment> {
@@ -77,5 +81,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun deleteCode(id: UUID) {
         codesSource.delete(id)
+    }
+
+    override suspend fun getCourse(id: UUID): Course? {
+        return coursesSource.getCourse(id)
     }
 }

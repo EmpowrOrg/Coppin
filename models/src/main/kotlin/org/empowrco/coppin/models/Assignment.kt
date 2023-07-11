@@ -14,5 +14,7 @@ data class Assignment(
     val lastModifiedAt: LocalDateTime,
     val totalAttempts: Int,
     val title: String,
+    val archived: Boolean,
     val blockId: String?,
+    val courseId: UUID,
 )
