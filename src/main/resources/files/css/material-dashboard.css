@@ -5414,14 +5414,31 @@ fieldset:disabled .btn {
   }
 
   .card-group>.card:not(:first-child) .card-img-top,
-  .card-group>.card:not(:first-child) .card-header {
+  .card-group > .card:not(:first-child) .card-header {
     border-top-left-radius: 0;
   }
 
-  .card-group>.card:not(:first-child) .card-img-bottom,
-  .card-group>.card:not(:first-child) .card-footer {
+  .card-group > .card:not(:first-child) .card-img-bottom,
+  .card-group > .card:not(:first-child) .card-footer {
     border-bottom-left-radius: 0;
   }
+}
+
+.coppin-table {
+  background: transparent;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: solid #F0F2F5;
+  margin: 0.5rem;
+  flex-shrink: 16;
+}
+
+div.dataTables_wrapper div.dataTables_filter input {
+  border-radius: 1rem;
+}
+
+div.dataTables_wrapper div.dataTables_length select {
+  border-radius: 1rem;
 }
 
 .accordion {
@@ -5643,7 +5660,7 @@ fieldset:disabled .btn {
   display: block;
   padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);
   font-size: var(--bs-pagination-font-size);
-  color: var(--bs-pagination-color);
+  color: #344767;
   background-color: var(--bs-pagination-bg);
   border: var(--bs-pagination-border-width) solid var(--bs-pagination-border-color);
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -5674,13 +5691,12 @@ fieldset:disabled .btn {
 .active>.page-link {
   z-index: 3;
   color: var(--bs-pagination-active-color);
-  background-color: var(--bs-pagination-active-bg);
-  border-color: var(--bs-pagination-active-border-color);
+  background-color: #344767;
 }
 
 .page-link.disabled,
 .disabled>.page-link {
-  color: var(--bs-pagination-disabled-color);
+  color: var(--bs-pagination-disabled-color) !important;
   pointer-events: none;
   background-color: var(--bs-pagination-disabled-bg);
   border-color: var(--bs-pagination-disabled-border-color);
@@ -24798,7 +24814,7 @@ body:not(.dark-version) .sidenav.bg-transparent .collapse .nav-item .nav-link.ac
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7b809a;
+  color: white;
   padding: 0;
   margin: 0 3px;
   border-radius: 50% !important;
