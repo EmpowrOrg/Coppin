@@ -1,9 +1,4 @@
 <#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentPortalResponse" -->
-<link rel="stylesheet" type="text/css"
-      href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>
-
-<script type="text/javascript"
-        src="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.js"></script>
 <script>
     $(document).ready(function () {
         const table = $('#assignment-codes-table').DataTable({
@@ -25,7 +20,7 @@
         $('#assignment-codes-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
         $('#assignment-codes-table tbody').on('click', 'tr', function () {
             const data = table.row(this).data();
-            window.location = "/assignments/" + data[6] + "/codes/" + data[5]
+            window.location = "/courses/${content.courseId}/assignments/" + data[6] + "/codes/" + data[5]
         });
     });
 </script>
