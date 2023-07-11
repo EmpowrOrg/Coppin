@@ -12,6 +12,7 @@ object DatabaseFactory {
         AssignmentCodes,
         Assignments,
         Courses,
+        CoursesUsers,
         Languages,
         Submissions,
         UserAccessKeys,
