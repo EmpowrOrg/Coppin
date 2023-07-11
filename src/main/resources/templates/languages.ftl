@@ -2,30 +2,6 @@
 <#-- @ftlvariable name="content" type="org.empowrco.coppin.languages.presenters.GetLanguagesResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
-    <!-- Data Tables -->
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>
-
-    <script type="text/javascript"
-            src="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            const table = $('#languages-table').DataTable({
-                language: {search: ""},
-                columnDefs: [
-                    {
-                        target: 2,
-                        visible: false,
-                    },
-                ],
-            });
-            $('#languages-table_filter').find("input").addClass('form-control').attr("placeholder", "Search");
-            $('#languages-table tbody').on('click', 'tr', function () {
-                const data = table.row(this).data();
-                window.location = "/languages/" + data[2]
-            });
-        });
-    </script>
 <style>
     #languages-container {
         border-radius: 1rem;
@@ -64,7 +40,7 @@
     </div>
     <div>
         <#list content.languages as language>
-            <div class="language-item mt-2">
+            <a href="/languages/${language.id}" class="language-item mt-2">
                 <h6>Name: ${language.name}</h6>
                 <p class="language-detail">
                     <b>Lasted edited:</b> ${language.lastModifiedDate}
@@ -75,7 +51,7 @@
                 <p class="language-detail">
                     <b>Mime:</b> ${language.mime}
                 </p>
-            </div>
+            </a>
         </#list>
     </div>
     <div class="fixed-plugin">
