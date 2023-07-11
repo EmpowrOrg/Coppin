@@ -23,6 +23,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
         <!-- CSS Files -->
         <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+        <link href="/css/pds.min.css" rel="stylesheet"/>
         <link id="pagestyle" href="/css/coppin.css" rel="stylesheet"/>
         <script src="https://code.jquery.com/jquery-3.6.1.min.js"
                 integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
