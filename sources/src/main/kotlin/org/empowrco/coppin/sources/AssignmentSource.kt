@@ -5,10 +5,10 @@ import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -27,19 +27,21 @@ internal class RealAssignmentSource(
     private val assignmentCodesSource: AssignmentCodesSource,
 ) : AssignmentSource {
     override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
-        Assignments.select { Assignments.id eq id }.limit(1).map { buildAssigment(it) }.firstOrNull()
+        Assignments.select { (Assignments.id eq id) and (Assignments.archived eq false) }.limit(1)
+            .map { buildAssigment(it) }.firstOrNull()
     }
 
     override suspend fun getAssignments(): List<Assignment> = dbQuery {
-        Assignments.selectAll().map { buildAssigment(it) }
+        Assignments.select { (Assignments.archived eq false) }.map { buildAssigment(it) }
     }
 
     override suspend fun getAssignmentsForCourse(id: UUID) = dbQuery {
-        Assignments.select { Assignments.courseId eq id }.map { buildAssigment(it) }
+        Assignments.select { (Assignments.courseId eq id) and (Assignments.archived eq false) }
+            .map { buildAssigment(it) }
     }
 
     override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
-        Assignments.select { Assignments.referenceId eq id }.limit(1).map {
+        Assignments.select { (Assignments.referenceId eq id) and (Assignments.archived eq false) }.limit(1).map {
             buildAssigment(it)
         }.firstOrNull()
     }
@@ -60,7 +62,7 @@ internal class RealAssignmentSource(
 
     override suspend fun deleteAssignment(id: UUID): Boolean {
         val result = dbQuery {
-            Assignments.deleteWhere { Assignments.id eq  id }
+            Assignments.deleteWhere { Assignments.id eq id }
         }
         assignmentCodesSource.deleteByAssignment(id)
         return result > 0
@@ -89,6 +91,8 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment, isCreate: Boolean) {
     this[Assignments.totalAttempts] = assignment.totalAttempts
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
     this[Assignments.blockId] = assignment.blockId
+    this[Assignments.archived] = assignment.archived
+    this[Assignments.courseId] = assignment.courseId
 }
 
 private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assignment {
@@ -104,7 +108,9 @@ private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assig
         successMessage = this[Assignments.successMessage],
         instructions = this[Assignments.instructions],
         totalAttempts = this[Assignments.totalAttempts],
-        blockId = this[Assignments.blockId]
+        archived = this[Assignments.archived],
+        blockId = this[Assignments.blockId],
+        courseId = this[Assignments.courseId].value
     )
 }
 
