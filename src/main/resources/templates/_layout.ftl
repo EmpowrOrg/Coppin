@@ -98,11 +98,10 @@
             }
         }
     </script>
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>
+    <link href="https://cdn.datatables.net/v/bs5/dt-1.13.5/b-2.4.1/b-colvis-2.4.1/r-2.5.0/sc-2.2.0/sp-2.2.0/datatables.min.css"
+          rel="stylesheet"/>
 
-    <script type="text/javascript"
-            src="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.5/b-2.4.1/b-colvis-2.4.1/r-2.5.0/sc-2.2.0/sp-2.2.0/datatables.min.js"></script>
     <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/material-dashboard.min.js?v=3.0.4"></script>
     <script type="text/javascript" src="/js/plugins/chartjs.min.js"></script>
