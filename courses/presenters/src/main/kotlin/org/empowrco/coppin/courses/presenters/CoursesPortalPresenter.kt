@@ -3,24 +3,35 @@ package org.empowrco.coppin.courses.presenters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
+import java.util.UUID
 
 interface CoursesPortalPresenter {
-    suspend fun getCourses(): Result<GetCoursesResponse>
+    suspend fun getCourses(request: GetCoursesRequest): Result<GetCoursesResponse>
     suspend fun getCourse(request: GetCourseRequest): Result<GetCourseResponse>
-    suspend fun getUnlinkedCourses(): Result<GetCoursesResponse>
+    suspend fun getUnlinkedCourses(request: GetCoursesRequest): Result<GetUnlinkedCoursesResponse>
+    suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit>
 }
 
 internal class RealCoursesPortalPresenter(
     private val repo: CoursesPortalRepository,
 ) : CoursesPortalPresenter {
-    override suspend fun getCourses(): Result<GetCoursesResponse> {
-        val courses = repo.getCourses()
+    override suspend fun getCourses(request: GetCoursesRequest): Result<GetCoursesResponse> {
+        val userId = request.id.toUuid() ?: return failure("Invalid uuid")
+        val courses = repo.getLinkedCourses(userId)
+        if (courses.isEmpty()) {
+            return GetCoursesResponse(
+                coursesCount = 0,
+                courses = emptyList()
+            ).toResult()
+        }
         val edxCoursesResult = repo.getEdxCourses()
         if (edxCoursesResult.isFailure) {
             return Result.failure(edxCoursesResult.exceptionOrNull()!!)
@@ -42,29 +53,77 @@ internal class RealCoursesPortalPresenter(
         ).toResult()
     }
 
-    override suspend fun getUnlinkedCourses(): Result<GetCoursesResponse> {
-        val courses = repo.getCourses()
-        val edxCoursesResult = repo.getEdxCourses()
-        if (edxCoursesResult.isFailure) {
-            return Result.failure(edxCoursesResult.exceptionOrNull()!!)
+    override suspend fun getUnlinkedCourses(request: GetCoursesRequest): Result<GetUnlinkedCoursesResponse> {
+        val userId = request.id.toUuid() ?: return failure("Invalid uuid")
+        val courses = repo.getLinkedCourses(userId)
+        val edxCoursesResult = repo.getEdxCourses().getOrNull()?.results?.filterNot { edxCourse ->
+            courses.any { it.edxId == edxCourse.id }
+        } ?: return failure("Could not fetch edx courses")
+        val edxCourses = if (edxCoursesResult.size <= 3) {
+            listOf(edxCoursesResult)
+        } else {
+            edxCoursesResult.windowed(size = 3, partialWindows = true)
         }
-        val edxCourses = edxCoursesResult.getOrThrow().results // Should never throw
-        return GetCoursesResponse(
-            courses = edxCourses.mapNotNull { edxCourse ->
-                val course = courses.find { it.edxId == edxCourse.id }
-                if (course != null) {
-                    return@mapNotNull null
-                }
-                GetCoursesResponse.Course(
-                    id = edxCourse.id,
-                    endDate = edxCourse.end ?: "",
-                    startDate = edxCourse.start,
-                    name = edxCourse.name,
-                    number = edxCourse.number,
+
+        return GetUnlinkedCoursesResponse(
+            rows = edxCourses.map { courseRow ->
+                val one = GetUnlinkedCoursesResponse.Course(
+                    name = courseRow[0].name,
+                    id = courseRow[0].id,
+                    dates = courseRow[0].start,
+                    number = courseRow[0].number,
+                    org = courseRow[0].org,
                 )
+                val two = courseRow.getOrNull(1)?.let {
+                    GetUnlinkedCoursesResponse.Course(
+                        name = it.name,
+                        id = it.id,
+                        dates = it.start,
+                        number = it.number,
+                        org = courseRow[0].org,
+                    )
+                }
+                val three = courseRow.getOrNull(2)?.let {
+                    GetUnlinkedCoursesResponse.Course(
+                        name = it.name,
+                        id = it.id,
+                        dates = it.start,
+                        number = it.number,
+                        org = courseRow[0].org,
+                    )
+                }
+                GetUnlinkedCoursesResponse.CourseRow(one, two, three)
             },
-            coursesCount = courses.size,
+            count = edxCoursesResult.size,
         ).toResult()
+    }
+
+    override suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit> {
+        val userId = request.userId.toUuid() ?: return failure("Invalid user id")
+        var failureStatement = ""
+        val currentTime = LocalDateTime.now()
+        request.classIds.forEach { edxId ->
+            val edxCourse = repo.getEdxCourse(edxId).getOrNull() ?: run {
+                failureStatement += "Failure adding $edxId\n"
+                return@forEach
+            }
+            val courseId = repo.getCourseByEdxId(edxId)?.id ?: run {
+                val course = Course(
+                    id = UUID.randomUUID(),
+                    edxId = edxId,
+                    title = edxCourse.name,
+                    number = edxCourse.number,
+                    org = edxCourse.org,
+                    createdAt = currentTime,
+                    lastModifiedAt = currentTime,
+                )
+                repo.createCourse(course)
+                course.id
+            }
+            repo.linkCourse(courseId, userId, currentTime)
+
+        }
+        return Unit.toResult()
     }
 
     private suspend fun updateCourse(edxCourse: EdxCourse, course: Course) {

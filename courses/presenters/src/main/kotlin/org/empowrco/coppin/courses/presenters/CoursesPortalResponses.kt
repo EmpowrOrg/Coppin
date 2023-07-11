@@ -10,6 +10,19 @@ data class GetCoursesResponse(val courses: List<Course>, val coursesCount: Int) 
     )
 }
 
+
+data class GetUnlinkedCoursesResponse(val count: Int, val rows: List<CourseRow>) {
+
+    data class CourseRow(val one: Course, val two: Course?, val three: Course?)
+    data class Course(
+        val id: String,
+        val name: String,
+        val number: String,
+        val dates: String,
+        val org: String,
+    )
+}
+
 data class GetCourseResponse(
     val id: String,
     val name: String,
