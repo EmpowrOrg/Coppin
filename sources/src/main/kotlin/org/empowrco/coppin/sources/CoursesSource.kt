@@ -1,6 +1,8 @@
 package org.empowrco.coppin.sources
 
+import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.db.Courses
+import org.empowrco.coppin.db.CoursesUsers
 import org.empowrco.coppin.models.Course
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -16,8 +18,12 @@ interface CoursesSource {
     suspend fun createCourse(course: Course)
     suspend fun getCourse(id: UUID): Course?
     suspend fun getCourses(): List<Course>
+    suspend fun getCourseByEdxId(id: String): Course?
+    suspend fun getLinkedCourses(userId: UUID): List<Course>
+    suspend fun getUnlinkedCourses(userId: UUID): List<Course>
     suspend fun deleteCourse(id: UUID): Boolean
     suspend fun updateCourse(course: Course): Boolean
+    suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime)
 }
 
 internal class RealCoursesSource : CoursesSource {
@@ -32,8 +38,32 @@ internal class RealCoursesSource : CoursesSource {
         Courses.select { Courses.id eq id }.limit(1).map { it.toCourse() }.firstOrNull()
     }
 
+    override suspend fun getCourseByEdxId(id: String): Course? = dbQuery {
+        Courses.select { Courses.edxId eq id }.limit(1).map { it.toCourse() }.firstOrNull()
+    }
+
     override suspend fun getCourses(): List<Course> = dbQuery {
         Courses.selectAll().map { it.toCourse() }
+    }
+
+    override suspend fun getLinkedCourses(userId: UUID): List<Course> = dbQuery {
+        val courseIds = CoursesUsers.select { CoursesUsers.user eq userId }.map { it[CoursesUsers.course].value }
+        Courses.select { Courses.id inList courseIds }.map { it.toCourse() }
+    }
+
+    override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) = dbQuery {
+        CoursesUsers.insert {
+            it[CoursesUsers.course] = courseId
+            it[CoursesUsers.user] = userId
+            it[CoursesUsers.createdAt] = currentTime
+            it[CoursesUsers.lastModifiedAt] = currentTime
+        }
+        Unit
+    }
+
+    override suspend fun getUnlinkedCourses(userId: UUID): List<Course> = dbQuery {
+        val courseIds = CoursesUsers.select { CoursesUsers.user eq userId }.map { it[CoursesUsers.course].value }
+        Courses.select { Courses.id notInList courseIds }.map { it.toCourse() }
     }
 
     override suspend fun deleteCourse(id: UUID): Boolean = dbQuery {
