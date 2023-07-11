@@ -1,0 +1,126 @@
+.pds-segmentedControl {
+    background: #F8F9FA;
+    border-radius: 0.5rem;
+    position: relative;
+    display: table;
+    height: 40px
+}
+
+.pds-segmentedControl:focus-within {
+    box-shadow: 0 0 5px #0061a0;
+    box-shadow: 0 0 5px var(--color-core-1)
+}
+
+.pds-segmentedControl input {
+    position: absolute;
+    opacity: 0
+}
+
+.pds-segmentedControl input + label {
+    position: relative;
+    color: #344767;
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 2;
+    transition: color .5s cubic-bezier(.8, 0, .33, 1)
+}
+
+.pds-segmentedControl input:checked + label {
+    z-index: 3;
+    color: #344767;
+    text-align: center;
+    font-size: 16px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.pds-segmentedControl :last-child:before, .pds-segmentedControl input + label {
+    margin: 4px;
+    min-width: 106px;
+    height: 32px;
+    display: table-cell;
+    width: 50%;
+    text-align: center;
+    vertical-align: middle
+}
+
+.pds-segmentedControl :last-child:before {
+    content: "";
+    background: #E9EAED;
+    border-radius: 0.5rem;
+    color: #0061a0;
+    color: black;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.25);
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    transform: translateX(-8px)
+}
+
+.pds-segmentedControl.pds-segmentedControl-triple input + label {
+    width: 33.33%
+}
+
+.pds-segmentedControl.pds-segmentedControl-triple :nth-child(1):checked ~ :last-child:before {
+    transform: translateX(-200%);
+    transition: transform .5s cubic-bezier(.05, 0, .18, 1)
+}
+
+.pds-segmentedControl.pds-segmentedControl-triple :nth-child(3):checked ~ :last-child:before {
+    transform: translateX(-100%) translateX(-8px);
+    transition: transform .5s cubic-bezier(.05, 0, .18, 1)
+}
+
+.pds-segmentedControl.pds-segmentedControl-triple :nth-child(5):checked ~ :last-child:before {
+    transform: translateX(-8px);
+    transition: transform .5s cubic-bezier(.05, 0, .18, 1)
+}
+
+.pds-segmentedControl.pds-segmentedControl-disabled {
+    background: gray;
+}
+
+.pds-segmentedControl.pds-segmentedControl-disabled :last-child:before {
+    background: white;
+    box-shadow: 0 0 0.5rem #e8e8e8;
+    box-shadow: 0 0 0.5rem darkgray;
+}
+
+.pds-segmentedControl.pds-segmentedControl-disabled input + label {
+    color: #9d9ea4;
+    color: dimgray;
+    cursor: not-allowed
+}
+
+.pds-segmentedControl.pds-segmentedControl-small {
+    height: 1.75rem;
+}
+
+.pds-segmentedControl.pds-segmentedControl-small input + label {
+    font-size: 12px
+}
+
+.pds-segmentedControl.pds-segmentedControl-small :last-child:before {
+    transform: translateX(-8px)
+}
+
+.pds-segmentedControl.pds-segmentedControl-small :last-child:before, .pds-segmentedControl.pds-segmentedControl-small input + label {
+    margin: 0.25rem;
+    height: 1.25rem;
+}
+
+.pds-segmentedControl :nth-child(1):checked ~ :last-child:before {
+    transform: translateX(-100%);
+    transition: transform .5s cubic-bezier(.05, 0, .18, 1);
+}
+
+.pds-segmentedControl :nth-child(3):checked ~ :last-child:before {
+    transform: translateX(-8px);
+    transition: transform .5s cubic-bezier(.05, 0, .18, 1)
+}
