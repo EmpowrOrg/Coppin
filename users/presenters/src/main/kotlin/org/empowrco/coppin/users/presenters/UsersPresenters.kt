@@ -127,7 +127,8 @@ class RealUsersPresenters(
                     createdAt = it.createdAt.toString(),
                 )
             },
-            hasKeys = user.keys.isNotEmpty()
+            hasKeys = user.keys.isNotEmpty(),
+            isAdmin = currentUser.type == User.Type.Admin,
         ).toResult()
     }
 

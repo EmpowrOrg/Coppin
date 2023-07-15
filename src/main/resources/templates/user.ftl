@@ -105,28 +105,34 @@
                                        value="${content.email}">
                             </div>
                             <div class="my-3 col">
-                                <label for="authorized" class="form-label"><h6>Authorized</h6></label>
-                                <select class="form-select mb-3" id="authorized" name="authorized"
-                                        aria-label=".form-select-lg example">
-                                    <option value="true" <#if content.authorized>selected</#if>>Yes</option>
-                                    <option value="false" <#if content.authorized><#else >selected</#if>>No</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-2 info-row" style="width: 100%">
+                                <#if content.isAdmin()>
+                                    <label for="authorized" class="form-label"><h6>Authorized</h6></label>
+                                    <select class="form-select mb-3" id="authorized" name="authorized"
+                                            aria-label=".form-select-lg example">
+                                        <option value="true" <#if content.authorized>selected</#if>>Yes</option>
+                                        <option value="false" <#if content.authorized><#else >selected</#if>>No</option>
+                                    </select>
+                                </#if>
 
-                            <div class="my-3 col">
-                                <label for="type" class="form-label"><h6>Role</h6></label>
-                                <select class="form-select mb-3" id="type" name="type"
-                                        aria-label=".form-select-lg example">
-                                    <option value="Teacher" <#if content.type == "Teacher"> selected</#if>>Teacher
-                                    </option>
-                                    <option value="Admin" <#if content.type == "Admin"> selected</#if>>Admin</option>
-                                </select>
-                            </div>
-                            <div class="my-3 col">
                             </div>
                         </div>
+                        <#if content.isAdmin()>
+                            <div class="col-2 info-row" style="width: 100%">
+
+                                <div class="my-3 col">
+                                    <label for="type" class="form-label"><h6>Role</h6></label>
+                                    <select class="form-select mb-3" id="type" name="type"
+                                            aria-label=".form-select-lg example">
+                                        <option value="Teacher" <#if content.type == "Teacher"> selected</#if>>Teacher
+                                        </option>
+                                        <option value="Admin" <#if content.type == "Admin"> selected</#if>>Admin
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="my-3 col">
+                                </div>
+                            </div>
+                        </#if>
 
                     </form>
                 </div>

@@ -27,6 +27,7 @@ data class GetUserResponse(
     val lastName: String,
     val hasKeys: Boolean,
     val keys: List<Key>?,
+    val isAdmin: Boolean,
 ) {
     data class Key(val name: String, val key: String, val id: String, val createdAt: String)
 }
