@@ -5426,11 +5426,19 @@ fieldset:disabled .btn {
 
 .coppin-table {
   background: transparent;
-  padding: 1rem;
+  padding: 1rem 0;
   border-radius: 1rem;
   border: solid #F0F2F5;
   margin: 0.5rem;
   flex-shrink: 16;
+}
+
+div.dataTables_length {
+  padding-left: 1rem;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+  padding-right: 1rem;
 }
 
 div.dataTables_wrapper div.dataTables_filter input {
@@ -5439,6 +5447,47 @@ div.dataTables_wrapper div.dataTables_filter input {
 
 div.dataTables_wrapper div.dataTables_length select {
   border-radius: 1rem;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+  margin-right: 1rem !important;
+  padding-top: 0.85rem;
+}
+
+.dataTable thead {
+  background: #F0F2F5;
+}
+
+.dataTable th:first-child {
+  padding-left: 1rem;
+}
+
+.dataTable th:last-child {
+  padding-right: 1rem;
+}
+
+.dataTable td:first-child {
+  padding-left: 1rem;
+}
+
+.dataTable td:last-child {
+  padding-right: 1rem;
+}
+
+.dataTable th {
+  padding: 0.5rem;
+}
+
+.dataTable .even td {
+  background: #F8F9FA;
+}
+
+.dataTable td {
+  padding: 0.5rem 0;
+}
+
+div.dataTables_wrapper div.dataTables_info {
+  margin-left: 1rem;
 }
 
 .accordion {
