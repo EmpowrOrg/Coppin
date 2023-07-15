@@ -1,5 +1,6 @@
 package org.empowrco.coppin.utils.routing
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLBuilder
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
@@ -11,6 +12,8 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.util.url
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 suspend fun ApplicationCall.respondFreemarker(template: String, content: Any) {
     respondFreemarker(template, mapOf("content" to content))
@@ -49,5 +52,10 @@ suspend fun ApplicationCall.errorRedirect(error: String, path: String? = null) {
     }
     respondRedirect(errorUrl)
 }
+
+suspend fun ApplicationCall.error(exception: Throwable) {
+    respond(HttpStatusCode.InternalServerError, JsonObject(mapOf("error" to JsonPrimitive(exception.message))))
+}
+
 
 data class UserSession(val userId: String, val isAdmin: Boolean)
