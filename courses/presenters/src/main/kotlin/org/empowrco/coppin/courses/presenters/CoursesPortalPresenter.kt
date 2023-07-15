@@ -8,6 +8,7 @@ import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
@@ -43,8 +44,8 @@ internal class RealCoursesPortalPresenter(
                 updateCourse(edxCourse, course)
                 GetCoursesResponse.Course(
                     id = course.id.toString(),
-                    endDate = edxCourse.end ?: "",
-                    startDate = edxCourse.start,
+                    endDate = edxCourse.end?.monthDayYear() ?: "",
+                    startDate = edxCourse.start.monthDayYear() ?: "",
                     name = edxCourse.name,
                     number = edxCourse.number,
                 )
@@ -161,7 +162,7 @@ internal class RealCoursesPortalPresenter(
                 title = assignment.title,
                 successRate = "${successPercent.toInt()}%",
                 completionRate = "${completionPercent.toInt()}%",
-                lastModified = assignment.lastModifiedAt.toString()
+                lastModified = assignment.lastModifiedAt.monthDayYear(),
             )
         }
         return GetCourseResponse(

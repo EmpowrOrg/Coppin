@@ -8,6 +8,7 @@ import org.empowrco.coppin.utils.DuplicateKeyException
 import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.capitalize
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
@@ -124,7 +125,7 @@ class RealUsersPresenters(
                     id = it.id.toString(),
                     key = it.key,
                     name = it.name,
-                    createdAt = it.createdAt.toString(),
+                    createdAt = it.createdAt.monthDayYear(),
                 )
             },
             hasKeys = user.keys.isNotEmpty(),

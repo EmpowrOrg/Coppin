@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.languages.backend.LanguagesRepository
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.nonEmpty
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
@@ -26,7 +27,7 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
                     id = it.id.toString(),
                     mime = it.mime,
                     name = it.name,
-                    lastModifiedDate = it.lastModifiedAt.date.toString(),
+                    lastModifiedDate = it.lastModifiedAt.monthDayYear(),
                     url = it.url,
                 )
             },
