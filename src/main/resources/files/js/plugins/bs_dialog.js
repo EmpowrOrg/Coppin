@@ -56,7 +56,7 @@ class BsDialogs {
         }
 
 
-        let close_btn = `<button type="button" class="btn-close" data-ret="" aria-label="Close"></button>`
+        let close_btn = `<button type="button" class="btn-close text-black-50" data-ret="" aria-label="Close"><i class="material-icons opacity-10">close</i></button>`
         if (!this._options.close) {
             close_btn = ''
         }
