@@ -28,7 +28,7 @@ data class GetUserResponse(
     val hasKeys: Boolean,
     val keys: List<Key>?,
 ) {
-    data class Key(val key: String, val id: String)
+    data class Key(val name: String, val key: String, val id: String, val createdAt: String)
 }
 
 

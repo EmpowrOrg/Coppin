@@ -119,10 +119,12 @@ class RealUsersPresenters(
             authorized = user.isAuthorized,
             email = user.email,
             type = user.type.name,
-            keys = user.keys.map {
+            keys = user.keys.sortedBy { it.name }.map {
                 GetUserResponse.Key(
                     id = it.id.toString(),
                     key = it.key,
+                    name = it.name,
+                    createdAt = it.createdAt.toString(),
                 )
             },
             hasKeys = user.keys.isNotEmpty()
