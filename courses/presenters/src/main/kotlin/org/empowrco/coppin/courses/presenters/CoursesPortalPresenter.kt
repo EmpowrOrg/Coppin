@@ -71,7 +71,7 @@ internal class RealCoursesPortalPresenter(
                 val one = GetUnlinkedCoursesResponse.Course(
                     name = courseRow[0].name,
                     id = courseRow[0].id,
-                    dates = courseRow[0].start,
+                    dates = courseRow[0].dates(),
                     number = courseRow[0].number,
                     org = courseRow[0].org,
                 )
@@ -79,7 +79,7 @@ internal class RealCoursesPortalPresenter(
                     GetUnlinkedCoursesResponse.Course(
                         name = it.name,
                         id = it.id,
-                        dates = it.start,
+                        dates = it.dates(),
                         number = it.number,
                         org = courseRow[0].org,
                     )
@@ -88,7 +88,7 @@ internal class RealCoursesPortalPresenter(
                     GetUnlinkedCoursesResponse.Course(
                         name = it.name,
                         id = it.id,
-                        dates = it.start,
+                        dates = it.dates(),
                         number = it.number,
                         org = courseRow[0].org,
                     )
@@ -97,6 +97,12 @@ internal class RealCoursesPortalPresenter(
             },
             count = edxCoursesResult.size,
         ).toResult()
+    }
+
+    private fun EdxCourse.dates(): String {
+        val start = start.monthDayYear()
+        val endRange = end?.monthDayYear() ?: "Present"
+        return "$start - $endRange"
     }
 
     override suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit> {
