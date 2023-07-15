@@ -140,8 +140,9 @@ class RealUsersPresenters(
             return failure("Invalid User Type")
         }
         val updatedUser = user.copy(
-            firstName = user.firstName,
-            lastName = user.lastName,
+            firstName = request.firstName,
+            lastName = request.lastName,
+            email = request.email,
             type = type,
             isAuthorized = request.authorized.toBoolean(),
             lastModifiedAt = LocalDateTime.now(),
