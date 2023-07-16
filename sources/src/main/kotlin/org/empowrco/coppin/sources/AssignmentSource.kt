@@ -3,6 +3,7 @@ package org.empowrco.coppin.sources
 import org.empowrco.coppin.db.Assignments
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
+import org.empowrco.coppin.models.Subject
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -16,23 +17,35 @@ import java.util.UUID
 interface AssignmentSource {
     suspend fun getAssignment(id: UUID): Assignment?
     suspend fun getAssignmentByReferenceId(id: String): Assignment?
+    suspend fun getAssignmentCountBySubject(id: UUID): Long
     suspend fun createAssignment(assignment: Assignment)
     suspend fun deleteAssignment(id: UUID): Boolean
     suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getAssignments(): List<Assignment>
     suspend fun getAssignmentsForCourse(id: UUID): List<Assignment>
+    suspend fun getAssignmentsForSubject(id: UUID): List<Assignment>
 }
 
 internal class RealAssignmentSource(
     private val assignmentCodesSource: AssignmentCodesSource,
+    private val subjectSource: SubjectSource,
 ) : AssignmentSource {
     override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
         Assignments.select { (Assignments.id eq id) and (Assignments.archived eq false) }.limit(1)
             .map { buildAssigment(it) }.firstOrNull()
     }
 
+    override suspend fun getAssignmentsForSubject(id: UUID): List<Assignment> = dbQuery {
+        Assignments.select { (Assignments.subject eq id) and (Assignments.archived eq false) }
+            .map { buildAssigment(it) }
+    }
+
     override suspend fun getAssignments(): List<Assignment> = dbQuery {
         Assignments.select { (Assignments.archived eq false) }.map { buildAssigment(it) }
+    }
+
+    override suspend fun getAssignmentCountBySubject(id: UUID): Long = dbQuery {
+        Assignments.select { Assignments.subject eq id }.count()
     }
 
     override suspend fun getAssignmentsForCourse(id: UUID) = dbQuery {
@@ -49,7 +62,9 @@ internal class RealAssignmentSource(
     private suspend fun buildAssigment(result: ResultRow): Assignment {
         val assignmentId = result[Assignments.id].value
         val starterCodes = assignmentCodesSource.getByAssigment(assignmentId)
-        return result.toAssignment(starterCodes)
+        val subjectId = result[Assignments.subject].value
+        val subject = subjectSource.getSubject(subjectId) ?: throw Exception("Subject not found")
+        return result.toAssignment(starterCodes, subject)
     }
 
     override suspend fun createAssignment(assignment: Assignment) {
@@ -93,9 +108,10 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment, isCreate: Boolean) {
     this[Assignments.blockId] = assignment.blockId
     this[Assignments.archived] = assignment.archived
     this[Assignments.courseId] = assignment.courseId
+    this[Assignments.subject] = assignment.subject.id
 }
 
-private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assignment {
+private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>, subject: Subject): Assignment {
     val id = this[Assignments.id].value
     return Assignment(
         id = id,
@@ -110,7 +126,8 @@ private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>): Assig
         totalAttempts = this[Assignments.totalAttempts],
         archived = this[Assignments.archived],
         blockId = this[Assignments.blockId],
-        courseId = this[Assignments.courseId].value
+        courseId = this[Assignments.courseId].value,
+        subject = subject,
     )
 }
 
