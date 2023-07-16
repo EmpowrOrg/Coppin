@@ -40,6 +40,7 @@ fun Application.assignmentRouting() {
                             val referenceId = formParameters["reference-id"].toString()
                             val title = formParameters["title"].toString()
                             val totalAttempts = formParameters["total-attempts"].toString()
+                            val subjectId = formParameters["subject"].toString()
                             presenter.createAssignment(
                                 CreateAssignmentPortalRequest(
                                     referenceId = referenceId,
@@ -49,6 +50,7 @@ fun Application.assignmentRouting() {
                                     title = title,
                                     courseId = call.parameters["courseId"].toString(),
                                     totalAttempts = totalAttempts,
+                                    subjectId = subjectId,
                                 )
                             ).fold({
                                 call.respondRedirect("/courses/${call.parameters["courseId"]}/assignments/${it.id}")
@@ -78,6 +80,7 @@ fun Application.assignmentRouting() {
                             val title = formParameters["title"].toString()
                             val totalAttempts = formParameters["total-attempts"].toString().toInt()
                             val referenceId = formParameters["reference-id"].toString()
+                            val subject = formParameters["subject"].toString()
                             presenter.updateAssignment(
                                 UpdateAssignmentPortalRequest(
                                     id = call.parameters["uuid"],
@@ -87,6 +90,7 @@ fun Application.assignmentRouting() {
                                     title = title,
                                     totalAttempts = totalAttempts,
                                     referenceId = referenceId,
+                                    subject = subject,
                                 )
                             ).fold({
                                 call.respondRedirect("/courses/${it.courseId}")

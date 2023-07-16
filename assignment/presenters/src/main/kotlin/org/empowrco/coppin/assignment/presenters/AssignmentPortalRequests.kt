@@ -11,6 +11,7 @@ data class CreateAssignmentPortalRequest(
     val totalAttempts: String,
     val title: String,
     val courseId: String,
+    val subjectId: String,
 )
 
 data class GetAssignmentRequest(
@@ -32,6 +33,7 @@ data class UpdateAssignmentPortalRequest(
     val totalAttempts: Int,
     val title: String,
     val referenceId: String,
+    val subject: String,
 )
 
 @Serializable

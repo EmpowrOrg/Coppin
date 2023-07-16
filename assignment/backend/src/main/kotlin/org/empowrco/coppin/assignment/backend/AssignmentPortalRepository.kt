@@ -4,16 +4,20 @@ import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Language
+import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.sources.AssignmentCodesSource
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.sources.SubjectSource
 import java.util.UUID
 
 
 interface AssignmentPortalRepository {
     suspend fun getAssignments(): List<Assignment>
     suspend fun getAssignment(id: UUID): Assignment?
+    suspend fun getSubject(id: UUID): Subject?
+    suspend fun getSubjectsForCourse(id: UUID): List<Subject>
     suspend fun createAssignment(assignment: Assignment)
     suspend fun getLanguage(mime: String): Language?
     suspend fun getCode(id: UUID): AssignmentCode?
@@ -32,10 +36,15 @@ internal class RealAssignmentPortalRepository(
     private val languagesSource: LanguagesSource,
     private val codesSource: AssignmentCodesSource,
     private val coursesSource: CoursesSource,
+    private val subjectSource: SubjectSource,
 ) : AssignmentPortalRepository {
 
     override suspend fun getAssignments(): List<Assignment> {
         return assignmentSource.getAssignments()
+    }
+
+    override suspend fun getSubject(id: UUID): Subject? {
+        return subjectSource.getSubject(id)
     }
 
     override suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode> {
@@ -85,5 +94,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getCourse(id: UUID): Course? {
         return coursesSource.getCourse(id)
+    }
+
+    override suspend fun getSubjectsForCourse(id: UUID): List<Subject> {
+        return subjectSource.getSubjectsForCourse(id)
     }
 }

@@ -12,6 +12,8 @@ data class GetAssignmentPortalResponse(
     val attempts: Int?,
     val title: String?,
     val codes: List<Code>,
+    val subjects: List<Subject>,
+    val subjectId: String?,
 ) {
     data class Code(
         val id: String,
@@ -21,6 +23,11 @@ data class GetAssignmentPortalResponse(
         val hasSolution: String,
         val hasStarter: String,
         val injectable: String,
+    )
+
+    data class Subject(
+        val id: String,
+        val name: String,
     )
 }
 

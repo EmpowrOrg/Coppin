@@ -289,24 +289,49 @@
                                        type="text" class="form-control">
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <label for="reference-id" class="col-form-label"><h6>Reference Id</h6></label>
+                                <div class="col-auto row align-items-center mt-2">
+                                    <div class="col-auto">
+                                        <label for="reference-id" class="col-form-label"><h6>Reference Id</h6></label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input name="reference-id" type="text" id="reference-id" class="form-control"
+                                               <#if content.referenceId??>value="${content.referenceId}" </#if>>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <input name="reference-id" type="text" id="reference-id" class="form-control"
-                                           <#if content.referenceId??>value="${content.referenceId}" </#if>>
+                                <div class="col-auto row align-items-center mt-2">
+                                    <div class="col-auto">
+                                        <label for="total-attempts" class="col-form-label"><h6>Total Attempts</h6>
+                                        </label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="total-attempts" class="form-control" min="0"
+                                               step="1"
+                                               name="total-attempts"
+                                               onfocus="this.previousValue = this.value"
+                                               onkeydown="this.previousValue = this.value"
+                                               <#if content.attempts??>value="${content.attempts}" </#if>
+                                               oninput="validity.valid || (value = this.previousValue)">
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <label for="total-attempts" class="col-form-label"><h6>Total Attempts</h6></label>
-                                </div>
-                                <div class="col-auto">
-                                    <input type="number" id="total-attempts" class="form-control" min="0"
-                                           step="1"
-                                           name="total-attempts"
-                                           onfocus="this.previousValue = this.value"
-                                           onkeydown="this.previousValue = this.value"
-                                           <#if content.attempts??>value="${content.attempts}" </#if>
-                                           oninput="validity.valid || (value = this.previousValue)">
+
+                                <div class="col-auto row align-items-center mt-2">
+                                    <div class="col-auto align-middle">
+                                        <label for="subject" class="col-form-label"><h6>Subject</h6></label>
+                                    </div>
+                                    <div class="col-auto align-middle">
+                                        <select name="subject" id="subject" class="form-select">
+                                            <#list content.subjects as subject>
+                                                <option value="${subject.id}"
+                                                        <#if subject.id == content.subjectId>selected</#if>>${subject.name}</option>
+                                            </#list>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-auto ps-0 align-middle">
+                                        <button type="button" id="add-subject" class="btn col-sm text-black-50 p-2 m-0"
+                                                onclick="addSubject()"><i class="material-icons opacity-10">add</i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -405,4 +430,45 @@
         </div>
 
     </div>
+    <script>
+        async function addSubject() {
+            const frm = `<form>
+                         <div>Create a new subject. Note: This will reload the page.
+                         </div>
+                         <div class="input-group input-group-outline mt-3">
+                             <input data-name="name" name="name" id="name" type="text"
+                                    class="form-control" placeholder="ex: Functions" required>
+                         </div>
+</form>`
+            let dlg = new BsDialogs()
+            dlg.form('Create Subject', 'Create', frm)
+            let result = await dlg.onsubmit()
+            if (result === undefined) {
+                return
+            }
+            const name = result.name
+            console.log(name)
+            const body = JSON.stringify({
+                name: name,
+                courseId: "${content.courseId}",
+            })
+            console.log(body)
+            fetch('/courses/${content.courseId}/subjects', {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: body
+            }).then(async response => {
+                return await parseResponse(response)
+            }).then(async res => {
+                if (res.error) {
+                    throw new Error(res.error)
+                } else {
+                    await new BsDialogs().ok('Subject Created', 'Subject \'' + name + '\' created');
+                    window.location.reload()
+                }
+            }).catch(async error => {
+                await showError(error)
+            });
+        }
+    </script>
 </@layout.header>

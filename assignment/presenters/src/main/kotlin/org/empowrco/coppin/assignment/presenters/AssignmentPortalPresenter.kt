@@ -53,6 +53,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         } else if (request.failureMessage.isBlank()) {
             return failure("Please include a failure message")
         }
+        val subjectId = request.subject.toUuid() ?: return failure("Invalid Subject Selected")
+        val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
         val updatedAssignment = assignment.copy(
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
@@ -60,6 +62,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             totalAttempts = request.totalAttempts,
             title = request.title,
             referenceId = request.referenceId,
+            subject = subject,
             lastModifiedAt = currentTime,
         )
         val result = repo.updateAssignment(updatedAssignment)
@@ -87,6 +90,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         }
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
         val course = repo.getCourse(courseId) ?: return failure("Course not found")
+        val subjectId = request.subjectId.toUuid() ?: return failure("Invalid Subject Selected")
+        val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
 
         val assignment = Assignment(
             id = id,
@@ -102,12 +107,15 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             courseId = course.id,
             createdAt = currentTime,
             lastModifiedAt = currentTime,
+            subject = subject,
         )
         repo.createAssignment(assignment)
         return CreateAssignmentResponse(id.toString()).toResult()
     }
 
     override suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse> {
+        val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        val subjects = repo.getSubjectsForCourse(courseId)
         if (request.id == null) {
             return GetAssignmentPortalResponse(
                 title = null,
@@ -119,6 +127,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 courseId = request.courseId,
                 instructions = null,
                 codes = emptyList(),
+                subjects = subjects.map {
+                    GetAssignmentPortalResponse.Subject(
+                        id = it.id.toString(),
+                        name = it.name,
+                    )
+                },
+                subjectId = null
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -144,6 +159,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             id = assignment.id.toString(),
             instructions = StringEscapeUtils.escapeJava(assignment.instructions),
             codes = codes,
+            subjectId = assignment.subject.id.toString(),
+            subjects = subjects.map {
+                GetAssignmentPortalResponse.Subject(
+                    id = it.id.toString(),
+                    name = it.name,
+                )
+            }
         ).toResult()
     }
 
