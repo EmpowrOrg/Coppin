@@ -220,17 +220,25 @@ internal class RealCoursesPortalPresenter(
         val assignments = repo.getAssignmentsForCourse(course.id)
         val studentResponse = repo.getStudentsForCourse(course.edxId)
         val students = studentResponse.getOrNull()?.results ?: return failure(
-            "Could not " +
-                    "retrieve student info for the course"
+            "Could not retrieve student info for the course"
         )
+        val subjects = repo.getSubjects(courseId)
+        val subjectCompletionRates = mutableMapOf<String, List<Double>>()
+        val subjectSuccessRates = mutableMapOf<String, List<Double>>()
         val responseAssignments = assignments.map { assignment ->
             val submissions = repo.getLastStudentSubmissionForAssignment(assignment.id)
             val successes = submissions.filter { it.correct }
             val successRate = successes.size.toDouble() / submissions.size.toDouble()
             val successPercent = successRate * 100
+            val subSRates = subjectSuccessRates.getOrDefault(assignment.subject.name, emptyList()).toMutableList()
+            subSRates.add(successRate)
+            subjectSuccessRates[assignment.subject.name] = subSRates
 
             val completionRate = submissions.size.toDouble() / students.size.toDouble()
             val completionPercent = completionRate * 100
+            val subCRates = subjectCompletionRates.getOrDefault(assignment.subject.name, emptyList()).toMutableList()
+            subCRates.add(completionRate)
+            subjectCompletionRates[assignment.subject.name] = subCRates
             GetCourseResponse.Assignment(
                 id = assignment.id.toString(),
                 title = assignment.title,
@@ -240,7 +248,6 @@ internal class RealCoursesPortalPresenter(
                 lastModified = assignment.lastModifiedAt.monthDayYear(),
             )
         }
-        val subjects = repo.getSubjects(courseId)
         val courseSubjects = subjects.map {
             val numOfAssignments = repo.getAssignmentCountBySubject(it.id)
             GetCourseResponse.Subject(
@@ -249,6 +256,14 @@ internal class RealCoursesPortalPresenter(
                 assignments = numOfAssignments.toString(),
                 lastModified = it.lastModifiedAt.monthDayYear(),
             )
+        }
+        subjects.forEach {
+            if (!subjectCompletionRates.containsKey(it.name)) {
+                subjectCompletionRates[it.name] = listOf(0.0)
+            }
+            if (!subjectSuccessRates.containsKey(it.name)) {
+                subjectSuccessRates[it.name] = listOf(0.0)
+            }
         }
         return GetCourseResponse(
             id = course.id.toString(),
@@ -265,7 +280,22 @@ internal class RealCoursesPortalPresenter(
                 ),
                 x = GetCourseResponse.Chart.X(
                     labels = subjects.map { it.name },
-                    lines = emptyList()
+                    lines = listOf(
+                        GetCourseResponse.Chart.X.Line(
+                            name = "Completion Rate",
+                            points = subjectCompletionRates.entries.sortedBy { it.key }.map { (_, value) ->
+                                value.average() * 100
+                            },
+                            color = "#5D0E81",
+                        ),
+                        GetCourseResponse.Chart.X.Line(
+                            name = "Success Rate",
+                            points = subjectSuccessRates.entries.sortedBy { it.key }.map { (_, value) ->
+                                value.average() * 100
+                            },
+                            color = "#FFD700",
+                        ),
+                    )
                 )
             )
         ).toResult()

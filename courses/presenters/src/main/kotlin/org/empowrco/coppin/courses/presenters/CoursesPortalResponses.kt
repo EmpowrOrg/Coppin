@@ -41,7 +41,7 @@ data class GetCourseResponse(
     ) {
         data class Y(val label: String, val min: Int, val max: Int)
         data class X(val labels: List<String>, val lines: List<Line>) {
-            data class Line(val name: String, val points: List<Int>)
+            data class Line(val name: String, val points: List<Double>, val color: String)
         }
     }
 

@@ -20,7 +20,7 @@
         #summary-container {
             display: flex;
             width: 100%;
-            align-items: flex-start;
+            align-items: center;
             gap: 1.75rem;
         }
 
@@ -36,6 +36,10 @@
             display: inline-flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        #summary-grade-container {
+            width: 100%;
         }
     </style>
     <script>
@@ -128,6 +132,58 @@
                     hideSection("course")
                 }
             });
+
+            const data = {
+                labels: [<#list content.chart.x.labels as label>'${label}', </#list>],
+                datasets: [
+                    <#list content.chart.x.lines as line>
+                    {
+                        label: '${line.name}',
+                        data: [<#list line.points as point>${point}, </#list>],
+                        borderColor: '${line.color}',
+                        backgroundColor: '${line.color}',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    </#list >
+                ]
+            }
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '${content.chart.title}'
+                        },
+                    },
+                    interaction: {
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '${content.chart.y.label}'
+                            },
+                            suggestedMin: ${content.chart.y.min},
+                            suggestedMax: ${content.chart.y.max},
+                        }
+                    }
+                },
+            }
+            const ctx = document.getElementById('course-summary-chart');
+
+            new Chart(ctx, config);
         });
     </script>
     <body class="g-sidenav-show  bg-gray-200">
@@ -136,7 +192,11 @@
         <div class="container-fluid py-4">
             <div id="course-container" class="row m-3 pb-4">
                 <div id="course-header" class="justify-content-between">
-                    <div class="pds-segmentedControl">
+                    <div class="pds-segmentedControl pds-segmentedControl-triple">
+                        <input id="sc-course" name="sc" type="radio" data-gtm="filter"
+                               data-gtm-label="second" value="sc-course"/>
+                        <label for="sc-course"
+                               style="white-space: nowrap">Course</label>
                         <input id="sc-assignments" name="sc" type="radio" data-gtm="filter"
                                data-gtm-label="second" value="sc-assignments"/>
                         <label for="sc-assignments"
