@@ -17,4 +17,5 @@ data class Assignment(
     val archived: Boolean,
     val blockId: String?,
     val courseId: UUID,
+    val subject: Subject,
 )
