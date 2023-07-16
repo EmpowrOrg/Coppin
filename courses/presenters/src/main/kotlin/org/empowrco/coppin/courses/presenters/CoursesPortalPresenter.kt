@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.monthDayYear
@@ -19,6 +20,10 @@ interface CoursesPortalPresenter {
     suspend fun getCourse(request: GetCourseRequest): Result<GetCourseResponse>
     suspend fun getUnlinkedCourses(request: GetCoursesRequest): Result<GetUnlinkedCoursesResponse>
     suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit>
+    suspend fun createSubject(request: CreateSubjectRequest): Result<CreateSubjectResponse>
+    suspend fun getSubject(request: GetSubjectRequest): Result<GetSubjectResponse>
+    suspend fun updateSubject(request: UpdateSubjectRequest): Result<UpdateSubjectResponse>
+    suspend fun deleteSubject(request: DeleteSubjectRequest): Result<DeleteSubjectResponse>
 }
 
 internal class RealCoursesPortalPresenter(
@@ -146,6 +151,69 @@ internal class RealCoursesPortalPresenter(
         }
     }
 
+    override suspend fun createSubject(request: CreateSubjectRequest): Result<CreateSubjectResponse> {
+        if (request.name.isBlank()) {
+            return failure("Name must not be blank")
+        }
+        val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        repo.getCourse(courseId) ?: return failure("Course Not Found")
+        val currentTime = LocalDateTime.now()
+        val subject = Subject(
+            id = UUID.randomUUID(),
+            courseId = courseId,
+            name = request.name,
+            createdAt = currentTime,
+            lastModifiedAt = currentTime,
+        )
+        return try {
+            repo.createSubject(subject)
+            CreateSubjectResponse.toResult()
+        } catch (ex: Exception) {
+            failure(ex.localizedMessage)
+        }
+    }
+
+    override suspend fun getSubject(request: GetSubjectRequest): Result<GetSubjectResponse> {
+        val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        val subjectId = request.id?.toUuid() ?: return failure("Invalid subject id")
+        val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
+        val assignmentCount = repo.getAssignmentCountBySubject(subjectId)
+        return GetSubjectResponse(
+            courseId = courseId.toString(),
+            id = subjectId.toString(),
+            name = subject.name,
+            canBeDeleted = assignmentCount == 0L
+        ).toResult()
+    }
+
+    override suspend fun updateSubject(request: UpdateSubjectRequest): Result<UpdateSubjectResponse> {
+        if (request.name.isBlank()) {
+            return failure("Name must not be blank")
+        }
+        val subjectId = request.id.toUuid() ?: return failure("Invalid subject id")
+        val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
+        val updatedSubject = subject.copy(
+            name = request.name,
+            lastModifiedAt = LocalDateTime.now(),
+        )
+        val result = repo.updateSubject(updatedSubject)
+        return if (!result) {
+            failure("Error updating subject")
+        } else {
+            UpdateSubjectResponse.toResult()
+        }
+    }
+
+    override suspend fun deleteSubject(request: DeleteSubjectRequest): Result<DeleteSubjectResponse> {
+        val id = request.id.toUuid() ?: return failure("Invalid subject id")
+        val result = repo.deleteSubject(id)
+        return if (!result) {
+            failure("Unknown error")
+        } else {
+            DeleteSubjectResponse.toResult()
+        }
+    }
+
     override suspend fun getCourse(request: GetCourseRequest): Result<GetCourseResponse> {
         val courseId = request.id.toUuid() ?: return failure("Invalid Course Id")
         val course = repo.getCourse(courseId) ?: return failure("Course Not Found")
@@ -168,7 +236,18 @@ internal class RealCoursesPortalPresenter(
                 title = assignment.title,
                 successRate = "${successPercent.toInt()}%",
                 completionRate = "${completionPercent.toInt()}%",
+                subject = assignment.subject.name,
                 lastModified = assignment.lastModifiedAt.monthDayYear(),
+            )
+        }
+        val subjects = repo.getSubjects(courseId)
+        val courseSubjects = subjects.map {
+            val numOfAssignments = repo.getAssignmentCountBySubject(it.id)
+            GetCourseResponse.Subject(
+                id = it.id.toString(),
+                name = it.name,
+                assignments = numOfAssignments.toString(),
+                lastModified = it.lastModifiedAt.monthDayYear(),
             )
         }
         return GetCourseResponse(
@@ -176,6 +255,19 @@ internal class RealCoursesPortalPresenter(
             name = course.title,
             referenceId = course.edxId,
             assignments = responseAssignments,
+            subjects = courseSubjects,
+            chart = GetCourseResponse.Chart(
+                title = "Overall Course Summary",
+                y = GetCourseResponse.Chart.Y(
+                    label = "Rate",
+                    min = 0,
+                    max = 100,
+                ),
+                x = GetCourseResponse.Chart.X(
+                    labels = subjects.map { it.name },
+                    lines = emptyList()
+                )
+            )
         ).toResult()
     }
 }

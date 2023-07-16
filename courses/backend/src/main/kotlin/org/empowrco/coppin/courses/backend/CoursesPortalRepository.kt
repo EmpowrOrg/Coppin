@@ -3,6 +3,7 @@ package org.empowrco.coppin.courses.backend
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
@@ -10,6 +11,7 @@ import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.EdxSource
+import org.empowrco.coppin.sources.SubjectSource
 import org.empowrco.coppin.sources.SubmissionSource
 import java.util.UUID
 
@@ -27,6 +29,13 @@ interface CoursesPortalRepository {
     suspend fun getAssignmentsForCourse(courseId: UUID): List<Assignment>
     suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission>
     suspend fun getStudentsForCourse(edxId: String): Result<EdxEnrollmentsResponse>
+    suspend fun createSubject(subject: Subject)
+    suspend fun getSubjects(courseId: UUID): List<Subject>
+    suspend fun getAssignmentCountBySubject(id: UUID): Long
+    suspend fun getAssignmentsBySubject(id: UUID): List<Assignment>
+    suspend fun getSubject(id: UUID): Subject?
+    suspend fun updateSubject(subject: Subject): Boolean
+    suspend fun deleteSubject(id: UUID): Boolean
 }
 
 internal class RealCoursesPortalRepository(
@@ -34,7 +43,36 @@ internal class RealCoursesPortalRepository(
     private val edxSource: EdxSource,
     private val assignmentSource: AssignmentSource,
     private val submissionSource: SubmissionSource,
+    private val subjectSource: SubjectSource,
 ) : CoursesPortalRepository {
+
+    override suspend fun createSubject(subject: Subject) {
+        return subjectSource.createSubject(subject)
+    }
+
+    override suspend fun getSubject(id: UUID): Subject? {
+        return subjectSource.getSubject(id)
+    }
+
+    override suspend fun deleteSubject(id: UUID): Boolean {
+        return subjectSource.deleteSubject(id)
+    }
+
+    override suspend fun updateSubject(subject: Subject): Boolean {
+        return subjectSource.updateSubject(subject)
+    }
+
+    override suspend fun getSubjects(courseId: UUID): List<Subject> {
+        return subjectSource.getSubjectsForCourse(courseId)
+    }
+
+    override suspend fun getAssignmentsBySubject(id: UUID): List<Assignment> {
+        return assignmentSource.getAssignmentsForSubject(id)
+    }
+
+    override suspend fun getAssignmentCountBySubject(id: UUID): Long {
+        return assignmentSource.getAssignmentCountBySubject(id)
+    }
 
     override suspend fun getLinkedCourses(userId: UUID): List<Course> {
         return coursesSource.getLinkedCourses(userId)
