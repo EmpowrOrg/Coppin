@@ -36,6 +36,11 @@
     </#if>
 
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+        <div class="to-header ms-2">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <i class="material-icons" style="padding: 1rem">menu</i>
+            </a>
+        </div>
         <div class="container-fluid" id="body-content" style="padding-right: 0; padding-left: 0;">
             <#nested>
         </div>
