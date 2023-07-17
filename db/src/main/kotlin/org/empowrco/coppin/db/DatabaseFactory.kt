@@ -14,6 +14,7 @@ object DatabaseFactory {
         Courses,
         CoursesUsers,
         Languages,
+        Subjects,
         Submissions,
         UserAccessKeys,
         Users,
