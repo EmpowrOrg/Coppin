@@ -244,7 +244,7 @@
             </#if>
         });
     </script>
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
         <form role="form" id="edit-assignment" method="post"
               action="/courses/${content.courseId}/assignments/<#if content.id??>${content.id}<#else >create</#if>">
             <div id="assignment-container" class="row m-3 pb-4">

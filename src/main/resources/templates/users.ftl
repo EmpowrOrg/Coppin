@@ -36,7 +36,7 @@
     </style>
     <body class="g-sidenav-show  bg-gray-200">
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <div class="container-fluid py-4">
+        <div class="container-fluid">
             <div id="users-container" class="row m-4 pb-4">
                 <h6 class="mt-3 mb-3">All teachers (${content.usersCount})</h6>
                 <#include "error.ftl">

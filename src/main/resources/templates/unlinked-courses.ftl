@@ -62,7 +62,7 @@
     <body class="g-sidenav-show  bg-gray-200">
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
 
-        <div class="container-fluid py-4">
+        <div class="container-fluid">
             <div id="courses-container" class="row m-4 pb-4">
                 <h4 class="mt-4 ms-4">Available courses (${content.count})</h4>
 

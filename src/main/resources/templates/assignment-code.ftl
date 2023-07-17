@@ -86,7 +86,7 @@
             gap: 0.5rem;
         }
     </style>
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
         <form role="form"
               action="/courses/${content.courseId}/assignments/${content.assignmentId}/codes/<#if content.id??>${content.id}</#if>"
               id="create-assignment-code" method="post">

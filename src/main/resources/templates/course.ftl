@@ -189,7 +189,7 @@
     <body class="g-sidenav-show  bg-gray-200">
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
 
-        <div class="container-fluid py-4">
+        <div class="container-fluid">
             <div id="course-container" class="row m-3 pb-4">
                 <div id="course-header" class="justify-content-between">
                     <div class="pds-segmentedControl pds-segmentedControl-triple">

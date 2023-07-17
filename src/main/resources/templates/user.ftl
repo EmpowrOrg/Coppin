@@ -74,7 +74,7 @@
 </style>
 <body class="bg-gray-200">
 <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg mt-4">
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
         <div id="profile-container" class="row m-3 pb-4">
 
             <div id="profile-header" class="justify-content-between">
