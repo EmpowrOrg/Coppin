@@ -265,12 +265,17 @@ internal class RealCoursesPortalPresenter(
                 subjectSuccessRates[it.name] = listOf(0.0)
             }
         }
+        val subjectCompletionPercentages = subjectCompletionRates.entries.sortedBy { it.key }.map { (_, value) ->
+            value.average() * 100
+        }
+        val completionAverage = subjectCompletionPercentages.average().toInt()
         return GetCourseResponse(
             id = course.id.toString(),
             name = course.title,
             referenceId = course.edxId,
             assignments = responseAssignments,
             subjects = courseSubjects,
+            completionRate = completionAverage.toString(),
             chart = GetCourseResponse.Chart(
                 title = "Overall Course Summary",
                 y = GetCourseResponse.Chart.Y(
@@ -283,9 +288,7 @@ internal class RealCoursesPortalPresenter(
                     lines = listOf(
                         GetCourseResponse.Chart.X.Line(
                             name = "Completion Rate",
-                            points = subjectCompletionRates.entries.sortedBy { it.key }.map { (_, value) ->
-                                value.average() * 100
-                            },
+                            points = subjectCompletionPercentages,
                             color = "#5D0E81",
                         ),
                         GetCourseResponse.Chart.X.Line(

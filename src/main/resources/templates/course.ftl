@@ -213,7 +213,7 @@
                     <div id="summary-container" class="mt-3">
                         <div id="summary-completion-rate-container" class="justify-content-center">
                             <div id="summary-completion-rate" class="align-middle">
-                                <h1 class="text-center" style="color: #2B5198;">91%</h1>
+                                <h1 class="text-center" style="color: #2B5198;">${content.completionRate}%</h1>
                                 <h4 class="text-center ms-4 me-4" style="color: #2B5198;">Completion Rate</h4>
                             </div>
                         </div>

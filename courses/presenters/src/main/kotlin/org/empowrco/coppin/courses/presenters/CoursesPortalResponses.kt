@@ -29,6 +29,7 @@ data class GetCourseResponse(
     val id: String,
     val name: String,
     val referenceId: String,
+    val completionRate: String,
     val assignments: List<Assignment>,
     val subjects: List<Subject>,
     val chart: Chart,
