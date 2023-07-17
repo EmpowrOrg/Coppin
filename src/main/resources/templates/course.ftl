@@ -193,7 +193,7 @@
             <div id="course-container" class="row m-3 pb-4">
                 <div id="course-header" class="justify-content-between">
                     <div class="pds-segmentedControl pds-segmentedControl-triple">
-                        <input id="sc-course" name="sc" type="radio" data-gtm="filter"
+                        <input id="sc-course" name="sc" type="radio" data-gtm="filter" checked
                                data-gtm-label="second" value="sc-course"/>
                         <label for="sc-course"
                                style="white-space: nowrap">Course</label>
@@ -201,7 +201,7 @@
                                data-gtm-label="second" value="sc-assignments"/>
                         <label for="sc-assignments"
                                style="white-space: nowrap">Assignments</label>
-                        <input id="sc-subjects" name="sc" type="radio" checked
+                        <input id="sc-subjects" name="sc" type="radio"
                                data-gtm="filter" data-gtm-label="first" value="sc-subjects"/>
                         <label for="sc-subjects">Subjects</label>
                     </div>
