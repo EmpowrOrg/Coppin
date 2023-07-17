@@ -32,7 +32,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
-import org.empowrco.coppin.models.responses.EdxBlocksResponse
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
 import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
@@ -44,7 +43,6 @@ interface EdxSource {
     suspend fun getCourses(): Result<EdxCoursesResponse>
     suspend fun getCourse(id: String): Result<EdxCourse>
     suspend fun getGrades(id: String): Result<EdxGradeResponse>
-    suspend fun getBlocks(id: String): Result<EdxBlocksResponse>
     suspend fun getStudentsForCourse(id: String): Result<EdxEnrollmentsResponse>
 }
 
@@ -121,18 +119,6 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
 
     override suspend fun getCourse(id: String): Result<EdxCourse> {
         return get<EdxCourse>("api/courses/v1/courses/$id")
-    }
-
-    override suspend fun getBlocks(id: String): Result<EdxBlocksResponse> {
-        return get<EdxBlocksResponse>(
-            "api/courses/v1/blocks/block-v1:Empowr+ID101+2022_V1+type@course+block@course/",
-            params = mapOf(
-                "depth" to "all",
-                "username" to System.getenv("EDX_API_CLIENT_UN"),
-                "block_types" to "swiftplugin",
-            ),
-            auth = true,
-        )
     }
 
     override suspend fun getGrades(id: String): Result<EdxGradeResponse> {
@@ -213,11 +199,8 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
     private suspend inline fun obtainJwt() {
         val response: HttpResponse =
             client.submitForm(url = "oauth2/access_token/", formParameters = parameters {
-                append("client_id", "je9Kt6gN97SnufqcXIfhZOikVLlRFkpcsOjKlv1y")
-                append(
-                    "client_secret",
-                    "QQ9YbGMYw5dJd8GvRgASn6QFuoUBlcxx51qjhSZ46djT7VsyQ15C5weVvLMSp3J4sxObGOmPSoARwDN2KVDoNOYgnYOAQ0UYRx9KVefALfTR3Vpm2k9GoHgkoxzLouJp"
-                )
+                append("client_id", System.getenv("EDX_API_CLIENT_ID"))
+                append("client_secret", System.getenv("EDX_API_CLIENT_SECRET"))
                 append("grant_type", "client_credentials")
                 append("token_type", "jwt")
             })
