@@ -82,6 +82,7 @@ dependencies {
     implementation(project(Deps.Utils.authenticator))
     implementation(Deps.Ktor.auth)
     implementation(Deps.Koin.main)
+    implementation(Deps.Koin.logger)
     implementation(Deps.Ktor.callLogging)
     implementation(Deps.Ktor.core)
     implementation(Deps.Ktor.headers)

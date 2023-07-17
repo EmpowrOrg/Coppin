@@ -90,6 +90,7 @@ object Deps {
 
     object Koin {
         val main by lazy { "io.insert-koin:koin-ktor:${Versions.koin}" }
+        val logger by lazy { "io.insert-koin:koin-logger-slf4j:${Versions.koin}" }
     }
 
     object Kotlin {
