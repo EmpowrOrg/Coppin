@@ -24,6 +24,7 @@ import org.empowrco.coppin.users.presenters.RegisterRequest
 import org.empowrco.coppin.users.presenters.UpdateUserRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
 import org.empowrco.coppin.utils.routing.UserSession
+import org.empowrco.coppin.utils.routing.error
 import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
@@ -84,7 +85,7 @@ fun Application.usersRouting() {
                         presenter.createKey(request).fold({
                             call.respond(it)
                         }, {
-                            call.errorRedirect(it, "/user/${call.parameters["uuid"]}")
+                            call.error(it)
                         })
                     }
                     delete {
@@ -92,7 +93,7 @@ fun Application.usersRouting() {
                         presenter.deleteKey(request).fold({
                             call.respond(it)
                         }, {
-                            call.errorRedirect(it, "/user/${call.parameters["uuid"]}")
+                            call.error(it)
                         })
                     }
                 }
@@ -133,7 +134,10 @@ fun Application.usersRouting() {
                     )
                 ).fold({
                     call.sessions.set(UserSession(it.id, it.isAdmin))
-                    call.respondRedirect("/")
+                    call.errorRedirect(
+                        "Your account was created but must be authorized by your Administrator",
+                        "/login"
+                    )
                 }, {
                     call.errorRedirect(it.localizedMessage)
                 })

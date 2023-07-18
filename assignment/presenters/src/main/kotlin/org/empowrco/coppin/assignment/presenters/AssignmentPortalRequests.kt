@@ -8,13 +8,15 @@ data class CreateAssignmentPortalRequest(
     val instructions: String,
     val successMessage: String,
     val failureMessage: String,
-    val totalAttempts: Int,
+    val totalAttempts: String,
     val title: String,
-    val gradingType: String,
+    val courseId: String,
+    val subjectId: String,
 )
 
 data class GetAssignmentRequest(
     val id: String?,
+    val courseId: String,
 )
 
 data class GetCodeRequest(
@@ -31,7 +33,7 @@ data class UpdateAssignmentPortalRequest(
     val totalAttempts: Int,
     val title: String,
     val referenceId: String,
-    val gradingType: String,
+    val subject: String,
 )
 
 @Serializable
@@ -47,3 +49,7 @@ data class UpdateCodePortalRequest(
 )
 
 data class DeleteCodeRequest(val id: String)
+
+data class ArchiveAssignmentRequest(
+    val id: String,
+)

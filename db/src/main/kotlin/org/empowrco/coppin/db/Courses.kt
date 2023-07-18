@@ -1,9 +1,7 @@
 package org.empowrco.coppin.db
 
-import org.jetbrains.exposed.dao.id.UUIDTable
-
-object Courses : UUIDTable() {
-    val edxId = text("edx_id")
+object Courses : BaseTable() {
+    val edxId = text("edx_id").uniqueIndex()
     val title = text("title")
     val number = text("number")
     val org = text("org")

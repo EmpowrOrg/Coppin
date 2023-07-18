@@ -23,42 +23,25 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
         <!-- CSS Files -->
         <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
+        <link href="/css/pds.min.css" rel="stylesheet"/>
         <link id="pagestyle" href="/css/coppin.css" rel="stylesheet"/>
         <script src="https://code.jquery.com/jquery-3.6.1.min.js"
                 integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     </head>
 
-    <body class="g-sidenav-show  bg-gray-200 p-0 me-3">
+    <body class="g-sidenav-show  bg-gray-200 p-0">
     <#if hideSideNav??>
     <#else>
         <#include "sidenav.ftl">
     </#if>
 
-    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg me-3">
-        <nav
-                class="navbar navbar-main navbar-expand-lg px-0 me-4 shadow-none border-radius-xl"
-                id="navbarBlur"
-                data-scroll="true"
-        >
-            <div class="container-fluid py-1 px-3">
-                <div
-                        class="nav-item d-xl-none ps-2 d-flex align-items-center me-sm-6"
-                >
-                    <a
-                            href="javascript:;"
-                            class="nav-link text-body p-0"
-                            id="iconNavbarSidenav"
-                    >
-                        <div class="sidenav-toggler-inner">
-                            <i class="sidenav-toggler-line"></i>
-                            <i class="sidenav-toggler-line"></i>
-                            <i class="sidenav-toggler-line"></i>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </nav>
-        <div class="container-fluid ms-3 mt-3 mb-1" id="body-content" style="padding-right: 0; padding-left: 0;">
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+        <div class="to-header ms-2">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <i class="material-icons" style="padding: 1rem">menu</i>
+            </a>
+        </div>
+        <div class="container-fluid" id="body-content" style="padding-right: 0; padding-left: 0;">
             <#nested>
         </div>
     </main>
@@ -120,11 +103,10 @@
             }
         }
     </script>
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.css"/>
+    <link href="https://cdn.datatables.net/v/bs5/dt-1.13.5/b-2.4.1/b-colvis-2.4.1/r-2.5.0/sc-2.2.0/sp-2.2.0/datatables.min.css"
+          rel="stylesheet"/>
 
-    <script type="text/javascript"
-            src="https://cdn.datatables.net/v/dt/dt-1.12.1/kt-2.7.0/r-2.3.0/datatables.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.5/b-2.4.1/b-colvis-2.4.1/r-2.5.0/sc-2.2.0/sp-2.2.0/datatables.min.js"></script>
     <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="/js/material-dashboard.min.js?v=3.0.4"></script>
     <script type="text/javascript" src="/js/plugins/chartjs.min.js"></script>

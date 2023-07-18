@@ -8,6 +8,7 @@ import org.empowrco.coppin.utils.DuplicateKeyException
 import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.capitalize
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
@@ -91,16 +92,16 @@ class RealUsersPresenters(
     }
 
     override suspend fun getUsers(): Result<GetUsersResponse> {
+        val users = repo.getUsers()
         return GetUsersResponse(
-            users = repo.getUsers().map {
+            users = users.map {
                 GetUsersResponse.User(
                     id = it.id.toString(),
-                    email = it.email,
                     name = it.fullName,
                     authorized = it.isAuthorized,
-                    type = it.type.name,
                 )
-            }
+            },
+            usersCount = users.size,
         ).toResult()
     }
 
@@ -119,13 +120,16 @@ class RealUsersPresenters(
             authorized = user.isAuthorized,
             email = user.email,
             type = user.type.name,
-            keys = user.keys.map {
+            keys = user.keys.sortedBy { it.name }.map {
                 GetUserResponse.Key(
                     id = it.id.toString(),
                     key = it.key,
+                    name = it.name,
+                    createdAt = it.createdAt.monthDayYear(),
                 )
             },
-            hasKeys = user.keys.isNotEmpty()
+            hasKeys = user.keys.isNotEmpty(),
+            isAdmin = currentUser.type == User.Type.Admin,
         ).toResult()
     }
 
@@ -138,8 +142,9 @@ class RealUsersPresenters(
             return failure("Invalid User Type")
         }
         val updatedUser = user.copy(
-            firstName = user.firstName,
-            lastName = user.lastName,
+            firstName = request.firstName,
+            lastName = request.lastName,
+            email = request.email,
             type = type,
             isAuthorized = request.authorized.toBoolean(),
             lastModifiedAt = LocalDateTime.now(),

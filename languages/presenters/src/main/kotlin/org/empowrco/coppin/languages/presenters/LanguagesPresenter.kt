@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.languages.backend.LanguagesRepository
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.utils.failure
+import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.nonEmpty
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
@@ -19,14 +20,18 @@ interface LanguagesPresenter {
 
 internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : LanguagesPresenter {
     override suspend fun getLanguages(): Result<GetLanguagesResponse> {
+        val languages = repo.getLanguages()
         return GetLanguagesResponse(
-            languages = repo.getLanguages().map {
+            languages = languages.map {
                 GetLanguagesResponse.Language(
                     id = it.id.toString(),
                     mime = it.mime,
                     name = it.name,
+                    lastModifiedDate = it.lastModifiedAt.monthDayYear(),
+                    url = it.url,
                 )
-            }
+            },
+            languagesCount = languages.size,
         ).toResult()
     }
 

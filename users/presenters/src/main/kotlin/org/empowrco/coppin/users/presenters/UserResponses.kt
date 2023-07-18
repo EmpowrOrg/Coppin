@@ -9,13 +9,12 @@ data class RegisterResponse(val id: String, val isAdmin: Boolean)
 
 data class GetUsersResponse(
     val users: List<User>,
+    val usersCount: Int,
 ) {
     data class User(
         val id: String,
         val name: String,
-        val email: String,
         val authorized: Boolean,
-        val type: String,
     )
 }
 
@@ -28,8 +27,9 @@ data class GetUserResponse(
     val lastName: String,
     val hasKeys: Boolean,
     val keys: List<Key>?,
+    val isAdmin: Boolean,
 ) {
-    data class Key(val key: String, val id: String)
+    data class Key(val name: String, val key: String, val id: String, val createdAt: String)
 }
 
 

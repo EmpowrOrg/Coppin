@@ -5,83 +5,60 @@
     <script>
         $(document).ready(function () {
             const table = $('#users-table').DataTable({
-                language: {search: ""},
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search...",
+                    paginate: {
+                        next: `<i class="material-icons opacity-10">arrow_forward_ios</i>`,
+                        previous: `<i class="material-icons opacity-10">arrow_back_ios</i>`,
+                    }
+                },
+                responsive: true,
                 columnDefs: [
                     {
-                        target: 4,
+                        target: 2,
                         visible: false,
                     },
                 ],
             });
-            $('#users-table_filter').addClass('me-4').find("input").addClass('form-control').attr("placeholder", "Search");
-            $('#users-table_length').addClass('form-group').addClass('ms-4').addClass('form-inline');
-            $('#users-table_info').addClass('ms-4').addClass('text-sm')
-            $('#users-table_paginate').addClass('me-4')
             $('#users-table tbody').on('click', 'tr', function () {
                 const data = table.row(this).data();
-                window.location = "/user/" + data[4]
+                window.location = "/user/" + data[2]
             });
         });
     </script>
+    <style>
+        #users-container {
+            border-radius: 1rem;
+            border: 0.125rem solid #DEE2E8;
+            background: #FFF
+        }
+    </style>
     <body class="g-sidenav-show  bg-gray-200">
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <div class="container-fluid py-4">
-
-            <div class="row mt-4">
-                <div class="row mb-4">
-                    <div class="mb-md-0 mb-4">
-                        <div class="card">
-                            <div class="card-header pb-0">
-                                <div class="row">
-                                    <div class="d-flex justify-content-start">
-                                        <h6>Users</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body px-0 pb-2">
-                                <#include "error.ftl">
-                                <div class="table-responsive">
-                                    <table id="users-table" class="table align-items-center mb-0">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Name
-                                            </th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Email
-                                            </th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Authorized
-                                            </th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Type
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <#list content.users as user>
-                                            <tr>
-                                                <td class="text-sm">
-                                                    <span class="text-xs font-weight-bold">${user.name}</span>
-                                                </td>
-                                                <td class="text-sm">
-                                                    <span class="text-xs font-weight-bold">${user.email}</span>
-                                                </td>
-                                                <td class="text-sm">
-                                                    <span class="text-xs font-weight-bold">${user.authorized?string("yes","no")}</span>
-                                                </td>
-                                                <td class="text-sm">
-                                                    <span class="text-xs font-weight-bold">${user.type}</span>
-                                                </td>
-                                                <td class="align-middle">${user.id}</td>
-                                            </tr>
-                                        </#list>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="container-fluid">
+            <div id="users-container" class="row m-4 pb-4">
+                <h6 class="mt-3 mb-3">All teachers (${content.usersCount})</h6>
+                <#include "error.ftl">
+                <div class="table-responsive coppin-table">
+                    <table id="users-table" class="stripe hover row-border order-column" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>TEACHER NAME</th>
+                            <th>STATUS</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <#list content.users as user>
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.authorized?string("yes","no")}</td>
+                                <td>${user.id}</td>
+                            </tr>
+                        </#list>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

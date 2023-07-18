@@ -17,7 +17,7 @@ object ResponseApi {
     )
 
     @Serializable
-    data class DeleteAssignmentResponse(val id: String)
+    data class DeleteAssignmentResponse(val courseId: String)
 
     @Serializable
     data class GetAssignmentResponse(

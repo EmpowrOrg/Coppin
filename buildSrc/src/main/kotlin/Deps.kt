@@ -16,6 +16,19 @@ object Deps {
         val main by lazy { ":assignment" }
     }
 
+    object Courses {
+        val api by lazy { ":courses:api" }
+        val presenters by lazy { ":courses:presenters" }
+
+        object Backend {
+            val main by lazy { ":courses:backend" }
+            val fakes by lazy { ":courses:backend:fakes" }
+        }
+
+        val main by lazy { ":courses" }
+    }
+
+
     object Languages {
         val api by lazy { ":languages:api" }
         val presenters by lazy { ":languages:presenters" }
@@ -77,6 +90,7 @@ object Deps {
 
     object Koin {
         val main by lazy { "io.insert-koin:koin-ktor:${Versions.koin}" }
+        val logger by lazy { "io.insert-koin:koin-logger-slf4j:${Versions.koin}" }
     }
 
     object Kotlin {
@@ -106,6 +120,7 @@ object Deps {
             val json by lazy { "io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}" }
             val auth by lazy { "io.ktor:ktor-client-auth:${Versions.ktor}" }
             val engine by lazy { "io.ktor:ktor-client-apache:${Versions.ktor}" }
+            val logging by lazy { "io.ktor:ktor-client-logging:${Versions.ktor}" }
         }
     }
 

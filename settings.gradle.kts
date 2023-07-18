@@ -50,3 +50,10 @@ include("utils:logs")
 findProject(":utils:logs")?.name = "logs"
 include("utils:serialization")
 findProject(":utils:serialization")?.name = "serialization"
+include("courses")
+include("courses:api")
+findProject(":courses:api")?.name = "api"
+include("courses:backend")
+findProject(":courses:backend")?.name = "backend"
+include("courses:presenters")
+findProject(":courses:presenters")?.name = "presenters"

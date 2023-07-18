@@ -15,6 +15,7 @@ import java.util.UUID
 
 interface SubmissionSource {
     suspend fun getSubmissionsForAssignment(id: UUID, studentId: String): List<Submission>
+    suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission>
     suspend fun saveSubmission(submission: Submission)
 }
 
@@ -33,6 +34,10 @@ internal class RealSubmissionSource(cache: Cache) : SubmissionSource {
 
     override suspend fun saveSubmission(submission: Submission) {
         database.saveSubmission(submission)
+    }
+
+    override suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission> {
+        return database.getLastStudentSubmissionForAssignment(id)
     }
 }
 
@@ -56,6 +61,10 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
         )
     }
 
+    override suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission> {
+        throw NotImplementedError("Do not cache")
+    }
+
     override suspend fun saveSubmission(submission: Submission) {
         throw NotImplementedError("Do not cache the save")
     }
@@ -66,6 +75,11 @@ private class DatabaseSubmissionsSource : SubmissionSource {
     override suspend fun getSubmissionsForAssignment(id: UUID, studentId: String): List<Submission> = dbQuery {
         Submissions.select { (Submissions.assignment eq id) and (Submissions.studentId eq studentId) }
             .orderBy(Submissions.attempt, SortOrder.DESC).map { it.toSubmission() }
+    }
+
+    override suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission> = dbQuery {
+        Submissions.select { (Submissions.assignment eq id) }.orderBy(Submissions.attempt, order = SortOrder.DESC)
+            .distinctBy { Submissions.studentId }.map { it.toSubmission() }
     }
 
     override suspend fun saveSubmission(submission: Submission) = dbQuery {

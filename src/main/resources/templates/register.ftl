@@ -1,73 +1,148 @@
 <#import "_layout.ftl" as layout />
+<style>
+    #sign-up-container {
+        max-width: none;
+        --bs-gutter-x: 0;
+    }
+
+    #sign-up-row {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        max-width: none;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        min-width: 200px;
+    }
+
+    #sign-up-have-account-container {
+        display: flex;
+    }
+
+    #sign-up-have-account {
+        flex: 1;
+    }
+
+    .sign-up-input {
+        max-width: 400px;
+    }
+
+    #sign-up-button {
+        max-width: 400px;
+        min-width: 250px;
+    }
+
+    #sign-up-carousel {
+        max-width: 450px;
+    }
+
+    .carousel-text {
+        color: #F8F9FA;
+    }
+</style>
 <@layout.header >
-    <main class="main-content  mt-0">
-        <section>
-            <div class="page-header min-vh-100">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 start-0 text-center justify-content-center flex-column">
-                            <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center"
-                                 style="background-image: url('/img/illustrations/illustration-signup.jpg'); background-size: cover;">
-                            </div>
+    <main class="container" id="sign-up-container">
+        <div class="row" id="sign-up-row" style="">
+            <div class="col" style="background: white;">
+                <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center">
+                    <form role="form" action="/register" method="post">
+                        <h1> {} COPPIN</h1>
+                        <h3>Create Your Account</h3>
+                        <div id="sign-up-have-account-container" class="row">
+                            <a id="sign-up-have-account">Already have an account? <b>Sign In</b></a>
                         </div>
-                        <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
-                            <div class="card card-plain">
-                                <div class="card-header">
-                                    <h4 class="font-weight-bolder">Sign Up</h4>
-                                    <p class="mb-0">Enter your email and password to register</p>
-                                </div>
-                                <div class="card-body">
-                                    <form role="form" action="/register" method="post">
-                                        <div class="input-group input-group-outline my-3">
-                                            <label for="firstName" class="form-label">First Name</label>
-                                            <input name="firstName" id="firstName" type="text" class="form-control">
-                                        </div>
-                                        <div class="input-group input-group-outline my-3">
-                                            <label for="lastName" class="form-label">Last Name</label>
-                                            <input name="lastName" id="lastName" type="text" class="form-control">
-                                        </div>
-                                        <div class="input-group input-group-outline mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input name="email" id="email" type="email" class="form-control">
-                                        </div>
-                                        <div class="input-group input-group-outline mb-3">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input name="password" id="password" type="password" class="form-control">
-                                        </div>
-                                        <div class="input-group input-group-outline mb-3">
-                                            <label for="confirm-password" class="form-label">Confirm Password</label>
-                                            <input name="confirmPassword" id="confirm-password" type="password"
-                                                   class="form-control">
-                                        </div>
-                                        <#include "error.ftl">
-                                        <div class="form-check form-check-info text-start ps-0">
-                                            <input name="termsAndConditions" class="form-check-input" type="checkbox"
-                                                   value="true" id="flexCheckDefault" checked>
-                                            <label id="terms-and-conditions" class="form-check-label"
-                                                   for="flexCheckDefault">
-                                                I agree the <a href="javascript:" class="text-dark font-weight-bolder">Terms
-                                                    and Conditions</a>
-                                            </label>
-                                        </div>
-                                        <div class="text-center">
-                                            <button type="submit"
-                                                    class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Sign
-                                                Up
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                                    <p class="mb-2 text-sm mx-auto">
-                                        Already have an account?
-                                        <a href="/login" class="text-primary text-gradient font-weight-bold">Sign in</a>
-                                    </p>
-                                </div>
-                            </div>
+                        <div class="sign-up-input mb-3 mt-3">
+                            <label class="form-label" for="sign-up-email">Email</label>
+                            <input name="email" id="sign-up-email" type="email" class="form-control">
                         </div>
-                    </div>
+                        <div class="sign-up-input mb-3">
+                            <label class="form-label" for="sign-up-first-name">First Name</label>
+                            <input name="firstName" id="sign-up-first-name" type="text" class="form-control">
+                        </div>
+                        <div class="sign-up-input mb-3">
+                            <label class="form-label" for="sign-up-last-name">Last Name</label>
+                            <input name="lastName" id="sign-up-last-name" type="text" class="form-control">
+                        </div>
+                        <div class="sign-up-input mb-3">
+                            <label class="form-label" for="sign-up-password">Password</label>
+                            <input name="password" id="sign-up-password" type="password" class="form-control">
+                        </div>
+                        <div class="sign-up-input mb-3">
+                            <label class="form-label" for="sign-up-confirm-password">Confirm Password</label>
+                            <input name="confirmPassword" id="sign-up-confirm-password" type="password"
+                                   class="form-control">
+                        </div>
+                        <#include "error.ftl">
+                        <button id="sign-up-button" type="submit" class="btn btn-primary my-4 mb-2">Create Your Account
+                        </button>
+                    </form>
                 </div>
             </div>
-        </section>
+            <div class="col" style="background-image: linear-gradient(180deg, #3E3D45 0%, #202020 100%);">
+                <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center text-start">
+                    <div id="sign-up-carousel-controls" class="carousel slide" data-bs-interval="10000"
+                         data-bs-ride="carousel">
+                        <div id="sign-up-carousel" class="carousel-inner">
+                            <div class="carousel-item active">
+                                <h3 class="carousel-text">
+                                    A revolutionary programming assignment creator and grader for the Open edX Platform
+                                </h3>
+                                <p class="carousel-text">
+                                    Empowr's goal is to create an equitable future for all. Coppin empowers educators to
+                                    create and grade programming assignments effortlessly, supporting over 100
+                                    programming languages. Since students can write and execute the programming code in
+                                    the browser with Coppin, they will no longer need expensive hardware to learn
+                                    computer science.
+                                </p>
+                            </div>
+                            <div class="carousel-item">
+                                <h3 class="carousel-text">
+                                    Coppin is named after Fanny Coppin. She was the first African American
+                                    Superintendent in the United States.
+                                </h3>
+                                <p class="carousel-text">
+                                    Coppin's streamlined interface enables instructors to develop programming
+                                    assignments in under three minutes, revolutionizing how programming courses are
+                                    created and delivered on the Open edX platform. By harnessing the power of
+                                    CodeEditorXblock, an XBlock for Open edX that facilitates input and checking of any
+                                    programming language, and Doctor, a secure server for executing arbitrary code,
+                                    Coppin offers a comprehensive solution for programming education.
+                                </p>
+                            </div>
+                            <div class="carousel-item">
+                                <h3 class="carousel-text">
+                                    Coppin has four key features:
+                                </h3>
+                                <ul class="carousel-text">
+                                    <li>Support for over 100 programming languages, allowing educators to create Open
+                                        edX
+                                        courses in any language they wish.
+                                    </li>
+                                    <br>
+                                    <li>A seamless integration with CodeEditorXblock, enabling efficient input and
+                                        checking
+                                        of programming assignments.
+                                    </li>
+                                    <br>
+                                    <li>A secure, cloud-based execution environment powered by Doctor eliminates
+                                        students'
+                                        need to have expensive computers for compiling code.
+                                    </li>
+                                    <br>
+                                    <li>Free and Open Source Software</li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <button class="carousel-control-next" type="button" data-bs-target="#sign-up-carousel-controls"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 </@layout.header>

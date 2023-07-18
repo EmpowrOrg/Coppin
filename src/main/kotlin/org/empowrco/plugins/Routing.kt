@@ -16,17 +16,19 @@ import org.empowrco.coppin.assignment.api.assignmentRouting
 import org.empowrco.coppin.languages.api.languagesApi
 import org.empowrco.coppin.languages.api.languagesRouting
 import org.empowrco.coppin.users.api.usersRouting
+import org.empowrco.courses.api.coursesRouting
 
 fun Application.configureRouting() {
     assignmentApi()
     assignmentRouting()
+    coursesRouting()
     usersRouting()
     languagesApi()
     languagesRouting()
     routing {
         authenticate("auth-session") {
             get("/") {
-                call.respondRedirect("/assignments")
+                call.respondRedirect("/courses")
             }
         }
 

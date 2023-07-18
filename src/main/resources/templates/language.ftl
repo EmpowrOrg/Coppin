@@ -1,100 +1,77 @@
 <#-- @ftlvariable name="content" type="org.empowrco.coppin.languages.presenters.GetLanguageResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.js"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.js"
-            crossorigin="anonymous"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                        <h6 class="text-white text-capitalize ps-3"><#if content.name??>${content.name}<#else>Create Language</#if></h6>
+    <style>
+        #language-container {
+            border-radius: 1rem;
+            border: 0.125rem solid #DEE2E8;
+            background: #FFF
+        }
+
+        #language-header {
+            display: flex;
+            padding: 1.5rem 1rem 0 1rem;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    </style>
+    <div class="container-fluid">
+        <form role="form" id="create-assignment"
+              action="/languages/<#if content.id??>${content.id}</#if>"
+              method="post">
+            <div id="language-container" class="row m-3 p-4">
+                <div id="language-header" class="justify-content-between">
+                    <div></div>
+                    <div>
+                        <button class="btn btn-primary">Save</button>
+                        <#if content.id??>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">Delete
+                            </button>
+                        </#if>
                     </div>
                 </div>
-                <div class="card-body">
-                    <#include "error.ftl">
-                    <form role="form" id="create-assignment"
-                          action="/languages/<#if content.id??>${content.id}</#if>"
-                          method="post">
-                        <div class="row col-lg-12">
-                            <div class="col-4">
-                                <div class="input-group input-group-outline mb-3">
-                                    <input type="text" name="name" class="form-control" placeholder="Name"
-                                           <#if content.name??>value="${content.name}" </#if>>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="input-group input-group-outline mb-3">
-                                    <input type="text" name="mime" class="form-control" placeholder="Mime"
-                                           <#if content.mime??>value="${content.mime}" </#if>>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="input-group input-group-outline mb-3">
-                                    <div class="input-group-prepend m-1">
-                                        <a class="align-middle">
-                                            <span class="material-icons align-middle">info</span>
-                                        </a>
-                                    </div>
-                                    <input id="unitTestRegex" type="text" name="unitTestRegex" class="form-control"
-                                           placeholder="Unit Test Regex"
-                                           <#if content.unitTestRegex??>value="${content.unitTestRegex}" </#if>>
-                                </div>
-                            </div>
-
-
+                <#include "error.ftl">
+                <label for="name" class="form-label"><h6>Name</h6></label>
+                <input name="name" id="name" type="text" class="form-control"
+                       <#if content.name??>value="${content.name}" </#if>>
+                <label for="url" class="form-label mt-4"><h6>CodeMirror Url</h6></label>
+                <input name="url" id="url" type="url" class="form-control"
+                       <#if content.url??>value="${content.url}" </#if>>
+                <label for="mime" class="form-label mt-4"><h6>Mime</h6></label>
+                <input name="mime" id="mime" type="text" class="form-control"
+                       <#if content.mime??>value="${content.mime}" </#if>>
+                <label for="regex" class="form-label mt-4"><h6>Unit Test Regex</h6></label>
+                <input name="regex" id="regex" type="text" class="form-control"
+                       <#if content.unitTestRegex??>value="${content.unitTestRegex}" </#if>>
+            </div>
+        </form>
+        <#if content.id??>
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete Assignment</h5>
                         </div>
-                        <div class="col-sm input-group input-group-outline mb-3">
-                            <input type="text" name="url" class="form-control" placeholder="CodeMirror Url"
-                                   <#if content.url??>value="${content.url}" </#if>>
+                        <div class="modal-body">
+                            By clicking delete, you will permanently delete this language.
                         </div>
-                        <div class="col-sm input-group input-group-outline mb-3">
-                            <input type="submit"
-                                   class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0"
-                                   value="<#if content.id??>Save<#else>Create</#if>">
-                        </div>
-                    </form>
-                    <#if content.id??>
-                        <div class="mt-3 d-flex justify-content-center">
-                            <button id="delete-assignment" onclick="$('#deleteModal').modal('show')"
-                                    data-toggle="modal" data-target="#assignModal"
-                                    class="btn btn-lg btn-outline-danger" style="--bs-btn-border-color: transparent;">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close
+                            </button>
+                            <button type="submit" class="btn btn-primary"
+                                    id="delete-confirm"
+                            >
                                 Delete
                             </button>
-                        </div>
-                        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
-                             aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel">Delete Assignment</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        By clicking delete, you will permanently delete this language.
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close
-                                        </button>
-                                        <button type="submit" class="btn btn-primary"
-                                                id="delete-confirm"
-                                        >
-                                            Delete
-                                        </button>
 
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </#if>
+                    </div>
                 </div>
             </div>
-        </div>
+        </#if>
     </div>
     <#if content.id??>
         <script>
