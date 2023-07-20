@@ -49,7 +49,7 @@
                         <h1> {} COPPIN</h1>
                         <h3>Create Your Account</h3>
                         <div id="sign-up-have-account-container" class="row">
-                            <a id="sign-up-have-account">Already have an account? <b>Sign In</b></a>
+                            <a href="/login" id="sign-up-have-account">Already have an account? <b>Sign In</b></a>
                         </div>
                         <div class="sign-up-input mb-3 mt-3">
                             <label class="form-label" for="sign-up-email">Email</label>
