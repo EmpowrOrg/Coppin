@@ -220,7 +220,7 @@ internal class RealCoursesPortalPresenter(
         val assignments = repo.getAssignmentsForCourse(course.id)
         val studentResponse = repo.getStudentsForCourse(course.edxId)
         val students = studentResponse.getOrNull()?.results ?: return failure(
-            "Could not retrieve student info for the course"
+            studentResponse.exceptionOrNull()?.localizedMessage ?: "Unknown error retrieving students"
         )
         val subjects = repo.getSubjects(courseId)
         val subjectCompletionRates = mutableMapOf<String, List<Double>>()
