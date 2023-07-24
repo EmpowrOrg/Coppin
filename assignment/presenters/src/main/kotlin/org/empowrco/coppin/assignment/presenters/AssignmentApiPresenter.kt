@@ -68,13 +68,16 @@ internal class RealAssignmentApiPresenter(
             throw RuntimeException("Please do not submit an empty assignment")
         }
         val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
+        val attempt = repo.getLastStudentSubmissionForAssignment(assignment.id, request.studentId)?.attempt?.let {
+            it + 1
+        } ?: 1
         val isFinalAttempt = if (assignment.totalAttempts == 0) {
             false
         } else {
-            request.attempt >= assignment.totalAttempts
+            attempt >= assignment.totalAttempts
         }
 
-        if (assignment.totalAttempts > 0 && request.attempt > assignment.totalAttempts) {
+        if (assignment.totalAttempts > 0 && attempt > assignment.totalAttempts) {
             return SubmitResponse(
                 output = assignment.failureMessage,
                 success = false,
@@ -101,7 +104,7 @@ internal class RealAssignmentApiPresenter(
             assignmentId = assignment.id,
             languageId = language.id,
             studentId = request.studentId,
-            attempt = request.attempt,
+            attempt = attempt,
             createdAt = currentTime,
             correct = matches.isEmpty() && codeResponse.success != false,
             lastModifiedAt = currentTime,

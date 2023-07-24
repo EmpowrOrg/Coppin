@@ -17,7 +17,6 @@ object RequestApi {
         val code: String,
         val referenceId: String,
         val language: String,
-        val attempt: Int,
         val studentId: String,
     )
 
