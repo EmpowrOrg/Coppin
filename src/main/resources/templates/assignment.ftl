@@ -322,7 +322,7 @@
                                         <select name="subject" id="subject" class="form-select">
                                             <#list content.subjects as subject>
                                                 <option value="${subject.id}"
-                                                        <#if subject.id == content.subjectId>selected</#if>>${subject.name}</option>
+                                                        <#if content.subjectId??><#if subject.id == content.subjectId>selected</#if></#if> >${subject.name}</option>
                                             </#list>
                                         </select>
 
