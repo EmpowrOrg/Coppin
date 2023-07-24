@@ -27,7 +27,7 @@ interface CoursesPortalRepository {
     suspend fun getEdxCourse(id: String): Result<EdxCourse>
     suspend fun getEdxCourses(): Result<EdxCoursesResponse>
     suspend fun getAssignmentsForCourse(courseId: UUID): List<Assignment>
-    suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission>
+    suspend fun getLatestStudentSubmissionsForAssignment(id: UUID): List<Submission>
     suspend fun getStudentsForCourse(edxId: String): Result<EdxEnrollmentsResponse>
     suspend fun createSubject(subject: Subject)
     suspend fun getSubjects(courseId: UUID): List<Subject>
@@ -118,8 +118,8 @@ internal class RealCoursesPortalRepository(
         return coursesSource.getCourse(id)
     }
 
-    override suspend fun getLastStudentSubmissionForAssignment(id: UUID): List<Submission> {
-        return submissionSource.getLastStudentSubmissionForAssignment(id)
+    override suspend fun getLatestStudentSubmissionsForAssignment(id: UUID): List<Submission> {
+        return submissionSource.getLatestStudentSubmissionsForAssignment(id)
     }
 
     override suspend fun getStudentsForCourse(edxId: String): Result<EdxEnrollmentsResponse> {

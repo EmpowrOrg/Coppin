@@ -226,7 +226,7 @@ internal class RealCoursesPortalPresenter(
         val subjectCompletionRates = mutableMapOf<String, List<Double>>()
         val subjectSuccessRates = mutableMapOf<String, List<Double>>()
         val responseAssignments = assignments.map { assignment ->
-            val submissions = repo.getLastStudentSubmissionForAssignment(assignment.id)
+            val submissions = repo.getLatestStudentSubmissionsForAssignment(assignment.id)
             val successes = submissions.filter { it.correct }
             val successRate = successes.size.toDouble() / submissions.size.toDouble()
             val successPercent = successRate * 100
