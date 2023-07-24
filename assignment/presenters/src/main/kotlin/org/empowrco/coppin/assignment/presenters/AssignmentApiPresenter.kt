@@ -79,7 +79,7 @@ internal class RealAssignmentApiPresenter(
 
         if (assignment.totalAttempts > 0 && attempt > assignment.totalAttempts) {
             return SubmitResponse(
-                output = assignment.failureMessage,
+                output = "You have run out of attempts. \n ${assignment.failureMessage}",
                 success = false,
                 finalAttempt = true,
             )
