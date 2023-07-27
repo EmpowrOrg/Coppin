@@ -188,18 +188,30 @@
 
             if ($('#sc-codes').is(':checked')) {
                 hideSection("instructions")
+                hideSection("submissions")
                 showSection("codes")
+            } else if ($("#sc-submissions").is(':checked')) {
+                hideSection("instructions")
+                hideSection("codes")
+                showSection("submissions")
             } else {
                 hideSection("codes")
+                hideSection("submissions")
                 showSection("instructions")
             }
             $('input[type=radio][name=sc]').change(function () {
                 if (this.value === 'sc-codes') {
                     hideSection("instructions")
+                    hideSection("submissions")
                     showSection("codes")
                 } else if (this.value === 'sc-instructions') {
                     hideSection("codes")
+                    hideSection("submissions")
                     showSection("instructions")
+                } else {
+                    hideSection("codes")
+                    hideSection("instructions")
+                    showSection("submissions")
                 }
             });
             <#if content.id??>
@@ -241,6 +253,23 @@
                 const data = table.row(this).data();
                 window.location = "/courses/${content.courseId}/assignments/${content.id}/codes/" + data[4]
             });
+            $('#submissions-table').DataTable({
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search...",
+                    paginate: {
+                        next: `<i class="material-icons opacity-10">arrow_forward_ios</i>`,
+                        previous: `<i class="material-icons opacity-10">arrow_back_ios</i>`,
+                    }
+                },
+                responsive: true,
+                columnDefs: [
+                    {
+                        target: 4,
+                        visible: false,
+                    },
+                ],
+            });
             </#if>
         });
     </script>
@@ -251,13 +280,16 @@
                 <div id="assignment-header" class="justify-content-between">
                     <div style='max-width: 400px;'>
                         <#if content.id??>
-                            <div class="pds-segmentedControl">
+                            <div class="pds-segmentedControl pds-segmentedControl-triple">
                                 <input id="sc-instructions" name="sc" type="radio" checked
                                        data-gtm="filter" data-gtm-label="first" value="sc-instructions"/>
                                 <label for="sc-instructions">Instructions</label>
                                 <input id="sc-codes" name="sc" type="radio" data-gtm="filter"
                                        data-gtm-label="second" value="sc-codes"/>
                                 <label for="sc-codes" style="padding-right: 0.5rem">Codes</label>
+                                <input id="sc-submissions" name="sc" type="radio" data-gtm="filter"
+                                       data-gtm-label="second" value="sc-submissions"/>
+                                <label for="sc-submissions" style="padding-right: 0.5rem">Submissions</label>
                             </div>
                         </#if>
 
@@ -337,7 +369,7 @@
                         </div>
                     </div>
                 </div>
-                <h6 class="mt-4">Instructions</h6>
+                <h6 class="mt-4 instructions">Instructions</h6>
                 <div id="markdown-row" class="instructions">
 
                     <div class="col-6 mb-3" style="height: 100%">
@@ -394,6 +426,32 @@
                                     <td>${code.hasStarter}</td>
                                     <td>${code.hasSolution}</td>
                                     <td>${code.id}</td>
+                                </tr>
+                            </#list>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="submissions">
+                    <div class="table-responsive coppin-table">
+                        <table id="submissions-table" class="stripe hover row-border order-column" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>STUDENT USERNAME</th>
+                                <th>SUCCESS</th>
+                                <th>NO OF ATTEMPTS</th>
+                                <th>LANGUAGE</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <#list content.submissions as submission>
+                                <tr>
+                                    <td>${submission.username}</td>
+                                    <td>${submission.success}</td>
+                                    <td>${submission.numberOfAttempts}</td>
+                                    <td>${submission.language}</td>
+                                    <td>${submission.id}</td>
                                 </tr>
                             </#list>
                             </tbody>

@@ -133,7 +133,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                         name = it.name,
                     )
                 },
-                subjectId = null
+                subjectId = null,
+                submissions = emptyList()
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -149,6 +150,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 assignmentId = assignment.id.toString(),
             )
         }
+        val studentSubmissions = repo.getLatestStudentSubmissionForAssignment(assignmentId)
         return GetAssignmentPortalResponse(
             title = assignment.title,
             successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
@@ -164,6 +166,16 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 GetAssignmentPortalResponse.Subject(
                     id = it.id.toString(),
                     name = it.name,
+                )
+            },
+            submissions = studentSubmissions.map {
+                val language = repo.getLanguage(it.languageId)
+                GetAssignmentPortalResponse.Submission(
+                    id = it.id.toString(),
+                    success = it.correct.toString(),
+                    numberOfAttempts = it.attempt,
+                    username = it.studentId,
+                    language = language?.name ?: "Unknown"
                 )
             }
         ).toResult()

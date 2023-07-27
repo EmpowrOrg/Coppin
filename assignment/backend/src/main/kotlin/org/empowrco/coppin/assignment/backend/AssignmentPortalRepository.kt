@@ -5,11 +5,13 @@ import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Subject
+import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.sources.AssignmentCodesSource
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.LanguagesSource
 import org.empowrco.coppin.sources.SubjectSource
+import org.empowrco.coppin.sources.SubmissionSource
 import java.util.UUID
 
 
@@ -29,6 +31,8 @@ interface AssignmentPortalRepository {
     suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
     suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode>
     suspend fun getCourse(id: UUID): Course?
+    suspend fun getLatestStudentSubmissionForAssignment(assignmentId: UUID): List<Submission>
+    suspend fun getLanguage(id: UUID): Language?
 }
 
 internal class RealAssignmentPortalRepository(
@@ -37,6 +41,7 @@ internal class RealAssignmentPortalRepository(
     private val codesSource: AssignmentCodesSource,
     private val coursesSource: CoursesSource,
     private val subjectSource: SubjectSource,
+    private val submissionSource: SubmissionSource,
 ) : AssignmentPortalRepository {
 
     override suspend fun getAssignments(): List<Assignment> {
@@ -98,5 +103,13 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getSubjectsForCourse(id: UUID): List<Subject> {
         return subjectSource.getSubjectsForCourse(id)
+    }
+
+    override suspend fun getLatestStudentSubmissionForAssignment(assignmentId: UUID): List<Submission> {
+        return submissionSource.getLatestStudentSubmissionsForAssignment(assignmentId)
+    }
+
+    override suspend fun getLanguage(id: UUID): Language? {
+        return languagesSource.getLanguage(id)
     }
 }
