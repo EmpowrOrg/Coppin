@@ -1,6 +1,9 @@
 package org.empowrco.coppin.assignment.presenters
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.serializer
 import org.apache.commons.text.StringEscapeUtils
 import org.empowrco.coppin.assignment.backend.AssignmentPortalRepository
 import org.empowrco.coppin.models.Assignment
@@ -10,6 +13,7 @@ import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.nonEmpty
 import org.empowrco.coppin.utils.now
+import org.empowrco.coppin.utils.serialization.json
 import org.empowrco.coppin.utils.toResult
 import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
@@ -23,6 +27,7 @@ interface AssignmentPortalPresenter {
     suspend fun createAssignment(request: CreateAssignmentPortalRequest): Result<CreateAssignmentResponse>
     suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse>
     suspend fun archiveAssignment(request: ArchiveAssignmentRequest): Result<ArchiveAssignmentResponse>
+    suspend fun getSubmission(request: GetSubmissionRequest): Result<GetSubmissionResponse>
 }
 
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
@@ -318,5 +323,36 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("Unknown error")
         }
         return ArchiveAssignmentResponse(assignment.courseId.toString()).toResult()
+    }
+
+    @OptIn(InternalSerializationApi::class)
+    override suspend fun getSubmission(request: GetSubmissionRequest): Result<GetSubmissionResponse> {
+        val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
+        val assignment = repo.getAssignment(assignmentId) ?: return failure("Assignmnet not found")
+        val submissions =
+            repo.getStudentSubmissionsForAssignment(assignmentId, request.studentId).sortedBy { it.attempt }
+        val submissionPresentables = submissions.map {
+            val language = repo.getLanguage(it.languageId) ?: return failure("Invalid language for Submission")
+            GetSubmissionResponse.Submission(
+                code = StringEscapeUtils.escapeJava(it.code),
+                attempt = it.attempt,
+                language = GetSubmissionResponse.Language(
+                    url = language.url,
+                    name = language.name,
+                    mime = language.mime,
+                )
+            )
+        }
+        return GetSubmissionResponse(
+            studentId = request.studentId,
+            submissions = submissionPresentables,
+            assignment = assignment.title,
+            submissionsJson = StringEscapeUtils.escapeJson(
+                json.encodeToString(
+                    ListSerializer(GetSubmissionResponse.Submission::class.serializer()),
+                    submissionPresentables
+                ),
+            ),
+        ).toResult()
     }
 }

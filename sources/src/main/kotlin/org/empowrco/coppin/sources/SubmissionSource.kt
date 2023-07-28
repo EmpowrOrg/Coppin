@@ -18,6 +18,7 @@ interface SubmissionSource {
     suspend fun getLatestStudentSubmissionsForAssignment(id: UUID): List<Submission>
     suspend fun getLastStudentSubmissionForAssignment(id: UUID, studentId: String): Submission?
     suspend fun saveSubmission(submission: Submission)
+    suspend fun getSubmission(id: UUID): Submission?
 }
 
 internal class RealSubmissionSource(cache: Cache) : SubmissionSource {
@@ -44,6 +45,14 @@ internal class RealSubmissionSource(cache: Cache) : SubmissionSource {
     override suspend fun getLatestStudentSubmissionsForAssignment(id: UUID): List<Submission> {
         return database.getLatestStudentSubmissionsForAssignment(id)
     }
+
+    override suspend fun getSubmission(id: UUID): Submission? {
+        return cache.getSubmission(id) ?: run {
+            database.getSubmission(id)?.also {
+                cache.saveSubmission(it)
+            }
+        }
+    }
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -51,6 +60,9 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
 
     private fun submissionsKey(assignmentId: UUID, studentId: String) =
         "assignment:$assignmentId:$studentId:submissions"
+
+    private fun submissionKey(id: UUID) =
+        "submissions:$id"
 
     override suspend fun getSubmissionsForAssignment(id: UUID, studentId: String): List<Submission> {
         return cache.getList(submissionsKey(id, studentId), Submission::class.serializer())
@@ -75,7 +87,11 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
     }
 
     override suspend fun saveSubmission(submission: Submission) {
-        throw NotImplementedError("Do not cache the save")
+        cache.set(submissionKey(submission.id), json.encodeToString(Submission::class.serializer(), submission))
+    }
+
+    override suspend fun getSubmission(id: UUID): Submission? {
+        return cache.get(submissionKey(id), Submission::class.serializer())
     }
 }
 
@@ -109,6 +125,10 @@ private class DatabaseSubmissionsSource : SubmissionSource {
             it[Submissions.lastModifiedAt] = submission.lastModifiedAt
         }
         Unit
+    }
+
+    override suspend fun getSubmission(id: UUID): Submission? = dbQuery {
+        Submissions.select { Submissions.id eq id }.limit(1).firstNotNullOfOrNull { it.toSubmission() }
     }
 
     private fun ResultRow.toSubmission(): Submission {

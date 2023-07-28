@@ -18,6 +18,7 @@ import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.DeleteCodeRequest
 import org.empowrco.coppin.assignment.presenters.GetAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.GetCodeRequest
+import org.empowrco.coppin.assignment.presenters.GetSubmissionRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -161,6 +162,26 @@ fun Application.assignmentRouting() {
                                     call.respond(HttpStatusCode.InternalServerError, it.localizedMessage)
                                 })
 
+                            }
+                        }
+                        route("/submissions/{studentId}") {
+                            get {
+                                presenter.getSubmission(
+                                    GetSubmissionRequest(
+                                        assignmentId = call.parameters["uuid"].toString(),
+                                        studentId = call.parameters["studentId"].toString(),
+                                    )
+                                ).fold({
+                                    call.respondFreemarker("submission.ftl", it)
+                                }, {
+                                    call.errorRedirect(
+                                        it,
+                                        "/courses/${call.parameters["courseId"]}/assignments/${
+                                            call
+                                                .parameters["uuid"]
+                                        }",
+                                    )
+                                })
                             }
                         }
                     }

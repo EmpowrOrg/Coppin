@@ -32,7 +32,9 @@ interface AssignmentPortalRepository {
     suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode>
     suspend fun getCourse(id: UUID): Course?
     suspend fun getLatestStudentSubmissionForAssignment(assignmentId: UUID): List<Submission>
+    suspend fun getStudentSubmissionsForAssignment(assignmentId: UUID, studentId: String): List<Submission>
     suspend fun getLanguage(id: UUID): Language?
+    suspend fun getSubmission(id: UUID): Submission?
 }
 
 internal class RealAssignmentPortalRepository(
@@ -111,5 +113,13 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getLanguage(id: UUID): Language? {
         return languagesSource.getLanguage(id)
+    }
+
+    override suspend fun getSubmission(id: UUID): Submission? {
+        return submissionSource.getSubmission(id)
+    }
+
+    override suspend fun getStudentSubmissionsForAssignment(assignmentId: UUID, studentId: String): List<Submission> {
+        return submissionSource.getSubmissionsForAssignment(assignmentId, studentId)
     }
 }

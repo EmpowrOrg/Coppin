@@ -232,7 +232,7 @@
                     await showError(error)
                 });
             });
-            const table = $('#codes-table').DataTable({
+            const codesTables = $('#codes-table').DataTable({
                 language: {
                     search: "",
                     searchPlaceholder: "Search...",
@@ -250,10 +250,10 @@
                 ],
             });
             $('#codes-table tbody').on('click', 'tr', function () {
-                const data = table.row(this).data();
+                const data = codesTables.row(this).data();
                 window.location = "/courses/${content.courseId}/assignments/${content.id}/codes/" + data[4]
             });
-            $('#submissions-table').DataTable({
+            const submissionsTable = $('#submissions-table').DataTable({
                 language: {
                     search: "",
                     searchPlaceholder: "Search...",
@@ -269,6 +269,11 @@
                         visible: false,
                     },
                 ],
+            });
+            $('#submissions-table tbody').on('click', 'tr', function () {
+                const data = submissionsTable.row(this).data();
+                console.log(data)
+                window.location = "/courses/${content.courseId}/assignments/${content.id}/submissions/" + data[0]
             });
             </#if>
         });

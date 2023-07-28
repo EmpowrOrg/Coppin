@@ -53,3 +53,8 @@ data class DeleteCodeRequest(val id: String)
 data class ArchiveAssignmentRequest(
     val id: String,
 )
+
+data class GetSubmissionRequest(
+    val assignmentId: String,
+    val studentId: String,
+)

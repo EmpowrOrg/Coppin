@@ -68,6 +68,27 @@ data class GetCodeResponse(
     )
 }
 
+data class GetSubmissionResponse(
+    val assignment: String,
+    val studentId: String,
+    val submissions: List<Submission>,
+    val submissionsJson: String,
+) {
+    @Serializable
+    data class Language(
+        val name: String,
+        val url: String,
+        val mime: String,
+    )
+
+    @Serializable
+    data class Submission(
+        val code: String,
+        val language: Language,
+        val attempt: Int,
+    )
+}
+
 data class CreateAssignmentResponse(val id: String)
 
 data class UpdateCodeResponse(val courseId: String)

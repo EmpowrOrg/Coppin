@@ -10,6 +10,7 @@ dependencies {
     implementation(project(Deps.Assignment.Backend.main))
     implementation(project(Deps.Utils.main))
     implementation(Deps.Apache.commonsText)
+    implementation(project(Deps.Utils.serialization))
 
     testImplementation(project(Deps.Assignment.Backend.fakes))
 }
