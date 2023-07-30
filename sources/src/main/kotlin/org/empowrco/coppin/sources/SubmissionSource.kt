@@ -5,9 +5,15 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
 import org.empowrco.coppin.db.Submissions
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.serialization.json
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.CustomFunction
+import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -103,8 +109,23 @@ private class DatabaseSubmissionsSource : SubmissionSource {
     }
 
     override suspend fun getLatestStudentSubmissionsForAssignment(id: UUID): List<Submission> = dbQuery {
-        Submissions.select { (Submissions.assignment eq id) }.orderBy(Submissions.attempt, order = SortOrder.DESC)
-            .distinctBy { Submissions.studentId }.map { it.toSubmission() }
+        val selectDistinctOn: CustomFunction<Boolean?> = distinctOn(
+            Submissions.studentId
+        )
+        val selectColumns: List<Column<*>> = Submissions.columns
+        val selectWhere: Op<Boolean> = (Submissions.assignment eq id)
+
+        val query: Query = Submissions
+            .slice(
+                selectDistinctOn,
+                *selectColumns.toTypedArray()
+            )
+            .select { selectWhere }
+            .orderBy(Submissions.studentId).orderBy(Submissions.attempt, order = SortOrder.DESC)
+
+        val sql: String = query.toSQL()
+        logDebug("==== Select Distinct On Example === SQL: $sql ")
+        query.map { it.toSubmission() }
     }
 
     override suspend fun getLastStudentSubmissionForAssignment(id: UUID, studentId: String): Submission? = dbQuery {
