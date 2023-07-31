@@ -1,9 +1,13 @@
 package org.empowrco.coppin.sources
 
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.serializer
 import org.empowrco.coppin.db.Assignments
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Subject
+import org.empowrco.coppin.utils.serialization.json
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -19,14 +23,100 @@ interface AssignmentSource {
     suspend fun getAssignmentByReferenceId(id: String): Assignment?
     suspend fun getAssignmentCountBySubject(id: UUID): Long
     suspend fun createAssignment(assignment: Assignment)
-    suspend fun deleteAssignment(id: UUID): Boolean
+    suspend fun deleteAssignment(assignment: Assignment): Boolean
     suspend fun updateAssignment(assignment: Assignment): Boolean
-    suspend fun getAssignments(): List<Assignment>
     suspend fun getAssignmentsForCourse(id: UUID): List<Assignment>
     suspend fun getAssignmentsForSubject(id: UUID): List<Assignment>
 }
 
 internal class RealAssignmentSource(
+    cache: Cache,
+    assignmentCodesSource: AssignmentCodesSource,
+    subjectSource: SubjectSource,
+) : AssignmentSource {
+    private val cache = CacheAssignmentSource(cache)
+    private val database = DatabaseAssignmentSource(assignmentCodesSource, subjectSource)
+    override suspend fun getAssignment(id: UUID): Assignment? {
+        return cache.getAssignment(id) ?: database.getAssignment(id)?.also {
+            cache.createAssignment(it)
+        }
+    }
+
+    override suspend fun getAssignmentByReferenceId(id: String): Assignment? {
+        return cache.getAssignmentByReferenceId(id) ?: database.getAssignmentByReferenceId(id)?.also {
+            cache.createAssignment(it)
+        }
+    }
+
+    override suspend fun getAssignmentCountBySubject(id: UUID): Long {
+        return database.getAssignmentCountBySubject(id)
+    }
+
+    override suspend fun createAssignment(assignment: Assignment) {
+        database.createAssignment(assignment)
+        cache.createAssignment(assignment)
+    }
+
+    override suspend fun deleteAssignment(assignment: Assignment): Boolean {
+        cache.deleteAssignment(assignment)
+        return database.deleteAssignment(assignment)
+    }
+
+    override suspend fun updateAssignment(assignment: Assignment): Boolean {
+        cache.deleteAssignment(assignment)
+        return database.updateAssignment(assignment)
+    }
+
+    override suspend fun getAssignmentsForCourse(id: UUID): List<Assignment> {
+        return database.getAssignmentsForCourse(id)
+    }
+
+    override suspend fun getAssignmentsForSubject(id: UUID): List<Assignment> {
+        return database.getAssignmentsForSubject(id)
+    }
+}
+
+@OptIn(InternalSerializationApi::class)
+private class CacheAssignmentSource(private val cache: Cache) : AssignmentSource {
+
+    fun assignmentKey(id: UUID?, referenceId: String?) = "assignment:$id:$referenceId"
+
+    override suspend fun getAssignment(id: UUID): Assignment? {
+        return cache.get(assignmentKey(id, null), Assignment::class.serializer())
+    }
+
+    override suspend fun getAssignmentByReferenceId(id: String): Assignment? {
+        return cache.get(assignmentKey(null, id), Assignment::class.serializer())
+    }
+
+    override suspend fun getAssignmentCountBySubject(id: UUID): Long {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun createAssignment(assignment: Assignment) {
+        cache.set(assignmentKey(assignment.id, null), json.encodeToString(assignment))
+        cache.set(assignmentKey(null, assignment.referenceId), json.encodeToString(assignment))
+    }
+
+    override suspend fun deleteAssignment(assignment: Assignment): Boolean {
+        cache.delete(assignmentKey(assignment.id, null))
+        return true
+    }
+
+    override suspend fun updateAssignment(assignment: Assignment): Boolean {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun getAssignmentsForCourse(id: UUID): List<Assignment> {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun getAssignmentsForSubject(id: UUID): List<Assignment> {
+        throw NotImplementedError("Use Database")
+    }
+}
+
+private class DatabaseAssignmentSource(
     private val assignmentCodesSource: AssignmentCodesSource,
     private val subjectSource: SubjectSource,
 ) : AssignmentSource {
@@ -40,9 +130,6 @@ internal class RealAssignmentSource(
             .map { buildAssigment(it) }
     }
 
-    override suspend fun getAssignments(): List<Assignment> = dbQuery {
-        Assignments.select { (Assignments.archived eq false) }.map { buildAssigment(it) }
-    }
 
     override suspend fun getAssignmentCountBySubject(id: UUID): Long = dbQuery {
         Assignments.select { Assignments.subject eq id }.count()
@@ -75,11 +162,11 @@ internal class RealAssignmentSource(
         }
     }
 
-    override suspend fun deleteAssignment(id: UUID): Boolean {
+    override suspend fun deleteAssignment(assignment: Assignment): Boolean {
         val result = dbQuery {
-            Assignments.deleteWhere { Assignments.id eq id }
+            Assignments.deleteWhere { Assignments.id eq assignment.id }
         }
-        assignmentCodesSource.deleteByAssignment(id)
+        assignmentCodesSource.deleteByAssignment(assignment)
         return result > 0
     }
 

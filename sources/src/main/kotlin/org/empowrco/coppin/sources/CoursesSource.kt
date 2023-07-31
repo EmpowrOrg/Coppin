@@ -1,9 +1,13 @@
 package org.empowrco.coppin.sources
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.serializer
 import org.empowrco.coppin.db.Courses
 import org.empowrco.coppin.db.CoursesUsers
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.utils.serialization.json
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
@@ -20,13 +24,113 @@ interface CoursesSource {
     suspend fun getCourses(): List<Course>
     suspend fun getCourseByEdxId(id: String): Course?
     suspend fun getLinkedCourses(userId: UUID): List<Course>
-    suspend fun getUnlinkedCourses(userId: UUID): List<Course>
-    suspend fun deleteCourse(id: UUID): Boolean
+    suspend fun deleteCourse(course: Course): Boolean
     suspend fun updateCourse(course: Course): Boolean
     suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime)
 }
 
-internal class RealCoursesSource : CoursesSource {
+internal class RealCoursesSource(cache: Cache) : CoursesSource {
+
+    private val cache = CacheCoursesSource(cache)
+    private val database = DatabaseCoursesSource()
+    override suspend fun createCourse(course: Course) {
+        database.createCourse(course)
+        cache.createCourse(course)
+    }
+
+    override suspend fun getCourse(id: UUID): Course? {
+        return cache.getCourse(id) ?: database.getCourse(id)?.also {
+            cache.createCourse(it)
+        }
+    }
+
+    override suspend fun getCourses(): List<Course> {
+        return cache.getCourses().ifEmpty {
+            database.getCourses().also {
+                cache.saveCourses(it)
+            }
+        }
+    }
+
+    override suspend fun getCourseByEdxId(id: String): Course? {
+        return cache.getCourseByEdxId(id) ?: database.getCourseByEdxId(id)?.also {
+            cache.createCourse(it)
+        }
+    }
+
+    override suspend fun getLinkedCourses(userId: UUID): List<Course> {
+        return database.getLinkedCourses(userId)
+    }
+
+    override suspend fun deleteCourse(course: Course): Boolean {
+        cache.deleteCourse(course)
+        return database.deleteCourse(course)
+    }
+
+    override suspend fun updateCourse(course: Course): Boolean {
+        cache.updateCourse(course)
+        return database.updateCourse(course)
+    }
+
+    override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) {
+        cache.linkCourse(courseId, userId, currentTime)
+        database.linkCourse(courseId, userId, currentTime)
+    }
+}
+
+@OptIn(InternalSerializationApi::class)
+private class CacheCoursesSource(private val cache: Cache) : CoursesSource {
+
+    private fun courseKey(id: UUID?, edxId: String?) = "course:$id:$edxId"
+    private fun coursesKey() = "courses"
+
+    override suspend fun createCourse(course: Course) {
+        cache.set(courseKey(course.id, null), json.encodeToString(course))
+        cache.set(courseKey(null, course.edxId), json.encodeToString(course))
+        cache.delete(coursesKey())
+    }
+
+
+    override suspend fun getCourse(id: UUID): Course? {
+        return cache.get(courseKey(id, null), Course::class.serializer())
+    }
+
+    override suspend fun getCourses(): List<Course> {
+        return cache.getList(coursesKey(), Course::class.serializer())
+    }
+
+    suspend fun saveCourses(courses: List<Course>) {
+        return cache.set(coursesKey(), json.encodeToString(courses))
+    }
+
+    override suspend fun getCourseByEdxId(id: String): Course? {
+        return cache.get(courseKey(null, id), Course::class.serializer())
+    }
+
+    override suspend fun getLinkedCourses(userId: UUID): List<Course> {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun deleteCourse(course: Course): Boolean {
+        cache.delete(courseKey(course.id, null))
+        cache.delete(courseKey(null, course.edxId))
+        cache.delete(coursesKey())
+        return true
+    }
+
+    override suspend fun updateCourse(course: Course): Boolean {
+        cache.delete(coursesKey())
+        cache.delete(courseKey(course.id, null))
+        cache.delete(courseKey(null, course.edxId))
+        return true
+    }
+
+    override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) {
+        throw NotImplementedError("Use Database")
+    }
+}
+
+private class DatabaseCoursesSource : CoursesSource {
     override suspend fun createCourse(course: Course) = dbQuery {
         Courses.insert {
             it.build(course)
@@ -61,13 +165,8 @@ internal class RealCoursesSource : CoursesSource {
         Unit
     }
 
-    override suspend fun getUnlinkedCourses(userId: UUID): List<Course> = dbQuery {
-        val courseIds = CoursesUsers.select { CoursesUsers.user eq userId }.map { it[CoursesUsers.course].value }
-        Courses.select { Courses.id notInList courseIds }.map { it.toCourse() }
-    }
-
-    override suspend fun deleteCourse(id: UUID): Boolean = dbQuery {
-        Courses.deleteWhere { Courses.id eq id } > 0
+    override suspend fun deleteCourse(course: Course): Boolean = dbQuery {
+        Courses.deleteWhere { Courses.id eq course.id } > 0
     }
 
     override suspend fun updateCourse(course: Course) = dbQuery {

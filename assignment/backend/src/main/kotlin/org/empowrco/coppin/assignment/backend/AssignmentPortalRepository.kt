@@ -16,7 +16,6 @@ import java.util.UUID
 
 
 interface AssignmentPortalRepository {
-    suspend fun getAssignments(): List<Assignment>
     suspend fun getAssignment(id: UUID): Assignment?
     suspend fun getSubject(id: UUID): Subject?
     suspend fun getSubjectsForCourse(id: UUID): List<Subject>
@@ -45,10 +44,6 @@ internal class RealAssignmentPortalRepository(
     private val subjectSource: SubjectSource,
     private val submissionSource: SubmissionSource,
 ) : AssignmentPortalRepository {
-
-    override suspend fun getAssignments(): List<Assignment> {
-        return assignmentSource.getAssignments()
-    }
 
     override suspend fun getSubject(id: UUID): Subject? {
         return subjectSource.getSubject(id)
@@ -88,7 +83,7 @@ internal class RealAssignmentPortalRepository(
     }
 
     override suspend fun saveCode(code: AssignmentCode) {
-        codesSource.create(listOf(code))
+        codesSource.create(code)
     }
 
     override suspend fun deprimaryAssignmentCodes(assignmentId: UUID) {

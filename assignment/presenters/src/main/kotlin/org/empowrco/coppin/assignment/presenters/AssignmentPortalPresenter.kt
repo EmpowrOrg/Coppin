@@ -9,7 +9,6 @@ import org.empowrco.coppin.assignment.backend.AssignmentPortalRepository
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.utils.capitalize
-import org.empowrco.coppin.utils.ellipsize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.nonEmpty
 import org.empowrco.coppin.utils.now
@@ -19,7 +18,6 @@ import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
 
 interface AssignmentPortalPresenter {
-    suspend fun getAssignments(): Result<GetAssignmentsResponse>
     suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse>
     suspend fun updateAssignment(request: UpdateAssignmentPortalRequest): Result<UpdateAssignmentResponse>
     suspend fun getCode(request: GetCodeRequest): Result<GetCodeResponse>
@@ -31,17 +29,6 @@ interface AssignmentPortalPresenter {
 }
 
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
-    override suspend fun getAssignments(): Result<GetAssignmentsResponse> {
-        return GetAssignmentsResponse(repo.getAssignments().map {
-            val createdDate = it.lastModifiedAt
-            GetAssignmentsResponse.AssignmentListItem(
-                referenceId = it.referenceId,
-                id = it.id.toString(),
-                createdAt = "${createdDate.monthNumber}/${createdDate.dayOfMonth}/${createdDate.year}",
-                title = it.title.ellipsize(),
-            )
-        }).toResult()
-    }
 
     override suspend fun updateAssignment(request: UpdateAssignmentPortalRequest): Result<UpdateAssignmentResponse> {
         val uuid = request.id?.toUuid() ?: return failure("Invalid id")

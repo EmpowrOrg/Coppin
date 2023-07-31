@@ -17,11 +17,10 @@ import java.util.UUID
 
 interface CoursesPortalRepository {
     suspend fun getLinkedCourses(userId: UUID): List<Course>
-    suspend fun getUnlinkedCourses(userId: UUID): List<Course>
     suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime)
     suspend fun createCourse(course: Course)
     suspend fun updateCourse(course: Course): Boolean
-    suspend fun deleteCourse(id: UUID): Boolean
+    suspend fun deleteCourse(course: Course): Boolean
     suspend fun getCourse(id: UUID): Course?
     suspend fun getCourseByEdxId(id: String): Course?
     suspend fun getEdxCourse(id: String): Result<EdxCourse>
@@ -35,7 +34,7 @@ interface CoursesPortalRepository {
     suspend fun getAssignmentsBySubject(id: UUID): List<Assignment>
     suspend fun getSubject(id: UUID): Subject?
     suspend fun updateSubject(subject: Subject): Boolean
-    suspend fun deleteSubject(id: UUID): Boolean
+    suspend fun deleteSubject(subject: Subject): Boolean
 }
 
 internal class RealCoursesPortalRepository(
@@ -54,8 +53,8 @@ internal class RealCoursesPortalRepository(
         return subjectSource.getSubject(id)
     }
 
-    override suspend fun deleteSubject(id: UUID): Boolean {
-        return subjectSource.deleteSubject(id)
+    override suspend fun deleteSubject(subject: Subject): Boolean {
+        return subjectSource.deleteSubject(subject)
     }
 
     override suspend fun updateSubject(subject: Subject): Boolean {
@@ -86,9 +85,6 @@ internal class RealCoursesPortalRepository(
         return coursesSource.getCourseByEdxId(id)
     }
 
-    override suspend fun getUnlinkedCourses(userId: UUID): List<Course> {
-        return coursesSource.getUnlinkedCourses(userId)
-    }
 
     override suspend fun updateCourse(course: Course): Boolean {
         return coursesSource.updateCourse(course)
@@ -98,8 +94,8 @@ internal class RealCoursesPortalRepository(
         coursesSource.createCourse(course)
     }
 
-    override suspend fun deleteCourse(id: UUID): Boolean {
-        return coursesSource.deleteCourse(id)
+    override suspend fun deleteCourse(course: Course): Boolean {
+        return coursesSource.deleteCourse(course)
     }
 
     override suspend fun getAssignmentsForCourse(courseId: UUID): List<Assignment> {

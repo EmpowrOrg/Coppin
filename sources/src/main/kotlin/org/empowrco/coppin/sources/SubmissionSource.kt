@@ -5,7 +5,6 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
 import org.empowrco.coppin.db.Submissions
 import org.empowrco.coppin.models.Submission
-import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.serialization.json
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.CustomFunction
@@ -65,7 +64,7 @@ internal class RealSubmissionSource(cache: Cache) : SubmissionSource {
 private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource {
 
     private fun submissionsKey(assignmentId: UUID, studentId: String) =
-        "assignment:$assignmentId:$studentId:submissions"
+        "submissions:$assignmentId:$studentId"
 
     private fun submissionKey(id: UUID) =
         "submissions:$id"
@@ -76,6 +75,10 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
     }
 
     suspend fun saveSubmissionsForAssignment(id: UUID, studentId: String, submissions: List<Submission>) {
+        submissions.forEach {
+            cache.delete(submissionKey(it.id))
+            cache.delete(submissionsKey(id, studentId))
+        }
         cache.set(
             submissionsKey(id, studentId), json.encodeToString(
                 ListSerializer(Submission::class.serializer()),
@@ -94,6 +97,7 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
 
     override suspend fun saveSubmission(submission: Submission) {
         cache.set(submissionKey(submission.id), json.encodeToString(Submission::class.serializer(), submission))
+        cache.delete(submissionsKey(submission.assignmentId, submission.studentId))
     }
 
     override suspend fun getSubmission(id: UUID): Submission? {
@@ -122,9 +126,6 @@ private class DatabaseSubmissionsSource : SubmissionSource {
             )
             .select { selectWhere }
             .orderBy(Submissions.studentId).orderBy(Submissions.attempt, order = SortOrder.DESC)
-
-        val sql: String = query.toSQL()
-        logDebug("==== Select Distinct On Example === SQL: $sql ")
         query.map { it.toSubmission() }
     }
 

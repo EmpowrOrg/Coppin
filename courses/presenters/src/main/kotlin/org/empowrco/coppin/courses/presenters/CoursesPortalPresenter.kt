@@ -206,7 +206,8 @@ internal class RealCoursesPortalPresenter(
 
     override suspend fun deleteSubject(request: DeleteSubjectRequest): Result<DeleteSubjectResponse> {
         val id = request.id.toUuid() ?: return failure("Invalid subject id")
-        val result = repo.deleteSubject(id)
+        val subject = repo.getSubject(id) ?: return failure("No subject found")
+        val result = repo.deleteSubject(subject)
         return if (!result) {
             failure("Unknown error")
         } else {

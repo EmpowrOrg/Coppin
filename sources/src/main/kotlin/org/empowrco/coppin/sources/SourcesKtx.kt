@@ -46,7 +46,7 @@ private fun customBooleanFunction(
 internal fun distinctOn(vararg expressions: Expression<*>): CustomFunction<Boolean?> = customBooleanFunction(
     functionName = "DISTINCT ON",
     postfix = " TRUE",
-    params = *expressions
+    params = expressions
 )
 
 internal fun Query.toSQL(): String = prepareSQL(QueryBuilder(false))
