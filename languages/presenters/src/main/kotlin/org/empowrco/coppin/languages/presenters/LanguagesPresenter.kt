@@ -30,7 +30,7 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
                     lastModifiedDate = it.lastModifiedAt.monthDayYear(),
                     url = it.url,
                 )
-            },
+            }.sortedBy { it.name },
             languagesCount = languages.size,
         ).toResult()
     }
