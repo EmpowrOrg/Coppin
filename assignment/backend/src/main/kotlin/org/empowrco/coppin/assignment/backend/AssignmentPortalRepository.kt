@@ -34,6 +34,7 @@ interface AssignmentPortalRepository {
     suspend fun getStudentSubmissionsForAssignment(assignmentId: UUID, studentId: String): List<Submission>
     suspend fun getLanguage(id: UUID): Language?
     suspend fun getSubmission(id: UUID): Submission?
+    suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long
 }
 
 internal class RealAssignmentPortalRepository(
@@ -116,5 +117,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getStudentSubmissionsForAssignment(assignmentId: UUID, studentId: String): List<Submission> {
         return submissionSource.getSubmissionsForAssignment(assignmentId, studentId)
+    }
+
+    override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long {
+        return assignmentSource.assignmentsWithReferenceStartingWithCount(name)
     }
 }
