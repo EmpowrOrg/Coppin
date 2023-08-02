@@ -276,6 +276,13 @@
                 window.location = "/courses/${content.courseId}/assignments/${content.id}/submissions/" + data[0]
             });
             </#if>
+            var input = document.getElementById('reference-id'); // get the input element
+            input.addEventListener('input', resizeInput); // bind the "resizeInput" callback on "input" event
+            resizeInput.call(input); // immediately call the function
+
+            function resizeInput() {
+                this.style.width = this.value.length + "ch";
+            }
         });
     </script>
     <div class="container-fluid">
@@ -328,15 +335,6 @@
                             <div class="row align-items-center">
                                 <div class="col-auto row align-items-center mt-2">
                                     <div class="col-auto">
-                                        <label for="reference-id" class="col-form-label"><h6>Reference Id</h6></label>
-                                    </div>
-                                    <div class="col-auto">
-                                        <input name="reference-id" type="text" id="reference-id" class="form-control"
-                                               <#if content.referenceId??>value="${content.referenceId}" </#if>>
-                                    </div>
-                                </div>
-                                <div class="col-auto row align-items-center mt-2">
-                                    <div class="col-auto">
                                         <label for="total-attempts" class="col-form-label"><h6>Total Attempts</h6>
                                         </label>
                                     </div>
@@ -370,6 +368,27 @@
                                         </button>
                                     </div>
                                 </div>
+                                <div id="snackbar">Copied Reference Id</div>
+                                <#if content.referenceId??>
+                                    <div class="col-auto row align-items-center mt-2">
+                                        <div class="col-auto">
+                                            <label for="reference-id" class="col-form-label"><h6>Reference Id</h6>
+                                            </label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input name="reference-id" type="text" id="reference-id"
+                                                   class="form-control"
+                                                   value="${content.referenceId}" disabled>
+                                        </div>
+                                        <div class="col-auto" style="padding: 0">
+                                            <button style="padding: 0.5rem 1rem;" type="button" id="copy"
+                                                    class="copy btn col-sm text-black-50 mb-0"
+                                                    onclick="copyReferenceId()"><i class="material-icons opacity-10">content_copy</i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </#if>
                             </div>
                         </div>
                     </div>
@@ -493,6 +512,19 @@
         </div>
 
     </div>
+    <#if content.referenceId??>
+        <script>
+            function copyReferenceId() {
+                navigator.clipboard.writeText("${content.referenceId}");
+                const snackbar = document.getElementById("snackbar");
+                snackbar.innerText
+                snackbar.className = "show";
+                setTimeout(function () {
+                    snackbar.className = snackbar.className.replace("show", "");
+                }, 3000);
+            }
+        </script>
+    </#if>
     <script>
         async function addSubject() {
             const frm = `<form>
