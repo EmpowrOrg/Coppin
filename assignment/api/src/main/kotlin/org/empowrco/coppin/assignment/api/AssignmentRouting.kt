@@ -38,13 +38,11 @@ fun Application.assignmentRouting() {
                             val failureMessage = formParameters["failure-message"].toString()
                             val successMessage = formParameters["success-message"].toString()
                             val instructions = formParameters["instructions"].toString()
-                            val referenceId = formParameters["reference-id"].toString()
                             val title = formParameters["title"].toString()
                             val totalAttempts = formParameters["total-attempts"].toString()
                             val subjectId = formParameters["subject"].toString()
                             presenter.createAssignment(
                                 CreateAssignmentPortalRequest(
-                                    referenceId = referenceId,
                                     failureMessage = failureMessage,
                                     successMessage = successMessage,
                                     instructions = instructions,
@@ -80,7 +78,6 @@ fun Application.assignmentRouting() {
                             val instructions = formParameters["instructions"].toString()
                             val title = formParameters["title"].toString()
                             val totalAttempts = formParameters["total-attempts"].toString().toInt()
-                            val referenceId = formParameters["reference-id"].toString()
                             val subject = formParameters["subject"].toString()
                             presenter.updateAssignment(
                                 UpdateAssignmentPortalRequest(
@@ -90,7 +87,6 @@ fun Application.assignmentRouting() {
                                     instructions = instructions,
                                     title = title,
                                     totalAttempts = totalAttempts,
-                                    referenceId = referenceId,
                                     subject = subject,
                                 )
                             ).fold({
