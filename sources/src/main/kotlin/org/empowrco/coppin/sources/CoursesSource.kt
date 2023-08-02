@@ -73,7 +73,6 @@ internal class RealCoursesSource(cache: Cache) : CoursesSource {
     }
 
     override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) {
-        cache.linkCourse(courseId, userId, currentTime)
         database.linkCourse(courseId, userId, currentTime)
     }
 }
