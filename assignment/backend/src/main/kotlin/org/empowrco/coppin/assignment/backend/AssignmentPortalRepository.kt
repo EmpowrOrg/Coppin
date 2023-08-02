@@ -26,8 +26,8 @@ interface AssignmentPortalRepository {
     suspend fun saveCode(code: AssignmentCode)
     suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getLanguages(): List<Language>
-    suspend fun deleteCode(id: UUID)
-    suspend fun deprimaryAssignmentCodes(assignmentId: UUID)
+    suspend fun deleteCode(assignmentCode: AssignmentCode)
+    suspend fun deprimaryAssignmentCodes(assignment: Assignment)
     suspend fun getAssignmentCodes(id: UUID): List<AssignmentCode>
     suspend fun getCourse(id: UUID): Course?
     suspend fun getLatestStudentSubmissionForAssignment(assignmentId: UUID): List<Submission>
@@ -86,12 +86,12 @@ internal class RealAssignmentPortalRepository(
         codesSource.create(code)
     }
 
-    override suspend fun deprimaryAssignmentCodes(assignmentId: UUID) {
-        codesSource.deprimaryAssignmentCodes(assignmentId)
+    override suspend fun deprimaryAssignmentCodes(assignment: Assignment) {
+        codesSource.deprimaryAssignmentCodes(assignment)
     }
 
-    override suspend fun deleteCode(id: UUID) {
-        codesSource.delete(id)
+    override suspend fun deleteCode(assignmentCode: AssignmentCode) {
+        codesSource.delete(assignmentCode)
     }
 
     override suspend fun getCourse(id: UUID): Course? {
