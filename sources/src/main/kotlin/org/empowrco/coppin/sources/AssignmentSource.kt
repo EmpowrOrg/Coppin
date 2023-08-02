@@ -27,6 +27,7 @@ interface AssignmentSource {
     suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getAssignmentsForCourse(id: UUID): List<Assignment>
     suspend fun getAssignmentsForSubject(id: UUID): List<Assignment>
+    suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long
 }
 
 internal class RealAssignmentSource(
@@ -67,6 +68,10 @@ internal class RealAssignmentSource(
         return database.updateAssignment(assignment)
     }
 
+    override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long {
+        return database.assignmentsWithReferenceStartingWithCount(name)
+    }
+
     override suspend fun getAssignmentsForCourse(id: UUID): List<Assignment> {
         return database.getAssignmentsForCourse(id)
     }
@@ -100,6 +105,7 @@ private class CacheAssignmentSource(private val cache: Cache) : AssignmentSource
 
     override suspend fun deleteAssignment(assignment: Assignment): Boolean {
         cache.delete(assignmentKey(assignment.id, null))
+        cache.delete(assignmentKey(null, assignment.referenceId))
         return true
     }
 
@@ -112,6 +118,10 @@ private class CacheAssignmentSource(private val cache: Cache) : AssignmentSource
     }
 
     override suspend fun getAssignmentsForSubject(id: UUID): List<Assignment> {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long {
         throw NotImplementedError("Use Database")
     }
 }
@@ -130,6 +140,9 @@ private class DatabaseAssignmentSource(
             .map { buildAssigment(it) }
     }
 
+    override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long = dbQuery {
+        Assignments.select { (Assignments.referenceId like "$name%") }.count()
+    }
 
     override suspend fun getAssignmentCountBySubject(id: UUID): Long = dbQuery {
         Assignments.select { Assignments.subject eq id }.count()
@@ -141,7 +154,8 @@ private class DatabaseAssignmentSource(
     }
 
     override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
-        Assignments.select { (Assignments.referenceId eq id) and (Assignments.archived eq false) }.limit(1).map {
+        Assignments.select { (Assignments.referenceId eq id) and (Assignments.archived eq false) }
+            .limit(1).map {
             buildAssigment(it)
         }.firstOrNull()
     }
