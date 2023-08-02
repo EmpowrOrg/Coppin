@@ -36,8 +36,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val currentTime = LocalDateTime.now()
         if (request.title.isBlank()) {
             return failure("Please specify a title")
-        } else if (request.referenceId.isBlank()) {
-            return failure("Please specify a referenceId")
         } else if (request.instructions.isBlank()) {
             return failure("Please include instructions")
         } else if (request.successMessage.isBlank()) {
@@ -53,7 +51,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             instructions = request.instructions,
             totalAttempts = request.totalAttempts,
             title = request.title,
-            referenceId = request.referenceId,
             subject = subject,
             lastModifiedAt = currentTime,
         )
@@ -69,8 +66,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val id = UUID.randomUUID()
         if (request.title.isBlank()) {
             return failure("Please specify a title")
-        } else if (request.referenceId.isBlank()) {
-            return failure("Please specify a referenceId")
         } else if (request.instructions.isBlank()) {
             return failure("Please include instructions")
         } else if (request.successMessage.isBlank()) {
@@ -84,14 +79,20 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val course = repo.getCourse(courseId) ?: return failure("Course not found")
         val subjectId = request.subjectId.toUuid() ?: return failure("Invalid Subject Selected")
         val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
-
+        val referenceName = "${course.edxId}-${request.title.trim().replace("\\p{Zs}+".toRegex(), "-")}"
+        val referenceCount = repo.assignmentsWithReferenceStartingWithCount(referenceName)
+        val referenceId = if (referenceCount > 0) {
+            "$referenceName-$referenceCount"
+        } else {
+            referenceName
+        }
         val assignment = Assignment(
             id = id,
             failureMessage = request.failureMessage,
             successMessage = request.successMessage,
             instructions = request.instructions,
             totalAttempts = request.totalAttempts.toInt(),
-            referenceId = request.referenceId,
+            referenceId = referenceId,
             assignmentCodes = emptyList(),
             title = request.title,
             blockId = null,
@@ -266,7 +267,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             repo.saveCode(code)
         } else { // updating existing assignment code
             if (primary) {
-                repo.deprimaryAssignmentCodes(assignmentId)
+                repo.deprimaryAssignmentCodes(assignment)
             }
             val assignmentCodeId = codeIdString.toUuid() ?: return failure("Invalid id")
             val code = repo.getCode(assignmentCodeId) ?: return failure("Code not found")
@@ -291,7 +292,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val uuid = request.id.toUuid() ?: return failure("Invalid code id")
         val code = repo.getCode(uuid) ?: return failure("Code not found")
         val assignment = repo.getAssignment(code.assignmentId) ?: return failure("Assignment not found")
-        repo.deleteCode(uuid)
+        repo.deleteCode(code)
         if (code.primary) {
             val codes = repo.getAssignmentCodes(code.assignmentId)
             if (codes.isNotEmpty()) {
