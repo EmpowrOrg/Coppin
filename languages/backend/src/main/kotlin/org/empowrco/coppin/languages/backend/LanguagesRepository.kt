@@ -7,7 +7,7 @@ import java.util.UUID
 
 interface LanguagesRepository {
     suspend fun createLanguage(language: Language)
-    suspend fun deleteLanguage(id: UUID): Boolean
+    suspend fun deleteLanguage(language: Language): Boolean
     suspend fun updateLanguage(language: Language): Boolean
     suspend fun getLanguage(id: UUID): Language?
     suspend fun getLanguages(): List<Language>
@@ -22,8 +22,8 @@ internal class RealLanguagesRepository(
         languagesSource.create(language)
     }
 
-    override suspend fun deleteLanguage(id: UUID): Boolean {
-        return languagesSource.deleteLanguage(id)
+    override suspend fun deleteLanguage(language: Language): Boolean {
+        return languagesSource.deleteLanguage(language)
     }
 
     override suspend fun updateLanguage(language: Language): Boolean {
