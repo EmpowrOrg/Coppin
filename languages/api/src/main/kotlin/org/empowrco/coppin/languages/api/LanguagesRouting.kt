@@ -45,7 +45,7 @@ fun Application.languagesRouting() {
                         val name = formParameters["name"].toString()
                         val mime = formParameters["mime"].toString()
                         val url = formParameters["url"].toString()
-                        val unitTestRegex = formParameters["unitTestRegex"].toString()
+                        val unitTestRegex = formParameters["regex"].toString()
                         presenter.upsertLanguage(
                             UpsertLanguageRequest(
                                 name = name,
