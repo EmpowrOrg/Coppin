@@ -21,6 +21,7 @@ import org.empowrco.coppin.assignment.presenters.GetCodeRequest
 import org.empowrco.coppin.assignment.presenters.GetSubmissionRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
+import org.empowrco.coppin.utils.routing.Breadcrumbs
 import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
@@ -68,7 +69,17 @@ fun Application.assignmentRouting() {
                                     courseId = call.parameters["courseId"].toString(),
                                 )
                             ).fold({
-                                call.respondFreemarker("assignment.ftl", it)
+                                call.respondFreemarker(
+                                    "assignment.ftl",
+                                    it,
+                                    Breadcrumbs(
+                                        crumbs = listOf(
+                                            Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                            Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
+                                            Breadcrumbs.Crumb(null, it.title ?: "New Assignment", null),
+                                        )
+                                    ),
+                                )
                             }, {
                                 call.errorRedirect(it, "/courses/${call.parameters["courseId"]}")
                             })
@@ -118,7 +129,22 @@ fun Application.assignmentRouting() {
                                         assignmentId = assignmentId
                                     )
                                 ).fold({
-                                    call.respondFreemarker("assignment-code.ftl", it)
+                                    call.respondFreemarker(
+                                        "assignment-code.ftl",
+                                        it,
+                                        Breadcrumbs(
+                                            crumbs = listOf(
+                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
+                                                Breadcrumbs.Crumb(
+                                                    null,
+                                                    it.assignmentName,
+                                                    "/courses/${it.courseId}/assignments/${it.assignmentId}",
+                                                ),
+                                                Breadcrumbs.Crumb(null, "Code", null),
+                                            )
+                                        ),
+                                    )
                                 }, {
                                     call.errorRedirect(it)
                                 })
@@ -174,7 +200,21 @@ fun Application.assignmentRouting() {
                                         studentId = call.parameters["studentId"].toString(),
                                     )
                                 ).fold({
-                                    call.respondFreemarker("submission.ftl", it)
+                                    call.respondFreemarker(
+                                        "submission.ftl", it,
+                                        Breadcrumbs(
+                                            crumbs = listOf(
+                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
+                                                Breadcrumbs.Crumb(
+                                                    null,
+                                                    it.assignment,
+                                                    "/courses/${it.courseId}/assignments/${it.assignmentId}",
+                                                ),
+                                                Breadcrumbs.Crumb(null, call.parameters["studentId"].toString(), null),
+                                            )
+                                        ),
+                                    )
                                 }, {
                                     call.errorRedirect(
                                         it,

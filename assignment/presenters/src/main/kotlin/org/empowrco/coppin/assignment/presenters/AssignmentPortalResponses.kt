@@ -6,6 +6,7 @@ data class GetAssignmentPortalResponse(
     val id: String?,
     val referenceId: String?,
     val courseId: String,
+    val courseName: String,
     val instructions: String?,
     val successMessage: String?,
     val failureMessage: String?,
@@ -54,7 +55,9 @@ data class GetCodeResponse(
     val solutionCode: String?,
     val solutionVisibility: String,
     val assignmentId: String,
+    val assignmentName: String,
     val courseId: String,
+    val courseName: String,
     val unitTest: String?,
     val primary: Boolean,
     val injectable: Boolean,
@@ -72,9 +75,12 @@ data class GetCodeResponse(
 
 data class GetSubmissionResponse(
     val assignment: String,
+    val assignmentId: String,
     val studentId: String,
     val submissions: List<Submission>,
     val submissionsJson: String,
+    val courseName: String,
+    val courseId: String,
 ) {
     @Serializable
     data class Language(

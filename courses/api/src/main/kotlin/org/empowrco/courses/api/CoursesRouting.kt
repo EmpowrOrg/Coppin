@@ -21,6 +21,7 @@ import org.empowrco.coppin.courses.presenters.GetCoursesRequest
 import org.empowrco.coppin.courses.presenters.GetSubjectRequest
 import org.empowrco.coppin.courses.presenters.LinkCoursesRequest
 import org.empowrco.coppin.courses.presenters.UpdateSubjectRequest
+import org.empowrco.coppin.utils.routing.Breadcrumbs
 import org.empowrco.coppin.utils.routing.UserSession
 import org.empowrco.coppin.utils.routing.error
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -45,7 +46,15 @@ fun Application.coursesRouting() {
                     get {
                         val userId = call.sessions.get<UserSession>()!!.userId
                         presenter.getUnlinkedCourses(GetCoursesRequest(userId)).fold({
-                            call.respondFreemarker("unlinked-courses.ftl", it)
+                            call.respondFreemarker(
+                                "unlinked-courses.ftl", it,
+                                Breadcrumbs(
+                                    crumbs = listOf(
+                                        Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                        Breadcrumbs.Crumb(null, "Unlinked Courses", null),
+                                    )
+                                ),
+                            )
                         }, {
                             call.errorRedirect(it)
                         })
@@ -65,7 +74,14 @@ fun Application.coursesRouting() {
                 route("{uuid}") {
                     get {
                         presenter.getCourse(GetCourseRequest(id = call.parameters["uuid"].toString())).fold({
-                            call.respondFreemarker("course.ftl", it)
+                            call.respondFreemarker(
+                                "course.ftl", it, Breadcrumbs(
+                                    crumbs = listOf(
+                                        Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                        Breadcrumbs.Crumb(null, it.name, null),
+                                    )
+                                )
+                            )
                         }, {
                             call.errorRedirect(it, "/courses")
                         })
@@ -84,7 +100,16 @@ fun Application.coursesRouting() {
                                 val subjectId = call.parameters["subjectId"]
                                 val courseId = call.parameters["uuid"].toString()
                                 presenter.getSubject(GetSubjectRequest(id = subjectId, courseId = courseId)).fold({
-                                    call.respondFreemarker("subject.ftl", it)
+                                    call.respondFreemarker(
+                                        "subject.ftl",
+                                        it,
+                                        Breadcrumbs(
+                                            crumbs = listOf(
+                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb(null, it.courseName, "/courses/$courseId"),
+                                            )
+                                        ),
+                                    )
                                 }, {
                                     call.errorRedirect(it, "/courses/$courseId")
                                 })

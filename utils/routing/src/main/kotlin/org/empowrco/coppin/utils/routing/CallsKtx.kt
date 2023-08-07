@@ -15,14 +15,21 @@ import io.ktor.server.util.url
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
-suspend fun ApplicationCall.respondFreemarker(template: String, content: Any) {
-    respondFreemarker(template, mapOf("content" to content))
+suspend fun ApplicationCall.respondFreemarker(template: String, content: Any, breadcrumbs: Breadcrumbs? = null) {
+    respondFreemarker(template, mapOf("content" to content), breadcrumbs)
 }
 
 
-suspend fun ApplicationCall.respondFreemarker(template: String, content: Map<String, Any?> = mapOf()) {
+suspend fun ApplicationCall.respondFreemarker(
+    template: String,
+    content: Map<String, Any?> = mapOf(),
+    breadcrumbs: Breadcrumbs? = null,
+) {
     val updatedContent = content.toMutableMap()
     updatedContent["isAdmin"] = sessions.get<UserSession>()?.isAdmin ?: false
+    if (breadcrumbs != null) {
+        updatedContent["breadcrumbs"] = breadcrumbs
+    }
     val error = request.queryParameters["error"]
     if (error == null) {
         respond(FreeMarkerContent(template, updatedContent))

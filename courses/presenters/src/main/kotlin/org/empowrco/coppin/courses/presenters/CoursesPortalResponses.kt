@@ -69,6 +69,7 @@ object CreateSubjectResponse
 data class GetSubjectResponse(
     val id: String,
     val courseId: String,
+    val courseName: String,
     val name: String,
     val canBeDeleted: Boolean,
 )

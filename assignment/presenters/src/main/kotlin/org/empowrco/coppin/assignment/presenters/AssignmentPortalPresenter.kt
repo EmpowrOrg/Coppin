@@ -112,6 +112,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
 
     override suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse> {
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        val course = repo.getCourse(courseId) ?: return failure("Course not found")
         val subjects = repo.getSubjectsForCourse(courseId)
         if (request.id == null) {
             return GetAssignmentPortalResponse(
@@ -133,6 +134,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 subjectId = null,
                 submissions = emptyList(),
                 points = null,
+                courseName = course.title,
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -167,6 +169,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 )
             },
             points = assignment.points.toInt(),
+            courseName = course.title,
             submissions = studentSubmissions.map {
                 val language = repo.getLanguage(it.languageId)
                 GetAssignmentPortalResponse.Submission(
@@ -184,6 +187,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         val existingLanguageIds = repo.getAssignmentCodes(assignmentId).map { it.language.id }
+        val course = repo.getCourse(assignment.courseId) ?: return failure("Course not found")
         val selectableLanguages = repo.getLanguages().mapNotNull {
             if (existingLanguageIds.contains(it.id)) {
                 return@mapNotNull null
@@ -209,6 +213,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 primary = existingLanguageIds.isEmpty(), //Should be primary if there are now existing languages
                 languages = selectableLanguages,
                 solutionVisibility = AssignmentCode.SolutionVisibility.onFinish.name,
+                assignmentName = assignment.title,
+                courseName = course.title,
             ).toResult()
         }
         val assignmentCodeId = request.id.toUuid() ?: return failure("Invalid id")
@@ -240,6 +246,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             injectable = code.injectable,
             languages = selectableLanguages,
             solutionVisibility = code.solutionVisibility.name,
+            assignmentName = assignment.title,
+            courseName = course.title,
         ).toResult()
     }
 
@@ -333,7 +341,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     @OptIn(InternalSerializationApi::class)
     override suspend fun getSubmission(request: GetSubmissionRequest): Result<GetSubmissionResponse> {
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
-        val assignment = repo.getAssignment(assignmentId) ?: return failure("Assignmnet not found")
+        val assignment = repo.getAssignment(assignmentId) ?: return failure("Assignment not found")
+        val course = repo.getCourse(assignment.courseId) ?: return failure("Course not found")
         val submissions =
             repo.getStudentSubmissionsForAssignment(assignmentId, request.studentId).sortedBy { it.attempt }
         val submissionPresentables = submissions.map {
@@ -358,6 +367,9 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     submissionPresentables
                 ),
             ),
+            assignmentId = assignment.id.toString(),
+            courseName = course.title,
+            courseId = course.id.toString(),
         ).toResult()
     }
 }

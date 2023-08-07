@@ -19,7 +19,7 @@ import java.util.UUID
 interface UsersPresenters {
     suspend fun login(request: LoginRequest): Result<LoginResponse>
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
-    suspend fun getUsers(): Result<GetUsersResponse>
+    suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse>
     suspend fun getUser(request: GetUserRequest): Result<GetUserResponse>
     suspend fun updateUser(request: UpdateUserRequest): Result<PatchUserResponse>
     suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse>
@@ -91,7 +91,10 @@ class RealUsersPresenters(
         return "^[a-zA-Z0-9_!#\$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+\$".toRegex().matches(this)
     }
 
-    override suspend fun getUsers(): Result<GetUsersResponse> {
+    override suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse> {
+        if (!request.isAdmin) {
+            return failure("")
+        }
         val users = repo.getUsers()
         return GetUsersResponse(
             users = users.map {

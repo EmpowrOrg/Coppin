@@ -1,3 +1,4 @@
+<#-- @ftlvariable name="breadcrumbs" type="org.empowrco.coppin.utils.routing.Breadcrumbs" -->
 <#macro header>
 
 
@@ -98,6 +99,30 @@
             </a>
         </div>
         <div class="container-fluid" id="body-content" style="padding-right: 0; padding-left: 0;">
+            <#if breadcrumbs??>
+                <div id="bcrumbs">
+                    <#list breadcrumbs.crumbs as crumb>
+                        <div class="crumb">
+                            <#if crumb.icon??>
+                                <div class="crumb-text me-1">
+                                    <i class="material-icons crumb-icon">${crumb.icon}</i>
+                                </div>
+                            </#if>
+                            <#if crumb.url??>
+                                <a class="crumb-text" href="${crumb.url}"><#if crumb?is_last>
+                                        <b>${crumb.name}</b><#else>${crumb.name}</#if></a>
+                            <#else >
+                                <p class="crumb-text"><#if crumb?is_last><b>${crumb.name}</b><#else>${crumb.name}</#if>
+                                </p>
+                            </#if>
+                            <#if crumb?is_last == false>
+                                <p class="crumb-text mx-2">/</p>
+                            </#if>
+                        </div>
+                    </#list>
+                </div>
+
+            </#if>
             <#nested>
         </div>
     </main>

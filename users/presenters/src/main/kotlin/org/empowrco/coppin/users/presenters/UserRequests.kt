@@ -20,6 +20,9 @@ data class GetUserRequest(
     val currentUserId: String,
 )
 
+data class GetUsersRequest(
+    val isAdmin: Boolean,
+)
 
 data class UpdateUserRequest(
     val id: String,

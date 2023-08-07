@@ -175,6 +175,7 @@ internal class RealCoursesPortalPresenter(
 
     override suspend fun getSubject(request: GetSubjectRequest): Result<GetSubjectResponse> {
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
+        val course = repo.getCourse(courseId) ?: return failure("Course not found")
         val subjectId = request.id?.toUuid() ?: return failure("Invalid subject id")
         val subject = repo.getSubject(subjectId) ?: return failure("Subject not found")
         val assignmentCount = repo.getAssignmentCountBySubject(subjectId)
@@ -182,7 +183,8 @@ internal class RealCoursesPortalPresenter(
             courseId = courseId.toString(),
             id = subjectId.toString(),
             name = subject.name,
-            canBeDeleted = assignmentCount == 0L
+            canBeDeleted = assignmentCount == 0L,
+            courseName = course.title,
         ).toResult()
     }
 

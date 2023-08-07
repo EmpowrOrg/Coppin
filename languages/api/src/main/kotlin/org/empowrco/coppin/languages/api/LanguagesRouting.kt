@@ -12,6 +12,7 @@ import io.ktor.server.routing.routing
 import org.empowrco.coppin.languages.presenters.GetLanguageRequest
 import org.empowrco.coppin.languages.presenters.LanguagesPresenter
 import org.empowrco.coppin.languages.presenters.UpsertLanguageRequest
+import org.empowrco.coppin.utils.routing.Breadcrumbs
 import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
@@ -33,7 +34,14 @@ fun Application.languagesRouting() {
                     get {
                         val uuid = call.parameters["uuid"]
                         presenter.getLanguage(GetLanguageRequest(uuid)).fold({
-                            call.respondFreemarker("language.ftl", it)
+                            call.respondFreemarker(
+                                "language.ftl", it, Breadcrumbs(
+                                    crumbs = listOf(
+                                        Breadcrumbs.Crumb("language", "Languages", "/languages"),
+                                        Breadcrumbs.Crumb(null, it.name ?: "Language", null),
+                                    )
+                                )
+                            )
                         }, {
                             call.errorRedirect(it)
                         })

@@ -19,10 +19,12 @@ import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.CreateAccessKey
 import org.empowrco.coppin.users.presenters.DeleteAccessKey
 import org.empowrco.coppin.users.presenters.GetUserRequest
+import org.empowrco.coppin.users.presenters.GetUsersRequest
 import org.empowrco.coppin.users.presenters.LoginRequest
 import org.empowrco.coppin.users.presenters.RegisterRequest
 import org.empowrco.coppin.users.presenters.UpdateUserRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
+import org.empowrco.coppin.utils.routing.Breadcrumbs
 import org.empowrco.coppin.utils.routing.UserSession
 import org.empowrco.coppin.utils.routing.error
 import org.empowrco.coppin.utils.routing.errorRedirect
@@ -35,7 +37,8 @@ fun Application.usersRouting() {
         authenticate("auth-session") {
             route("users") {
                 get {
-                    presenter.getUsers().fold({
+                    val isAdmin = call.sessions.get<UserSession>()?.isAdmin ?: false
+                    presenter.getUsers(GetUsersRequest(isAdmin)).fold({
                         call.respondFreemarker("users.ftl", it)
                     }, {
                         call.errorRedirect(it.localizedMessage, "/")
@@ -58,7 +61,22 @@ fun Application.usersRouting() {
                         currentUserId = currentUserId
                     )
                     presenter.getUser(request).fold({
-                        call.respondFreemarker("user.ftl", it)
+                        call.respondFreemarker("user.ftl", it, Breadcrumbs(
+                            crumbs = buildList {
+                                if (it.isAdmin) {
+                                    add(Breadcrumbs.Crumb("manage_accounts", "Users", "/users"))
+                                }
+                                add(
+                                    Breadcrumbs.Crumb(
+                                        if (it.isAdmin) {
+                                            null
+                                        } else {
+                                            "account_circle"
+                                        }, it.firstName, null
+                                    )
+                                )
+                            }
+                        ))
                     }, {
                         call.errorRedirect(it.localizedMessage)
                     })

@@ -27844,9 +27844,41 @@ pre[class*="language-"] {
     display:none;
 }
 
+
+#bcrumbs {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2rem;
+    margin-top: 1rem;
+}
+
+.crumb {
+    display: inline-flex;
+}
+
+.crumb-icon {
+    line-height: normal;
+    font-size: 14px;
+}
+
+.crumb-text {
+    color: #3D3D3D;
+    font-size: 14px;
+    font-style: normal;
+    line-height: 140%;
+    margin: 0;
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 @media (min-width:250px) and (max-width:1198px){
     .to-header{
         display:inline-block!important;
+    }
+
+    #bcrumbs {
+        margin-top: 0;
     }
 }
 
