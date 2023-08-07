@@ -146,13 +146,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val studentSubmissions = repo.getLatestStudentSubmissionForAssignment(assignmentId)
         return GetAssignmentPortalResponse(
             title = assignment.title,
-            successMessage = StringEscapeUtils.escapeJava(assignment.successMessage),
+            successMessage = assignment.successMessage,
             referenceId = assignment.referenceId,
             courseId = assignment.courseId.toString(),
-            failureMessage = StringEscapeUtils.escapeJava(assignment.failureMessage),
+            failureMessage = assignment.failureMessage,
             attempts = assignment.totalAttempts,
             id = assignment.id.toString(),
-            instructions = StringEscapeUtils.escapeJava(assignment.instructions),
+            instructions = assignment.instructions,
             codes = codes,
             subjectId = assignment.subject.id.toString(),
             subjects = subjects.map {

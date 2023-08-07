@@ -1,6 +1,7 @@
 <#-- @ftlvariable name="content" type="org.empowrco.coppin.assignment.presenters.GetAssignmentPortalResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
+
     <style>
         #assignment-container {
             border-radius: 1rem;
@@ -20,7 +21,6 @@
             align-items: flex-start;
             width: 100%;
             gap: 1rem;
-            min-height: 600px;
         }
 
         #success-row {
@@ -59,111 +59,30 @@
             max-height: 600px;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
-            integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
-          integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/markdown/markdown.js"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"
-            integrity="sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        const showdownOptions = {
-            tables: true,
-            emoji: true,
-            tasklists: true,
-            strikethrough: true,
-            parseImgDimensions: true,
-            openLinksInNewWindow: true
-        }
-        const converter = new showdown.Converter(showdownOptions);
-
-        function setPreview(id, markdown) {
-            let html = converter.makeHtml(markdown);
-            const regex = /<table>/g;
-            html = html.replace(regex, '<table class="table table-striped table-sm">');
-            document.getElementById(id).innerHTML = `<div class="class table-responsive" style="width: auto; max-height: 600px">` + html + `</div>`
-
-        }
-
         $(document).ready(function () {
-
-
-            const codeMirrorConfig = {
-                lineNumbers: true,
-                mode: "text/x-markdown",
-                lineWrapping: true,
-                indentWithTabs: true,
-                lineWiseCopyCut: true,
-                autoCloseBrackets: true,
-            }
-            const instructionsTextArea = document.getElementById("instructions-editor");
-            const instructionsConfig = codeMirrorConfig
-            <#if content.instructions??>
-            instructionsConfig.value = "${content.instructions}"
-            setPreview("markdown-preview", "${content.instructions}")
-            </#if>
-            const instructionsCodeMirror = CodeMirror(function (elt) {
-                instructionsTextArea.parentNode.replaceChild(elt, instructionsTextArea);
-            }, instructionsConfig);
-
-            instructionsCodeMirror.on('change', editor => {
-                setPreview("markdown-preview", editor.getValue())
-            })
-            instructionsCodeMirror.setSize('100%');
-
-            const successTextArea = document.getElementById("success-editor");
-            const successConfig = codeMirrorConfig
-            <#if content.successMessage??>
-            successConfig.value = "${content.successMessage}"
-            setPreview("success-preview", "${content.successMessage}")
-            </#if>
-            const successCodeMirror = CodeMirror(function (elt) {
-                successTextArea.parentNode.replaceChild(elt, successTextArea);
-            }, successConfig);
-            successCodeMirror.on('change', editor => {
-                setPreview("success-preview", editor.getValue())
-            })
-            successCodeMirror.setSize('100%');
-
-            const failureTextArea = document.getElementById("failure-editor");
-            const failureConfig = codeMirrorConfig
-            <#if content.failureMessage??>
-            failureConfig.value = "${content.failureMessage}"
-            setPreview("failure-preview", "${content.failureMessage}")
-            </#if>
-            const failureCodeMirror = CodeMirror(function (elt) {
-                failureTextArea.parentNode.replaceChild(elt, failureTextArea);
-            }, failureConfig);
-            failureCodeMirror.on('change', editor => {
-                setPreview("failure-preview", editor.getValue())
-            })
-            failureCodeMirror.setSize('100%');
-
-            $("#edit-assignment").submit(function (eventObj) {
-                eventObj.preventDefault()
-                $("<input />")
-                    .attr("name", "instructions")
-                    .attr("type", "hidden")
-                    .val(instructionsCodeMirror.getValue())
-                    .appendTo(this);
-                $("<input />")
-                    .attr("name", "success-message")
-                    .attr("type", "hidden")
-                    .val(successCodeMirror.getValue())
-                    .appendTo(this);
-                $("<input />")
-                    .attr("name", "failure-message")
-                    .attr("type", "hidden")
-                    .val(failureCodeMirror.getValue())
-                    .appendTo(this);
-                this.submit()
+            const instructionsText = $("#instructions-editor")
+            instructionsText.markdownEditor({
+                defaultMode: 'split',
+                toolbarFooterL: [
+                    ['hint'],
+                ]
             });
+            const successText = $("#success-editor")
+            successText.markdownEditor({
+                defaultMode: 'split',
+                toolbarFooterL: [
+                    [],
+                ]
+            });
+            const failureText = $("#failure-editor")
+            failureText.markdownEditor({
+                defaultMode: 'split',
+                toolbarFooterL: [
+                    [],
+                ]
+            });
+
 
             function hideSection(sectionName) {
                 const divsToHide = document.getElementsByClassName(sectionName); //divsToHide is an array
@@ -398,39 +317,35 @@
                 <h6 class="mt-4 instructions required-field">Instructions</h6>
                 <div id="markdown-row" class="instructions">
 
-                    <div class="col-6 mb-3" style="height: 100%">
+                    <div class="mb-3" style="height: 100%; width: 100%;">
                         <textarea id="instructions-editor"
                                   name="instructions"
-                                  rows="5">
-                        </textarea>
+                                  form="edit-assignment"
+                                  rows="15"><#if content.instructions??>${content.instructions}</#if></textarea>
 
                     </div>
-                    <div class="col-6 " id="markdown-preview"></div>
                 </div>
                 <h6 class="mt-4 instructions required-field">Success Message</h6>
                 <div id="success-row" class="instructions">
 
-                    <div class="col-6 mb-3" style="height: 100%">
+                    <div class="mb-3" style="height: 100%; width: 100%;">
                         <textarea id="success-editor"
                                   name="success"
-                                  rows="5">
-                        </textarea>
+                                  form="edit-assignment"
+                                  rows="10"><#if content.successMessage??>${content.successMessage}</#if></textarea>
 
                     </div>
-                    <div class="col-6 " id="success-preview"></div>
                 </div>
 
                 <h6 class="mt-4 instructions required-field">Failure Message</h6>
                 <div id="failure-row" class="instructions">
-
-                    <div class="col-6 mb-3" style="height: 100%">
+                    <div class="mb-3" style="height: 100%; width: 100%;">
                         <textarea id="failure-editor"
                                   name="failure"
-                                  rows="5">
-                        </textarea>
+                                  form="edit-assignment"
+                                  rows="10"><#if content.failureMessage??>${content.failureMessage}</#if></textarea>
 
                     </div>
-                    <div class="col-6 " id="failure-preview"></div>
                 </div>
                 <div class="codes">
                     <div class="table-responsive coppin-table">
