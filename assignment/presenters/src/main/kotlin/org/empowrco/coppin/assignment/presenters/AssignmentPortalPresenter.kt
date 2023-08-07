@@ -202,6 +202,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 language = selectableLanguages.first(),
                 primary = existingLanguageIds.isEmpty(), //Should be primary if there are now existing languages
                 languages = selectableLanguages,
+                solutionVisibility = AssignmentCode.SolutionVisibility.onFinish.name,
             ).toResult()
         }
         val assignmentCodeId = request.id.toUuid() ?: return failure("Invalid id")
@@ -232,6 +233,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             ),
             injectable = code.injectable,
             languages = selectableLanguages,
+            solutionVisibility = code.solutionVisibility.name,
         ).toResult()
     }
 
@@ -249,6 +251,11 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
         val codeIdString = request.id?.nonEmpty()
+        val solutionVisibility = try {
+            AssignmentCode.SolutionVisibility.valueOf(request.solutionVisibility)
+        } catch (ex: Exception) {
+            return failure(ex.localizedMessage)
+        }
         if (codeIdString == null) {
             val codes = repo.getAssignmentCodes(assignmentId)
             if (codes.isEmpty()) {
@@ -263,6 +270,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 solutionCode = request.solutionCode,
                 unitTest = request.unitTest ?: "",
                 injectable = injectable,
+                solutionVisibility = solutionVisibility,
                 createdAt = currentTime,
                 lastModifiedAt = currentTime,
             )
@@ -279,6 +287,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 language = language,
                 primary = primary,
                 injectable = injectable,
+                solutionVisibility = solutionVisibility,
                 unitTest = request.unitTest ?: "",
                 lastModifiedAt = currentTime,
             )

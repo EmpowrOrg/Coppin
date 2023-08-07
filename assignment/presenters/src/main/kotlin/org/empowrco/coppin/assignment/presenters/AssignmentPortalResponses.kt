@@ -51,6 +51,7 @@ data class GetCodeResponse(
     val id: String?,
     val starterCode: String?,
     val solutionCode: String?,
+    val solutionVisibility: String,
     val assignmentId: String,
     val courseId: String,
     val unitTest: String?,

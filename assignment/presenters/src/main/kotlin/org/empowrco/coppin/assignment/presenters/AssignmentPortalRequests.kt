@@ -44,6 +44,7 @@ data class UpdateCodePortalRequest(
     val injectable: String,
     val assignmentId: String,
     val unitTest: String?,
+    val solutionVisibility: String,
 )
 
 data class DeleteCodeRequest(val id: String)

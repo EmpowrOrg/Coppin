@@ -11,6 +11,7 @@ data class AssignmentCode(
     val id: UUID,
     val starterCode: String,
     val solutionCode: String,
+    val solutionVisibility: SolutionVisibility,
     val unitTest: String,
     val language: Language,
     @Serializable(with = UUIDSerializer::class)
@@ -19,4 +20,8 @@ data class AssignmentCode(
     val injectable: Boolean,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
-)
+) {
+    enum class SolutionVisibility {
+        always, onFinish, never
+    }
+}

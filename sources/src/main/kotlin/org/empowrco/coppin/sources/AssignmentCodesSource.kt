@@ -187,6 +187,7 @@ private fun ResultRow.toStarterCode(language: Language): AssignmentCode {
         primary = this[AssignmentCodes.primary],
         unitTest = this[AssignmentCodes.unitTest],
         injectable = this[AssignmentCodes.injectable],
+        solutionVisibility = this[AssignmentCodes.solutionVisibility],
         createdAt = this[AssignmentCodes.createdAt],
         lastModifiedAt = this[AssignmentCodes.lastModifiedAt],
     )
@@ -198,6 +199,7 @@ private fun UpdateBuilder<*>.build(assignmentCode: AssignmentCode) {
     this[AssignmentCodes.starterCode] = assignmentCode.starterCode
     this[AssignmentCodes.solutionCode] = assignmentCode.solutionCode
     this[AssignmentCodes.unitTest] = assignmentCode.unitTest
+    this[AssignmentCodes.solutionVisibility] = assignmentCode.solutionVisibility
     this[AssignmentCodes.language] = assignmentCode.language.id
     this[AssignmentCodes.injectable] = assignmentCode.injectable
     this[AssignmentCodes.createdAt] = assignmentCode.createdAt
