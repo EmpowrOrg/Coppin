@@ -242,6 +242,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         val injectable = request.injectable == "on"
         if (injectable && (request.starterCode.isNullOrBlank() || !request.starterCode.contains("{{code}}"))) {
             return failure("Injectable assignments must contain {{code}} placeholder")
+        } else if (request.solutionCode.isBlank()) {
+            return failure("You must specify a solution")
         }
         // new assignment code
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
@@ -258,7 +260,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 primary = primary,
                 assignmentId = UUID.fromString(request.assignmentId),
                 starterCode = request.starterCode ?: "",
-                solutionCode = request.solutionCode ?: "",
+                solutionCode = request.solutionCode,
                 unitTest = request.unitTest ?: "",
                 injectable = injectable,
                 createdAt = currentTime,
