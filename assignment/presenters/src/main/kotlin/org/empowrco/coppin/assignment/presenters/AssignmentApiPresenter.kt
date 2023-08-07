@@ -76,16 +76,23 @@ internal class RealAssignmentApiPresenter(
         } else {
             attempt >= assignment.totalAttempts
         }
-
-        if (assignment.totalAttempts > 0 && attempt > assignment.totalAttempts) {
+        val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
+        val assignmentCode = getAssignmentCode(assignment, language.name)
+        val solutionCode = if (assignmentCode.solutionVisibility == AssignmentCode.SolutionVisibility.onFinish) {
+            assignmentCode.solutionCode
+        } else {
+            null
+        }
+        if (assignment.totalAttempts in 1 until attempt) {
             return SubmitResponse(
                 output = "You have run out of attempts. \n ${assignment.failureMessage}",
                 success = false,
                 finalAttempt = true,
+                solutionCode = solutionCode,
+                gradePoints = assignment.points,
             )
         }
-        val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
-        val assignmentCode = getAssignmentCode(assignment, language.name)
+
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
@@ -115,18 +122,24 @@ internal class RealAssignmentApiPresenter(
                 output = matches.first().value,
                 success = false,
                 finalAttempt = isFinalAttempt,
+                solutionCode = solutionCode,
+                gradePoints = assignment.points,
             )
         } else if (codeResponse.success == false) {
             SubmitResponse(
                 output = codeResponse.output,
                 success = false,
                 finalAttempt = isFinalAttempt,
+                solutionCode = solutionCode,
+                gradePoints = assignment.points,
             )
         } else {
             SubmitResponse(
                 output = assignment.successMessage,
                 success = true,
                 finalAttempt = isFinalAttempt,
+                solutionCode = solutionCode,
+                gradePoints = assignment.points,
             )
         }
     }
@@ -145,7 +158,7 @@ internal class RealAssignmentApiPresenter(
                 mime = assignmentCode.language.mime,
                 starterCode = starterCode,
                 primary = assignmentCode.primary,
-                solutionCode = assignmentCode.solutionCode,
+                solutionCode = getSolutionCode(assignmentCode),
                 url = assignmentCode.language.url,
                 userCode = submissions.firstOrNull { it.languageId == assignmentCode.language.id }?.code
             )
@@ -172,7 +185,16 @@ internal class RealAssignmentApiPresenter(
             instructions = assignment.instructions,
             title = assignment.title,
             assignmentCodes = assignmentCodes,
+            points = assignment.points
         )
+    }
+
+    private fun getSolutionCode(assignmentCode: AssignmentCode): String {
+        return if (assignmentCode.solutionVisibility == AssignmentCode.SolutionVisibility.always) {
+            return assignmentCode.solutionCode
+        } else {
+            ""
+        }
     }
 
     override suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse {
