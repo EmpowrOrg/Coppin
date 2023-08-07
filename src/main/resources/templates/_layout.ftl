@@ -22,11 +22,67 @@
         <!-- Material Icons -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
         <!-- CSS Files -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+              crossorigin="anonymous">
+        <!-- Font Awesome 5.x Icon library (check themes to change this) -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
+        <!-- Krajee Markdown Editor Main Library Default Style -->
+        <link href="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/css/markdown-editor.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <!-- Highlight JS style provided with plugin for code styling -->
+        <link href="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/highlight/highlight.min.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <!-- jQuery JS Library -->
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <!-- Include DOM purify plugin if you need to purify HTML output (needed only if markdown-it HTML input
+           is allowed). This must be loaded before markdown-editor.js. -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/purify/purify.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Main Library -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Definition List Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-deflist.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Footnote Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-footnote.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Abbreviation Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-abbr.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Subscript Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-sub.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Superscript Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-sup.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Underline/Inserted Text Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-ins.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Mark Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-mark.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT SmartArrows Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-smartarrows.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Checkbox Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-checkbox.min.js"
+                type="text/javascript"></script>
+        <!-- Markdown IT Emoji Plugin -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/markdown-it/markdown-it-emoji.min.js"
+                type="text/javascript"></script>
+        <!-- Highlight JS Main Plugin Library for code styling -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/plugins/highlight/highlight.min.js"
+                type="text/javascript"></script>
+        <!-- Bootstrap Complete Bundle Library (including Popper) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+                type="text/javascript"></script>
+        <!-- Krajee Markdown Editor Main Library -->
+        <script src="https://cdn.jsdelivr.net/gh/kartik-v/krajee-markdown-editor@1.0.0/js/markdown-editor.js"
+                type="text/javascript"></script>
         <link id="pagestyle" href="/css/material-dashboard.css?v=3.0.4" rel="stylesheet"/>
         <link href="/css/pds.min.css" rel="stylesheet"/>
         <link id="pagestyle" href="/css/coppin.css" rel="stylesheet"/>
-        <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-                integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
     </head>
 
     <body class="g-sidenav-show  bg-gray-200 p-0">
@@ -49,8 +105,6 @@
     </body>
     <!--   Core JS Files   -->
 
-    <script src="/js/core/popper.min.js"></script>
-    <script src="/js/core/bootstrap.min.js"></script>
     <script src="/js/plugins/bs_dialog.js"></script>
     <script src="/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="/js/plugins/smooth-scrollbar.min.js"></script>

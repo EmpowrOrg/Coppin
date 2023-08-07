@@ -53,12 +53,12 @@ $colors: (
 ) !default;
 // scss-docs-end colors-map
 
-$primary:       #e91e63 !default;
+$primary: #3e506f !default;
 $secondary:     #7b809a !default;
 $info:          #1A73E8 !default;
 $success:       #4CAF50 !default;
 $warning:       #fb8c00 !default;
-$danger:        #F44335 !default;
+$danger: #b00020 !default;
 $light:         $gray-200 !default;
 $dark:          $h-color !default;
 
@@ -78,8 +78,8 @@ $theme-colors: (
 
 
 // Gradient colors
-$primary-gradient:            #EC407A !default;
-$primary-gradient-state:      #D81B60 !default;
+$primary-gradient: #323a54 !default;
+$primary-gradient-state: #1a2035 !default;
 
 $secondary-gradient:          #747b8a !default;
 $secondary-gradient-state:    #495361 !default;
@@ -426,14 +426,14 @@ $box-shadow-inset:            inset 0 1px 2px rgba($black, .075) !default;
 
 // colored Shadows
 
-$box-shadow-primary:          0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(233, 30, 99, .4) !default;
+$box-shadow-primary: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(52, 71, 103, .4) !default;
 $box-shadow-secondary:        0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(210, 210, 210, .4) !default;
 $box-shadow-info:             0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4) !default;
 $box-shadow-warning:          0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(255, 152, 0, .4) !default;
 $box-shadow-success:          0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(76, 175, 80, .4) !default;
 $box-shadow-danger:           0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(244, 67, 54, .4) !default;
 $box-shadow-dark:             0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(64, 64, 64, .4) !default;
-$box-shadow-light:            0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(233, 30, 99, .4) !default;
+$box-shadow-light: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(52, 71, 103, .4) !default;
 
 $component-active-color:      $white !default;
 $component-active-bg:         $primary !default;
@@ -1085,7 +1085,7 @@ $form-feedback-margin-top:          $form-text-margin-top !default;
 $form-feedback-font-size:           $form-text-font-size !default;
 $form-feedback-font-style:          $form-text-font-style !default;
 $form-feedback-valid-color:         #66d432 !default;
-$form-feedback-invalid-color:       #fd5c70 !default;
+$form-feedback-invalid-color: #b00020 !default;
 
 $form-feedback-icon-valid-color:    $form-feedback-valid-color !default;
 $form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>") !default;
@@ -1262,7 +1262,7 @@ $pagination-padding-x-sm:           .5rem !default;
 $pagination-padding-y-lg:           .75rem !default;
 $pagination-padding-x-lg:           1.5rem !default;
 
-$pagination-color:                  $link-color !default;
+$pagination-color: #3e506f !default;
 $pagination-bg:                     $white !default;
 $pagination-border-width:           $border-width !default;
 $pagination-border-radius:          $border-radius-md !default;
@@ -1279,7 +1279,7 @@ $pagination-hover-bg:               $gray-200 !default;
 $pagination-hover-border-color:     $gray-300 !default;
 
 $pagination-active-color:           $component-active-color !default;
-$pagination-active-bg:              $component-active-bg !default;
+$pagination-active-bg: #3e506f !default;
 $pagination-active-border-color:    $pagination-active-bg !default;
 
 $pagination-disabled-color:         $gray-600 !default;
