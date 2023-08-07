@@ -247,14 +247,15 @@
                     <div id="instructions-details-container">
                         <div class="row">
                             <div class="col mb-3">
-                                <label for="title" class="form-label"><h6>Title</h6></label>
+                                <label for="title" class="form-label required-field"><h6>Title</h6></label>
                                 <input name="title" id="title" <#if content.title??>value="${content.title}" </#if>
                                        type="text" class="form-control">
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-auto row align-items-center mt-2">
                                     <div class="col-auto">
-                                        <label for="total-attempts" class="col-form-label"><h6>Total Attempts</h6>
+                                        <label for="total-attempts" class="col-form-label required-field"><h6>Total
+                                                Attempts</h6>
                                         </label>
                                     </div>
                                     <div class="col-auto">
@@ -270,7 +271,8 @@
 
                                 <div class="col-auto row align-items-center mt-2">
                                     <div class="col-auto align-middle">
-                                        <label for="subject" class="col-form-label"><h6>Subject</h6></label>
+                                        <label for="subject" class="col-form-label required-field"><h6>Subject</h6>
+                                        </label>
                                     </div>
                                     <div class="col-auto align-middle">
                                         <select name="subject" id="subject" class="form-select">
@@ -312,7 +314,7 @@
                         </div>
                     </div>
                 </div>
-                <h6 class="mt-4 instructions">Instructions</h6>
+                <h6 class="mt-4 instructions required-field">Instructions</h6>
                 <div id="markdown-row" class="instructions">
 
                     <div class="mb-3" style="height: 100%; width: 100%;">
@@ -323,7 +325,7 @@
 
                     </div>
                 </div>
-                <h6 class="mt-4 instructions">Success Message</h6>
+                <h6 class="mt-4 instructions required-field">Success Message</h6>
                 <div id="success-row" class="instructions">
 
                     <div class="mb-3" style="height: 100%; width: 100%;">
@@ -335,7 +337,7 @@
                     </div>
                 </div>
 
-                <h6 class="mt-4 instructions">Failure Message</h6>
+                <h6 class="mt-4 instructions required-field">Failure Message</h6>
                 <div id="failure-row" class="instructions">
                     <div class="mb-3" style="height: 100%; width: 100%;">
                         <textarea id="failure-editor"

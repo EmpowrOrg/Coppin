@@ -126,7 +126,7 @@ fun Application.assignmentRouting() {
                                 val languageId = formParameters["language"].toString()
                                 val primary = formParameters["primary"].toString()
                                 val starterCode = formParameters["starter-code"]
-                                val solutionCode = formParameters["solution-code"]
+                                val solutionCode = formParameters["solution-code"].toString()
                                 val unitTest = formParameters["unit-test-code"]
                                 val injectable = formParameters["injectable"].toString()
                                 presenter.updateCode(

@@ -32,12 +32,12 @@
     --bs-success: #4CAF50;
     --bs-info: #1A73E8;
     --bs-warning: #fb8c00;
-    --bs-danger: #F44335;
+    --bs-danger: #b00020;
     --bs-light: #f0f2f5;
     --bs-dark: #344767;
     --bs-white: #fff;
     --bs-primary-rgb: 233, 30, 99;
-    --bs-secondary-rgb:, 128, 154;
+    --bs-secondary-rgb: 123, 128, 154;
     --bs-success-rgb: 76, 175, 80;
     --bs-info-rgb: 26, 115, 232;
     --bs-warning-rgb: 251, 140, 0;
@@ -27853,7 +27853,14 @@ pre[class*="language-"] {
     transition:0.5s ease;
 }
 
+
 .page-item.active .page-link {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
+}
+
+.required-field::after {
+    content: "*";
+    color: var(--bs-danger);
+    margin-left: 0.25rem;
 }
