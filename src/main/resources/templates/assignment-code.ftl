@@ -127,13 +127,13 @@
                           class="form-control"
                           rows="5"></textarea>
                 </div>
-                <h6 class="mt-3 ms-0 ps-0">Solution Code</h6>
+                <h6 class="mt-3 ms-0 ps-0 required-field">Solution Code</h6>
                 <div id="solution-code" class="ms-0 ps-0">
                 <textarea id="solution-code-editor"
                           class="form-control"
                           rows="5"></textarea>
                 </div>
-                <h6 class="mt-3 ms-0 ps-0">Unit Test Class</h6>
+                <h6 class="mt-3 ms-0 ps-0 required-field">Unit Test Class</h6>
                 <div id="unit-tests" class="ms-0 ps-0">
                 <textarea id="unit-tests-editor"
                           class="form-control"

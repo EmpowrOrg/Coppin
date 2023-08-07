@@ -32,16 +32,16 @@
                     </div>
                 </div>
                 <#include "error.ftl">
-                <label for="name" class="form-label"><h6>Name</h6></label>
+                <label for="name" class="form-label required-field"><h6>Name</h6></label>
                 <input name="name" id="name" type="text" class="form-control"
                        <#if content.name??>value="${content.name}" </#if>>
-                <label for="url" class="form-label mt-4"><h6>CodeMirror Url</h6></label>
+                <label for="url" class="form-label mt-4 required-field"><h6>CodeMirror Url</h6></label>
                 <input name="url" id="url" type="url" class="form-control"
                        <#if content.url??>value="${content.url}" </#if>>
-                <label for="mime" class="form-label mt-4"><h6>Mime</h6></label>
+                <label for="mime" class="form-label mt-4 required-field"><h6>Mime</h6></label>
                 <input name="mime" id="mime" type="text" class="form-control"
                        <#if content.mime??>value="${content.mime}" </#if>>
-                <label for="regex" class="form-label mt-4"><h6>Unit Test Regex</h6></label>
+                <label for="regex" class="form-label mt-4 required-field"><h6>Unit Test Regex</h6></label>
                 <input name="regex" id="regex" type="text" class="form-control"
                        <#if content.unitTestRegex??>value="${content.unitTestRegex}" </#if>>
             </div>
