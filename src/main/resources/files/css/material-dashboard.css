@@ -3073,11 +3073,11 @@ textarea.form-control-lg {
 }
 
 .form-check-input:checked[type="checkbox"] {
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%);
+    background-image: linear-gradient(195deg, #344767 0%, #344767 100%);
 }
 
 .form-check-input:checked[type="radio"] {
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%);
+    background-image: linear-gradient(195deg, #344767 0%, #344767 100%);
 }
 
 .form-check-input[type="checkbox"]:indeterminate {
@@ -3139,6 +3139,7 @@ textarea.form-control-lg {
 .form-check-inline {
     display: inline-block;
     margin-right: 1rem;
+    margin-bottom: 0;
 }
 
 .btn-check {
@@ -20320,7 +20321,7 @@ div.dataTables_wrapper div.dataTables_info {
 
 */
 .alert-primary {
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%);
+    background-image: linear-gradient(195deg, #344767 0%, #24324a 100%);
 }
 
 .alert-secondary {
@@ -21240,7 +21241,7 @@ div.dataTables_wrapper div.dataTables_info {
 }
 
 .card.card-background.card-background-mask-primary:after {
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%);
+    background-image: linear-gradient(195deg, #344767 0%, #344767 100%);
     opacity: .85;
 }
 
@@ -21399,7 +21400,7 @@ div.dataTables_wrapper div.dataTables_info {
     top: 0;
     content: "";
     border-radius: 0.5rem;
-    background-image: linear-gradient(195deg, #EC407A, #D81B60);
+    background-image: linear-gradient(195deg, #344767, #24324a);
     opacity: .85;
 }
 
@@ -22515,7 +22516,7 @@ body.dark-version {
     width: 0.8375rem;
     height: 0.8375rem;
     border-radius: 50%;
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%), var(--bs-gradient);
+    background-image: linear-gradient(195deg, #344767 0%, #24324a 100%), var(--bs-gradient);
     opacity: 0;
     left: 0;
     right: 0;
@@ -22936,11 +22937,11 @@ label,
 }
 
 svg.text-primary .color-foreground {
-    fill: #EC407A;
+    fill: #344767;
 }
 
 svg.text-primary .color-background {
-    fill: #D81B60;
+    fill: #24324a;
 }
 
 svg.text-secondary .color-foreground {
@@ -23062,7 +23063,7 @@ html {
 }
 
 *.gradient-animation {
-    background: linear-gradient(-45deg, #49a3f1, #F44335, #fb8c00, #EC407A, #344767);
+    background: linear-gradient(-45deg, #49a3f1, #F44335, #fb8c00, #344767, #344767);
     background-size: 400% 400% !important;
     animation: gradient 10s ease infinite;
 }
@@ -24893,7 +24894,7 @@ body:not(.dark-version) .sidenav.bg-transparent .collapse .nav-item .nav-link.ac
 .pagination.pagination-primary .page-item.active > .page-link,
 .pagination.pagination-primary .page-item.active > .page-link:focus,
 .pagination.pagination-primary .page-item.active > .page-link:hover {
-    background-image: linear-gradient(195deg, #EC407A 0%, #D81B60 100%);
+    background-image: linear-gradient(195deg, #344767 0%, #24324a 100%);
     border: none;
 }
 
@@ -26120,7 +26121,7 @@ p {
 }
 
 .text-gradient.text-primary {
-    background-image: linear-gradient(195deg, #EC407A, #D81B60);
+    background-image: linear-gradient(195deg, #344767, #24324a);
 }
 
 .text-gradient.text-info {
@@ -27858,6 +27859,11 @@ pre[class*="language-"] {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
 }
+
+.required-field {
+    display: flex;
+}
+
 
 .required-field::after {
     content: "*";
