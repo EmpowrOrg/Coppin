@@ -8,6 +8,7 @@ data class CreateAssignmentPortalRequest(
     val successMessage: String,
     val failureMessage: String,
     val totalAttempts: String,
+    val points: String,
     val title: String,
     val courseId: String,
     val subjectId: String,
@@ -32,6 +33,7 @@ data class UpdateAssignmentPortalRequest(
     val totalAttempts: Int,
     val title: String,
     val subject: String,
+    val points: Int,
 )
 
 @Serializable

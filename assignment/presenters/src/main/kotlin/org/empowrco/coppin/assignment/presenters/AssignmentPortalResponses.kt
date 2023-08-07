@@ -14,6 +14,7 @@ data class GetAssignmentPortalResponse(
     val codes: List<Code>,
     val subjects: List<Subject>,
     val subjectId: String?,
+    val points: Int?,
     val submissions: List<Submission>,
 ) {
     data class Code(

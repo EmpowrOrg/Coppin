@@ -17,6 +17,7 @@ data class Assignment(
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
     val totalAttempts: Int,
+    val points: Double,
     val title: String,
     val archived: Boolean,
     val blockId: String?,

@@ -251,6 +251,27 @@
                                 <input name="title" id="title" <#if content.title??>value="${content.title}" </#if>
                                        type="text" class="form-control">
                             </div>
+                            <div id="snackbar">Copied Reference Id</div>
+                            <#if content.referenceId??>
+                                <div class="row mt-2">
+                                    <div class="col-auto">
+                                        <label for="reference-id" class="col-form-label"><h6>Reference Id</h6>
+                                        </label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input name="reference-id" type="text" id="reference-id"
+                                               class="form-control"
+                                               value="${content.referenceId}" disabled>
+                                    </div>
+                                    <div class="col-auto" style="padding: 0">
+                                        <button style="padding: 0.5rem 1rem;" type="button" id="copy"
+                                                class="copy btn col-sm text-black-50 mb-0"
+                                                onclick="copyReferenceId()"><i class="material-icons opacity-10">content_copy</i>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </#if>
                             <div class="row align-items-center">
                                 <div class="col-auto row align-items-center mt-2">
                                     <div class="col-auto">
@@ -265,6 +286,22 @@
                                                onfocus="this.previousValue = this.value"
                                                onkeydown="this.previousValue = this.value"
                                                <#if content.attempts??>value="${content.attempts}" </#if>
+                                               oninput="validity.valid || (value = this.previousValue)">
+                                    </div>
+                                </div>
+                                <div class="col-auto row align-items-center mt-2">
+                                    <div class="col-auto">
+                                        <label for="total-attempts" class="col-form-label required-field"><h6>Points
+                                                (For Grading)</h6>
+                                        </label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="points" class="form-control" min="1"
+                                               step="1"
+                                               name="points"
+                                               onfocus="this.previousValue = this.value"
+                                               onkeydown="this.previousValue = this.value"
+                                               <#if content.points??>value="${content.points}" </#if>
                                                oninput="validity.valid || (value = this.previousValue)">
                                     </div>
                                 </div>
@@ -289,27 +326,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div id="snackbar">Copied Reference Id</div>
-                                <#if content.referenceId??>
-                                    <div class="col-auto row align-items-center mt-2">
-                                        <div class="col-auto">
-                                            <label for="reference-id" class="col-form-label"><h6>Reference Id</h6>
-                                            </label>
-                                        </div>
-                                        <div class="col-auto">
-                                            <input name="reference-id" type="text" id="reference-id"
-                                                   class="form-control"
-                                                   value="${content.referenceId}" disabled>
-                                        </div>
-                                        <div class="col-auto" style="padding: 0">
-                                            <button style="padding: 0.5rem 1rem;" type="button" id="copy"
-                                                    class="copy btn col-sm text-black-50 mb-0"
-                                                    onclick="copyReferenceId()"><i class="material-icons opacity-10">content_copy</i>
-                                            </button>
-                                        </div>
 
-                                    </div>
-                                </#if>
                             </div>
                         </div>
                     </div>

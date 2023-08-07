@@ -51,6 +51,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             instructions = request.instructions,
             totalAttempts = request.totalAttempts,
             title = request.title,
+            points = request.points.toDouble(),
             subject = subject,
             lastModifiedAt = currentTime,
         )
@@ -74,6 +75,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("Please include a failure message")
         } else if (request.totalAttempts.toIntOrNull() == null) {
             return failure("Please specify total attempts")
+        } else if (request.points.toDoubleOrNull() == null) {
+            return failure("Please specify points")
         }
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
         val course = repo.getCourse(courseId) ?: return failure("Course not found")
@@ -101,6 +104,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             createdAt = currentTime,
             lastModifiedAt = currentTime,
             subject = subject,
+            points = request.points.toDouble(),
         )
         repo.createAssignment(assignment)
         return CreateAssignmentResponse(id.toString()).toResult()
@@ -127,7 +131,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     )
                 },
                 subjectId = null,
-                submissions = emptyList()
+                submissions = emptyList(),
+                points = null,
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -161,6 +166,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     name = it.name,
                 )
             },
+            points = assignment.points.toInt(),
             submissions = studentSubmissions.map {
                 val language = repo.getLanguage(it.languageId)
                 GetAssignmentPortalResponse.Submission(
@@ -170,7 +176,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     username = it.studentId,
                     language = language?.name ?: "Unknown"
                 )
-            }
+            },
         ).toResult()
     }
 

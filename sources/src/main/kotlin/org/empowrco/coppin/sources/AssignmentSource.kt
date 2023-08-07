@@ -208,6 +208,7 @@ internal fun UpdateBuilder<*>.build(assignment: Assignment, isCreate: Boolean) {
     this[Assignments.lastModifiedAt] = assignment.lastModifiedAt
     this[Assignments.blockId] = assignment.blockId
     this[Assignments.archived] = assignment.archived
+    this[Assignments.points] = assignment.points
     this[Assignments.courseId] = assignment.courseId
     this[Assignments.subject] = assignment.subject.id
 }
@@ -229,6 +230,7 @@ private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>, subjec
         blockId = this[Assignments.blockId],
         courseId = this[Assignments.courseId].value,
         subject = subject,
+        points = this[Assignments.points],
     )
 }
 
