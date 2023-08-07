@@ -79,6 +79,15 @@
             background: #FFF
         }
 
+        #solution-visibility-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        #solution-visibility-radio-group {
+            display: flex;
+        }
         #code-header {
             display: flex;
             padding: 1.5rem 1rem 0 1rem;
@@ -127,7 +136,29 @@
                           class="form-control"
                           rows="5"></textarea>
                 </div>
-                <h6 class="mt-3 ms-0 ps-0 required-field">Solution Code</h6>
+
+                <div id="solution-visibility-container" class="justify-content-between mt-3 ms-0 ps-0">
+                    <h6 class="required-field">Solution Code</h6>
+                    <div id="solution-visibility-radio-group">
+                        <h6>Visibility</h6>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="solution-visibility"
+                                   value="always" <#if content.solutionVisibility == "always"> checked</#if>>
+                            <label class="form-check-label" for="inlineRadio1">Always</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="solution-visibility"
+                                   value="onFinish"<#if content.solutionVisibility == "onFinish"> checked</#if>>
+                            <label class="form-check-label" for="inlineRadio2">On Complete</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="solution-visibility"
+                                   value="never"<#if content.solutionVisibility == "never"> checked</#if>>
+                            <label class="form-check-label" for="inlineCheckbox3">Never</label>
+                        </div>
+                    </div>
+
+                </div>
                 <div id="solution-code" class="ms-0 ps-0">
                 <textarea id="solution-code-editor"
                           class="form-control"
