@@ -200,7 +200,7 @@
             resizeInput.call(input); // immediately call the function
 
             function resizeInput() {
-                this.style.width = this.value.length + "ch";
+                this.style.minWidth = (this.value.length + 1) + "ch";
             }
         });
     </script>
