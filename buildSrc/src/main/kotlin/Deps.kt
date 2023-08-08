@@ -136,4 +136,8 @@ object Deps {
     object Logback {
         val main by lazy { "ch.qos.logback:logback-classic:${Versions.logback}" }
     }
+
+    object OpenAi {
+        val chatGpt by lazy { "com.aallam.openai:openai-client:3.3.2" }
+    }
 }
