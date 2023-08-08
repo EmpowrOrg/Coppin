@@ -17,6 +17,7 @@ data class GetAssignmentPortalResponse(
     val subjectId: String?,
     val points: Int?,
     val submissions: List<Submission>,
+    val showGenerate: Boolean,
 ) {
     data class Code(
         val id: String,

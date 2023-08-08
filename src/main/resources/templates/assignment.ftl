@@ -39,45 +39,31 @@
             min-height: 300px;
         }
 
-        .CodeMirror {
-            height: 100% !important;
-            max-height: 600px;
-        }
-
-        #markdown-preview {
-            height: 100% !important;
-            max-height: 600px;
-        }
-
-        #success-preview {
-            height: 100% !important;
-            max-height: 600px;
-        }
-
-        #failure-preview {
-            height: 100% !important;
-            max-height: 600px;
+        #solution-visibility-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
     </style>
     <script>
         $(document).ready(function () {
             const instructionsText = $("#instructions-editor")
             instructionsText.markdownEditor({
-                defaultMode: 'split',
+                defaultMode: 'editor',
                 toolbarFooterL: [
                     ['hint'],
                 ]
             });
             const successText = $("#success-editor")
             successText.markdownEditor({
-                defaultMode: 'split',
+                defaultMode: 'editor',
                 toolbarFooterL: [
                     [],
                 ]
             });
             const failureText = $("#failure-editor")
             failureText.markdownEditor({
-                defaultMode: 'split',
+                defaultMode: 'editor',
                 toolbarFooterL: [
                     [],
                 ]
@@ -331,7 +317,20 @@
                         </div>
                     </div>
                 </div>
-                <h6 class="mt-4 instructions required-field">Instructions</h6>
+                <#if content.showGenerate>
+                    <div class="mt-4 mb-2 instructions">
+                        <div id="solution-visibility-container" class="justify-content-between align-content-center">
+                            <h6 class="required-field m-0">Instructions</h6>
+                            <button type="button" class="btn btn-primary m-0" onclick="generateAssignment()">Generate
+                                Assignment
+                            </button>
+                        </div>
+                    </div>
+                <#else >
+                    <h6 class="instructions required-field mt-4">Instructions</h6>
+                </#if>
+
+
                 <div id="markdown-row" class="instructions">
 
                     <div class="mb-3" style="height: 100%; width: 100%;">
@@ -500,4 +499,46 @@
             });
         }
     </script>
+    <#if content.showGenerate>
+        <script>
+            async function generateAssignment() {
+                const frm = `<form id="generate-form">
+                         <div> Generate your assignment using AI.
+                         </div>
+                         <div class="input-group input-group-outline mt-3">
+                             <input form="generate-form" data-name="prompt" name="prompt" id="prompt" type="text"
+                                    class="form-control" placeholder="ex: Create an assignment to teach variables in Swift" required></input>
+                         </div>
+</form>`
+                let dlg = new BsDialogs()
+                dlg.form('Generate Instructions', 'Generate', frm)
+                let result = await dlg.onsubmit()
+                if (result === undefined) {
+                    return
+                }
+                const prompt = result.prompt
+                const body = JSON.stringify({
+                    prompt: prompt,
+                    userId: "${content.userId}"
+                })
+                fetch('/courses/${content.courseId}/assignments/generate', {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: body
+                }).then(async response => {
+                    return await parseResponse(response)
+                }).then(async res => {
+                    if (res.error) {
+                        throw new Error(res.error)
+                    } else {
+                        const instructions = $("#instructions-editor")
+                        instructions.val(res.instructions)
+                    }
+                }).catch(async error => {
+                    await showError(error)
+                });
+            }
+        </script>
+    </#if>
+
 </@layout.header>
