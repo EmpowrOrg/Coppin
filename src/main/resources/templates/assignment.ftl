@@ -521,6 +521,17 @@
                     prompt: prompt,
                     userId: "${content.userId}"
                 })
+                let ret = new BsDialogs({
+                    close: false,
+                })
+                ret.custom(
+                    'Generating...', `<div class="d-flex justify-content-center">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Generating...</span>
+  </div>
+</div>`,
+                    []
+                )
                 fetch('/courses/${content.courseId}/assignments/generate', {
                     method: "POST",
                     headers: {'Content-Type': 'application/json'},
@@ -528,6 +539,7 @@
                 }).then(async response => {
                     return await parseResponse(response)
                 }).then(async res => {
+                    ret.close()
                     if (res.error) {
                         throw new Error(res.error)
                     } else {
@@ -535,6 +547,7 @@
                         instructions.val(res.instructions)
                     }
                 }).catch(async error => {
+                    ret.close()
                     await showError(error)
                 });
             }
