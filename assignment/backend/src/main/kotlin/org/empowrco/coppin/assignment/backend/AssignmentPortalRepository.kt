@@ -6,10 +6,12 @@ import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.models.responses.AiResponse
 import org.empowrco.coppin.sources.AssignmentCodesSource
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.sources.OpenAiSource
 import org.empowrco.coppin.sources.SubjectSource
 import org.empowrco.coppin.sources.SubmissionSource
 import java.util.UUID
@@ -35,6 +37,7 @@ interface AssignmentPortalRepository {
     suspend fun getLanguage(id: UUID): Language?
     suspend fun getSubmission(id: UUID): Submission?
     suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long
+    suspend fun generateAssignment(prompt: String, userId: String): AiResponse
 }
 
 internal class RealAssignmentPortalRepository(
@@ -44,6 +47,7 @@ internal class RealAssignmentPortalRepository(
     private val coursesSource: CoursesSource,
     private val subjectSource: SubjectSource,
     private val submissionSource: SubmissionSource,
+    private val openAiSource: OpenAiSource,
 ) : AssignmentPortalRepository {
 
     override suspend fun getSubject(id: UUID): Subject? {
@@ -121,5 +125,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long {
         return assignmentSource.assignmentsWithReferenceStartingWithCount(name)
+    }
+
+    override suspend fun generateAssignment(prompt: String, userId: String): AiResponse {
+        return openAiSource.prompt(prompt, userId)
     }
 }
