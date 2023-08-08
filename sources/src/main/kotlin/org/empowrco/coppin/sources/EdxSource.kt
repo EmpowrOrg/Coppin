@@ -36,6 +36,7 @@ import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
 import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
 import org.empowrco.coppin.models.responses.EdxGradeResponse
+import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.serialization.json
 import java.util.concurrent.TimeUnit
 
@@ -147,15 +148,7 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
                 header(shouldAuthKey, true)
             }
         }
-        return if (response.status == HttpStatusCode.OK) {
-            try {
-                Result.success(response.body<T>())
-            } catch (ex: Exception) {
-                Result.failure(ex)
-            }
-        } else {
-            Result.failure(Exception(response.body<String>()))
-        }
+        return handleResponse(response)
     }
 
     private suspend inline fun <reified T : Any> post(
@@ -170,14 +163,20 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
             }
             setBody(body)
         }
+        return handleResponse<T>(response)
+    }
+
+    private suspend inline fun <reified T : Any> handleResponse(response: HttpResponse): Result<T> {
         return if (response.status == HttpStatusCode.OK) {
             try {
                 Result.success(response.body<T>())
             } catch (ex: Exception) {
+                logDebug(ex.localizedMessage)
                 Result.failure(ex)
             }
         } else {
             val bodyString = response.body<String>()
+            logDebug(bodyString)
             Result.failure(Exception(bodyString))
         }
     }
@@ -215,13 +214,13 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
                         TimeUnit.MINUTES.toMillis(minutesToExpiration)
                     )
                 } catch (ex: Exception) {
-                    println(ex.localizedMessage)
+                    logDebug(ex.localizedMessage)
                 }
             }
 
             else -> {
                 val bodyString = response.body<String>()
-                println(bodyString)
+                logDebug(bodyString)
             }
         }
     }
