@@ -15,6 +15,7 @@ dependencies {
     implementation(Deps.Ktor.Client.json)
     implementation(Deps.Ktor.Client.auth)
     implementation(Deps.Ktor.Client.engine)
+    implementation(Deps.OpenAi.chatGpt)
     implementation(project(Deps.Utils.main))
     implementation(project(Deps.Utils.serialization))
 }
