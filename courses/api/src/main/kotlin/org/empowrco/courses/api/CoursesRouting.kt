@@ -50,7 +50,7 @@ fun Application.coursesRouting() {
                                 "manage-courses.ftl", it,
                                 Breadcrumbs(
                                     crumbs = listOf(
-                                        Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                        Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                         Breadcrumbs.Crumb(null, "Manage Courses", null),
                                     )
                                 ),
@@ -77,7 +77,7 @@ fun Application.coursesRouting() {
                             call.respondFreemarker(
                                 "course.ftl", it, Breadcrumbs(
                                     crumbs = listOf(
-                                        Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                        Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                         Breadcrumbs.Crumb(null, it.name, null),
                                     )
                                 )
@@ -105,7 +105,7 @@ fun Application.coursesRouting() {
                                         it,
                                         Breadcrumbs(
                                             crumbs = listOf(
-                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                                 Breadcrumbs.Crumb(null, it.courseName, "/courses/$courseId"),
                                             )
                                         ),
