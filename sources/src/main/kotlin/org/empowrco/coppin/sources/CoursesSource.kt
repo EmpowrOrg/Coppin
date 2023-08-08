@@ -10,6 +10,8 @@ import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.utils.serialization.json
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.notInList
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -27,6 +29,7 @@ interface CoursesSource {
     suspend fun deleteCourse(course: Course): Boolean
     suspend fun updateCourse(course: Course): Boolean
     suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime)
+    suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID)
 }
 
 internal class RealCoursesSource(cache: Cache) : CoursesSource {
@@ -75,6 +78,10 @@ internal class RealCoursesSource(cache: Cache) : CoursesSource {
     override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) {
         database.linkCourse(courseId, userId, currentTime)
     }
+
+    override suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID) {
+        database.unlinkCoursesNotIn(courseIds, userId)
+    }
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -107,6 +114,10 @@ private class CacheCoursesSource(private val cache: Cache) : CoursesSource {
     }
 
     override suspend fun getLinkedCourses(userId: UUID): List<Course> {
+        throw NotImplementedError("Use Database")
+    }
+
+    override suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID) {
         throw NotImplementedError("Use Database")
     }
 
@@ -160,6 +171,13 @@ private class DatabaseCoursesSource : CoursesSource {
             it[CoursesUsers.user] = userId
             it[CoursesUsers.createdAt] = currentTime
             it[CoursesUsers.lastModifiedAt] = currentTime
+        }
+        Unit
+    }
+
+    override suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID) = dbQuery {
+        CoursesUsers.deleteWhere {
+            (CoursesUsers.course notInList courseIds) and (CoursesUsers.user eq userId)
         }
         Unit
     }
