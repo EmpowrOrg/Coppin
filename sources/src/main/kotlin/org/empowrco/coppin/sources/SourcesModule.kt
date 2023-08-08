@@ -13,6 +13,7 @@ val sourcesModule = module {
     singleOf(::RealCoursesSource) { bind<CoursesSource>() }
     singleOf(::RealEdxSource) { bind<EdxSource>() }
     singleOf(::RealSubjectSource) { bind<SubjectSource>() }
+    singleOf(::RealOpenAiSource) { bind<OpenAiSource>() }
     single {
         if (System.getenv("DEBUG").toBoolean()) {
             DebugCache()
