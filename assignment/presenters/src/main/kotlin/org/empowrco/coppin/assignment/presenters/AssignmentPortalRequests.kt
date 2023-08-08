@@ -17,6 +17,7 @@ data class CreateAssignmentPortalRequest(
 data class GetAssignmentRequest(
     val id: String?,
     val courseId: String,
+    val userId: String,
 )
 
 data class GetCodeRequest(
@@ -59,3 +60,6 @@ data class GetSubmissionRequest(
     val assignmentId: String,
     val studentId: String,
 )
+
+@Serializable
+data class GenerateAssignmentRequest(val prompt: String, val userId: String)

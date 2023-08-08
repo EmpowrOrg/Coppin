@@ -4,6 +4,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
@@ -12,16 +13,21 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.get
+import io.ktor.server.sessions.sessions
 import org.empowrco.coppin.assignment.presenters.ArchiveAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.AssignmentPortalPresenter
 import org.empowrco.coppin.assignment.presenters.CreateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.DeleteCodeRequest
+import org.empowrco.coppin.assignment.presenters.GenerateAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.GetAssignmentRequest
 import org.empowrco.coppin.assignment.presenters.GetCodeRequest
 import org.empowrco.coppin.assignment.presenters.GetSubmissionRequest
 import org.empowrco.coppin.assignment.presenters.UpdateAssignmentPortalRequest
 import org.empowrco.coppin.assignment.presenters.UpdateCodePortalRequest
 import org.empowrco.coppin.utils.routing.Breadcrumbs
+import org.empowrco.coppin.utils.routing.UserSession
+import org.empowrco.coppin.utils.routing.error
 import org.empowrco.coppin.utils.routing.errorRedirect
 import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
@@ -61,12 +67,23 @@ fun Application.assignmentRouting() {
                             })
                         }
                     }
+                    route("generate") {
+                        post {
+                            presenter.generateAssignment(call.receive<GenerateAssignmentRequest>()).fold({
+                                call.respond(it)
+                            }, {
+                                call.error(it)
+                            })
+                        }
+                    }
                     route("{uuid?}") {
                         get {
+                            val userId = call.sessions.get<UserSession>()!!.userId
                             presenter.getAssignment(
                                 GetAssignmentRequest(
                                     id = call.parameters["uuid"],
                                     courseId = call.parameters["courseId"].toString(),
+                                    userId = userId,
                                 )
                             ).fold({
                                 call.respondFreemarker(

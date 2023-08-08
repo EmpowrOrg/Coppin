@@ -26,6 +26,7 @@ interface AssignmentPortalPresenter {
     suspend fun deleteCode(request: DeleteCodeRequest): Result<DeleteCodeResponse>
     suspend fun archiveAssignment(request: ArchiveAssignmentRequest): Result<ArchiveAssignmentResponse>
     suspend fun getSubmission(request: GetSubmissionRequest): Result<GetSubmissionResponse>
+    suspend fun generateAssignment(request: GenerateAssignmentRequest): Result<GenerateAssignmentResponse>
 }
 
 internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalRepository) : AssignmentPortalPresenter {
@@ -135,6 +136,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 submissions = emptyList(),
                 points = null,
                 courseName = course.title,
+                userId = request.userId,
+                showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -180,6 +183,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     language = language?.name ?: "Unknown"
                 )
             },
+            userId = request.userId,
+            showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
         ).toResult()
     }
 
@@ -370,6 +375,21 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             assignmentId = assignment.id.toString(),
             courseName = course.title,
             courseId = course.id.toString(),
+        ).toResult()
+    }
+
+    override suspend fun generateAssignment(request: GenerateAssignmentRequest): Result<GenerateAssignmentResponse> {
+        if (request.prompt.isBlank()) {
+            return failure("You must specify a prompt")
+        } else if (request.userId.isBlank()) {
+            return failure("Please try logging in again.")
+        }
+        val response = repo.generateAssignment(request.prompt, request.userId)
+        if (response.response.isNullOrBlank()) {
+            return failure(response.stopReason ?: "Unknown error")
+        }
+        return GenerateAssignmentResponse(
+            instructions = response.response!!
         ).toResult()
     }
 }

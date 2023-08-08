@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 data class GetAssignmentPortalResponse(
     val id: String?,
+    val userId: String,
     val referenceId: String?,
     val courseId: String,
     val courseName: String,
@@ -107,3 +108,6 @@ data class ArchiveAssignmentResponse(val courseId: String)
 
 @Serializable
 data class DeleteCodeResponse(val courseId: String)
+
+@Serializable
+data class GenerateAssignmentResponse(val instructions: String)
