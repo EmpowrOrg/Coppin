@@ -51,7 +51,7 @@ fun Application.coursesRouting() {
                                 Breadcrumbs(
                                     crumbs = listOf(
                                         Breadcrumbs.Crumb("home", "Courses", "/courses"),
-                                        Breadcrumbs.Crumb(null, "Unlinked Courses", null),
+                                        Breadcrumbs.Crumb(null, "Manage Courses", null),
                                     )
                                 ),
                             )

@@ -48,7 +48,7 @@
             <div id="courses-container" class="row m-4 pb-4">
                 <div id="courses-header" class="justify-content-between">
                     <h6 class="mt-3 mb-3">Your courses (${content.coursesCount})</h6>
-                    <a href="/courses/link" class="btn btn-primary">+ Link Course</a>
+                    <a href="/courses/link" class="btn btn-primary">+ Manage Courses</a>
                 </div>
                 <#include "error.ftl">
                 <div class="table-responsive coppin-table">
