@@ -8,6 +8,7 @@ import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.responses.EdxCourse
+import org.empowrco.coppin.utils.DuplicateKeyException
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.monthDayYear
 import org.empowrco.coppin.utils.now
@@ -18,7 +19,7 @@ import java.util.UUID
 interface CoursesPortalPresenter {
     suspend fun getCourses(request: GetCoursesRequest): Result<GetCoursesResponse>
     suspend fun getCourse(request: GetCourseRequest): Result<GetCourseResponse>
-    suspend fun getUnlinkedCourses(request: GetCoursesRequest): Result<GetUnlinkedCoursesResponse>
+    suspend fun getManageCourses(request: GetCoursesRequest): Result<GetManagedCoursesResponse>
     suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit>
     suspend fun createSubject(request: CreateSubjectRequest): Result<CreateSubjectResponse>
     suspend fun getSubject(request: GetSubjectRequest): Result<GetSubjectResponse>
@@ -59,46 +60,48 @@ internal class RealCoursesPortalPresenter(
         ).toResult()
     }
 
-    override suspend fun getUnlinkedCourses(request: GetCoursesRequest): Result<GetUnlinkedCoursesResponse> {
+    override suspend fun getManageCourses(request: GetCoursesRequest): Result<GetManagedCoursesResponse> {
         val userId = request.id.toUuid() ?: return failure("Invalid uuid")
-        val courses = repo.getLinkedCourses(userId)
-        val edxCoursesResult = repo.getEdxCourses().getOrNull()?.results?.filterNot { edxCourse ->
-            courses.any { it.edxId == edxCourse.id }
-        } ?: return failure("Could not fetch edx courses")
+        val linkedCourses = repo.getLinkedCourses(userId)
+        val edxCoursesResult =
+            repo.getEdxCourses().getOrNull()?.results ?: return failure("Could not fetch edx courses")
         val edxCourses = if (edxCoursesResult.size <= 3) {
             listOf(edxCoursesResult)
         } else {
             edxCoursesResult.windowed(size = 3, partialWindows = true)
         }
 
-        return GetUnlinkedCoursesResponse(
+        return GetManagedCoursesResponse(
             rows = edxCourses.map { courseRow ->
-                val one = GetUnlinkedCoursesResponse.Course(
+                val one = GetManagedCoursesResponse.Course(
                     name = courseRow[0].name,
                     id = courseRow[0].id,
                     dates = courseRow[0].dates(),
                     number = courseRow[0].number,
                     org = courseRow[0].org,
+                    selected = linkedCourses.any { it.edxId == courseRow[0].id },
                 )
                 val two = courseRow.getOrNull(1)?.let {
-                    GetUnlinkedCoursesResponse.Course(
+                    GetManagedCoursesResponse.Course(
                         name = it.name,
                         id = it.id,
                         dates = it.dates(),
                         number = it.number,
-                        org = courseRow[0].org,
+                        org = courseRow[1].org,
+                        selected = linkedCourses.any { it.edxId == courseRow[1].id },
                     )
                 }
                 val three = courseRow.getOrNull(2)?.let {
-                    GetUnlinkedCoursesResponse.Course(
+                    GetManagedCoursesResponse.Course(
                         name = it.name,
                         id = it.id,
                         dates = it.dates(),
                         number = it.number,
-                        org = courseRow[0].org,
+                        org = courseRow[2].org,
+                        selected = linkedCourses.any { it.edxId == courseRow[2].id },
                     )
                 }
-                GetUnlinkedCoursesResponse.CourseRow(one, two, three)
+                GetManagedCoursesResponse.CourseRow(one, two, three)
             },
             count = edxCoursesResult.size,
         ).toResult()
@@ -114,6 +117,7 @@ internal class RealCoursesPortalPresenter(
         val userId = request.userId.toUuid() ?: return failure("Invalid user id")
         var failureStatement = ""
         val currentTime = LocalDateTime.now()
+        val linkedCourses = mutableListOf<UUID>()
         request.classIds.forEach { edxId ->
             val edxCourse = repo.getEdxCourse(edxId).getOrNull() ?: run {
                 failureStatement += "Failure adding $edxId\n"
@@ -132,9 +136,17 @@ internal class RealCoursesPortalPresenter(
                 repo.createCourse(course)
                 course.id
             }
-            repo.linkCourse(courseId, userId, currentTime)
-
+            try {
+                repo.linkCourse(courseId, userId, currentTime)
+                linkedCourses.add(courseId)
+            } catch (ex: DuplicateKeyException) {
+                // Course is already linked
+                linkedCourses.add(courseId)
+            } catch (ex: Exception) {
+                failureStatement += "Failure adding $edxId\n"
+            }
         }
+        repo.unlinkCoursesNotIn(linkedCourses, userId)
         return Unit.toResult()
     }
 

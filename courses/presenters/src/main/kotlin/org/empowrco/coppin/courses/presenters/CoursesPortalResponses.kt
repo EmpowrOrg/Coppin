@@ -13,7 +13,7 @@ data class GetCoursesResponse(val courses: List<Course>, val coursesCount: Int) 
 }
 
 
-data class GetUnlinkedCoursesResponse(val count: Int, val rows: List<CourseRow>) {
+data class GetManagedCoursesResponse(val count: Int, val rows: List<CourseRow>) {
 
     data class CourseRow(val one: Course, val two: Course?, val three: Course?)
     data class Course(
@@ -22,6 +22,7 @@ data class GetUnlinkedCoursesResponse(val count: Int, val rows: List<CourseRow>)
         val number: String,
         val dates: String,
         val org: String,
+        val selected: Boolean,
     )
 }
 

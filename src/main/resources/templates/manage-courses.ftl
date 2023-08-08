@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="content" type="org.empowrco.coppin.courses.presenters.GetUnlinkedCoursesResponse" -->
+<#-- @ftlvariable name="content" type="org.empowrco.coppin.courses.presenters.GetManagedCoursesResponse" -->
 <#import "_layout.ftl" as layout />
 <@layout.header >
     <style>
@@ -75,7 +75,7 @@
                                         <div class="link-header">
                                             <h6 class="m-0">${row.one.name}</h6>
                                             <input name="class" class="align-middle" type="checkbox"
-                                                   value="${row.one.id}">
+                                                   value="${row.one.id}" <#if row.one.selected>checked</#if>>
                                         </div>
                                         <div class="link-detail-row">
                                             <p class="link-key-text">Number:</p>
@@ -99,7 +99,7 @@
                                             <div class="link-header">
                                                 <h6 class="m-0">${row.two.name}</h6>
                                                 <input name="class" class="align-middle" type="checkbox"
-                                                       value="${row.two.id}">
+                                                       value="${row.two.id}" <#if row.two.selected>checked</#if>>
                                             </div>
                                             <div class="link-detail-row">
                                                 <p class="link-key-text">Number:</p>
@@ -126,7 +126,7 @@
                                             <div class="link-header">
                                                 <h6 class="m-0">${row.three.name}</h6>
                                                 <input name="class" class="align-middle" type="checkbox"
-                                                       value="${row.three.id}">
+                                                       value="${row.three.id}" <#if row.three.selected>checked</#if>>
                                             </div>
                                             <div class="link-detail-row">
                                                 <p class="link-key-text">Number:</p>

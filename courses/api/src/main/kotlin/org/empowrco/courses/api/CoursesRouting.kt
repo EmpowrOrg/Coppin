@@ -45,9 +45,9 @@ fun Application.coursesRouting() {
                 route("link") {
                     get {
                         val userId = call.sessions.get<UserSession>()!!.userId
-                        presenter.getUnlinkedCourses(GetCoursesRequest(userId)).fold({
+                        presenter.getManageCourses(GetCoursesRequest(userId)).fold({
                             call.respondFreemarker(
-                                "unlinked-courses.ftl", it,
+                                "manage-courses.ftl", it,
                                 Breadcrumbs(
                                     crumbs = listOf(
                                         Breadcrumbs.Crumb("home", "Courses", "/courses"),

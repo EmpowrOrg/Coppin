@@ -35,6 +35,7 @@ interface CoursesPortalRepository {
     suspend fun getSubject(id: UUID): Subject?
     suspend fun updateSubject(subject: Subject): Boolean
     suspend fun deleteSubject(subject: Subject): Boolean
+    suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID)
 }
 
 internal class RealCoursesPortalRepository(
@@ -122,5 +123,7 @@ internal class RealCoursesPortalRepository(
         return edxSource.getStudentsForCourse(edxId)
     }
 
-
+    override suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID) {
+        return coursesSource.unlinkCoursesNotIn(courseIds, userId)
+    }
 }
