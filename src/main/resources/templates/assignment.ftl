@@ -507,7 +507,7 @@
                          </div>
                          <div class="input-group input-group-outline mt-3">
                              <input form="generate-form" data-name="prompt" name="prompt" id="prompt" type="text"
-                                    class="form-control" placeholder="ex: Create an assignment to teach variables in Swift" required></input>
+                                    class="form-control" placeholder="ex: Create a programming assignment word problem to teach variables in Swift" required></input>
                          </div>
 </form>`
                 let dlg = new BsDialogs()
