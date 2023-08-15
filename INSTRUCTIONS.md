@@ -27,6 +27,9 @@ We recommend hosting the server on AWS Elastic Beanstalk, but you can use hostin
 | EDX_API_CLIENT_ID     | Client Id for edx app                                                                              |
 | EDX_API_CLIENT_SECRET | Client secret for the edx app                                                                      |
 | EDX_API_CLIENT_UN     | username of the user account the client app is on                                                  |
+| OPEN_AI_KEY           | Optional key to support AI generated assignments                                                   |
+| OPEN_AI_ORG_KEY       | Optional org key to support AI generated assignments                                               |
+| OPEN_AI_MODEL         | Optional AI model to be specified to support AI generated assignments (gpt-3.5-turbo-16k)          |
 
 5. Ensure you have the database created before you first run the server
 6. Ensure you created a Redis Cluster instance.
