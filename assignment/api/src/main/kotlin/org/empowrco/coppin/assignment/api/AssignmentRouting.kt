@@ -103,6 +103,7 @@ fun Application.assignmentRouting() {
                         }
                         post {
                             val formParameters = call.receiveParameters()
+                            val assignmentId = call.parameters["uuid"]
                             val failureMessage = formParameters["failure"].toString()
                             val successMessage = formParameters["success"].toString()
                             val instructions = formParameters["instructions"].toString()
@@ -112,7 +113,7 @@ fun Application.assignmentRouting() {
                             val points = formParameters["points"].toString().toInt()
                             presenter.updateAssignment(
                                 UpdateAssignmentPortalRequest(
-                                    id = call.parameters["uuid"],
+                                    id = assignmentId,
                                     failureMessage = failureMessage,
                                     successMessage = successMessage,
                                     instructions = instructions,
@@ -122,7 +123,7 @@ fun Application.assignmentRouting() {
                                     points = points,
                                 )
                             ).fold({
-                                call.respondRedirect("/courses/${it.courseId}")
+                                call.respondRedirect("/courses/${it.courseId}/assignments/$assignmentId")
                             }, {
                                 call.errorRedirect(it)
                             })
