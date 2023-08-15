@@ -91,7 +91,7 @@ fun Application.assignmentRouting() {
                                     it,
                                     Breadcrumbs(
                                         crumbs = listOf(
-                                            Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                            Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                             Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
                                             Breadcrumbs.Crumb(null, it.title ?: "New Assignment", null),
                                         )
@@ -152,7 +152,7 @@ fun Application.assignmentRouting() {
                                         it,
                                         Breadcrumbs(
                                             crumbs = listOf(
-                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                                 Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
                                                 Breadcrumbs.Crumb(
                                                     null,
@@ -222,7 +222,7 @@ fun Application.assignmentRouting() {
                                         "submission.ftl", it,
                                         Breadcrumbs(
                                             crumbs = listOf(
-                                                Breadcrumbs.Crumb("home", "Courses", "/courses"),
+                                                Breadcrumbs.Crumb("school", "Courses", "/courses"),
                                                 Breadcrumbs.Crumb(null, it.courseName, "/courses/${it.courseId}"),
                                                 Breadcrumbs.Crumb(
                                                     null,
