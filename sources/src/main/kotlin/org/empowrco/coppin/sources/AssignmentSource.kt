@@ -64,7 +64,7 @@ internal class RealAssignmentSource(
     }
 
     override suspend fun updateAssignment(assignment: Assignment): Boolean {
-        cache.deleteAssignment(assignment)
+        cache.updateAssignment(assignment)
         return database.updateAssignment(assignment)
     }
 
@@ -84,7 +84,7 @@ internal class RealAssignmentSource(
 @OptIn(InternalSerializationApi::class)
 private class CacheAssignmentSource(private val cache: Cache) : AssignmentSource {
 
-    fun assignmentKey(id: UUID?, referenceId: String?) = "assignment:$id:$referenceId"
+    private fun assignmentKey(id: UUID?, referenceId: String?) = "assignment:$id:$referenceId"
 
     override suspend fun getAssignment(id: UUID): Assignment? {
         return cache.get(assignmentKey(id, null), Assignment::class.serializer())
@@ -110,7 +110,9 @@ private class CacheAssignmentSource(private val cache: Cache) : AssignmentSource
     }
 
     override suspend fun updateAssignment(assignment: Assignment): Boolean {
-        throw NotImplementedError("Use Database")
+        cache.delete(assignmentKey(assignment.id, null))
+        cache.delete(assignmentKey(null, assignment.referenceId))
+        return true
     }
 
     override suspend fun getAssignmentsForCourse(id: UUID): List<Assignment> {

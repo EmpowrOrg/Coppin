@@ -294,6 +294,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 lastModifiedAt = currentTime,
             )
             repo.saveCode(code)
+            repo.updateAssignment(assignment)
         } else { // updating existing assignment code
             if (primary) {
                 repo.deprimaryAssignmentCodes(assignment)
@@ -314,6 +315,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             if (!result) {
                 return failure("Unknown error")
             }
+            repo.updateAssignment(assignment)
         }
         return UpdateCodeResponse(assignment.courseId.toString()).toResult()
     }
@@ -329,6 +331,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 repo.updateCode(codes.first().copy(primary = true))
             }
         }
+        repo.updateAssignment(assignment)
         return DeleteCodeResponse(assignment.courseId.toString()).toResult()
     }
 
