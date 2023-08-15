@@ -42,8 +42,8 @@ fun Application.assignmentRouting() {
                     route("create") {
                         post {
                             val formParameters = call.receiveParameters()
-                            val failureMessage = formParameters["failure-message"].toString()
-                            val successMessage = formParameters["success-message"].toString()
+                            val failureMessage = formParameters["failure"].toString()
+                            val successMessage = formParameters["success"].toString()
                             val instructions = formParameters["instructions"].toString()
                             val title = formParameters["title"].toString()
                             val totalAttempts = formParameters["total-attempts"].toString()
