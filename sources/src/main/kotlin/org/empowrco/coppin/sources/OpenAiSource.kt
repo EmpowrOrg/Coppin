@@ -17,12 +17,12 @@ interface OpenAiSource {
 
 internal class RealOpenAiSource : OpenAiSource {
     private val config = OpenAIConfig(
-        token = System.getenv("OPEN_AI_KEY"),
+        token = System.getenv("OPEN_AI_KEY") ?: "",
         timeout = Timeout(socket = 60.seconds),
-        organization = System.getenv("OPEN_AI_ORG_KEY"),
+        organization = System.getenv("OPEN_AI_ORG_KEY") ?: "",
     )
     private val openAI = OpenAI(config)
-    private val model = ModelId(System.getenv("OPEN_AI_MODEL"))
+    private val model = ModelId(System.getenv("OPEN_AI_MODEL") ?: "")
 
     @OptIn(BetaOpenAI::class)
     override suspend fun prompt(query: String, user: String): AiResponse {

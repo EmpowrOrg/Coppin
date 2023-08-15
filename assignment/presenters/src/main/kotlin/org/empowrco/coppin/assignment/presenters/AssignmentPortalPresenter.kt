@@ -387,6 +387,13 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         } else if (request.userId.isBlank()) {
             return failure("Please try logging in again.")
         }
+        if (System.getenv("OPEN_AI_KEY") == null) {
+            return failure("OPEN_AI_KEY is missing from environment")
+        } else if (System.getenv("OPEN_AI_MODEL") == null) {
+            return failure("OPEN_AI_MODEL is missing from environment")
+        } else if (System.getenv("OPEN_AI_ORG_KEY") == null) {
+            return failure("OPEN_AI_ORG_KEY is missing from environment")
+        }
         val response = repo.generateAssignment(request.prompt, request.userId)
         if (response.response.isNullOrBlank()) {
             return failure(response.stopReason ?: "Unknown error")
