@@ -28,6 +28,7 @@ internal class RealAuthenticator(
         val uuid = UUID.fromString(id) ?: return null
         val user = usersSource.getUser(uuid) ?: return null
         if (!user.isAuthorized) {
+            logDebug("User not authorized for session $id")
             return null
         }
         return UserIdPrincipal(user.email)
