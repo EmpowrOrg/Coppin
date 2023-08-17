@@ -3,6 +3,7 @@ package org.empowrco.coppin.utils.authenticator
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.util.hex
 import org.empowrco.coppin.sources.UsersSource
+import org.empowrco.coppin.utils.logs.logDebug
 import java.util.Base64
 import java.util.UUID
 import javax.crypto.Mac
@@ -41,14 +42,24 @@ internal class RealAuthenticator(
         val keyId = try {
             UUID.fromString(keyIdString)
         } catch (ex: Exception) {
+            logDebug("UUID Exception with $accessKey")
+            logDebug(ex.localizedMessage)
             return null
         }
-        val userAccessKey = usersSource.getKey(keyId) ?: return null
-        val user = usersSource.getUser(userAccessKey.userId) ?: return null
+        val userAccessKey = usersSource.getKey(keyId) ?: run {
+            logDebug("Key not found for $accessKey")
+            return null
+        }
+        val user = usersSource.getUser(userAccessKey.userId) ?: run {
+            logDebug("user not found for $accessKey")
+            return null
+        }
         if (!user.isAuthorized) {
+            logDebug("User not authorized for $accessKey")
             return null
         }
         if (accessKey != userAccessKey.key) {
+            logDebug("User access key does not match db $userAccessKey")
             return null
         }
         return UserIdPrincipal(user.email)
