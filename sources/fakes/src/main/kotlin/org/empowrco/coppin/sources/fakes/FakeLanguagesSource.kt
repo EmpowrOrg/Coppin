@@ -18,8 +18,8 @@ class FakeLanguagesSource : LanguagesSource {
         return languages.find { it.mime == mime }
     }
 
-    override suspend fun deleteLanguage(id: UUID): Boolean {
-        return languages.removeIf { it.id == id }
+    override suspend fun deleteLanguage(language: Language): Boolean {
+        return languages.removeIf { it.id == language.id }
     }
 
     override suspend fun updateLanguage(language: Language): Boolean {

@@ -4,6 +4,7 @@ import org.empowrco.coppin.assignment.backend.AssignmentApiRepository
 import org.empowrco.coppin.assignment.backend.AssignmentCodeResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
+import org.empowrco.coppin.models.Submission
 import java.util.UUID
 
 class FakeAssignmentRepoApi : AssignmentApiRepository {
@@ -11,6 +12,7 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
     val assignments = mutableListOf<Assignment>()
     val languages = mutableListOf<Language>()
     val codeResponses = mutableListOf<AssignmentCodeResponse>()
+    val submissions = mutableListOf<Submission>()
 
     override suspend fun getAssignment(referenceId: String): Assignment? {
         return assignments.find { it.referenceId == referenceId }
@@ -36,11 +38,29 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
         return response
     }
 
-    override suspend fun deleteAssignment(id: UUID): Boolean {
-        return assignments.removeAll { it.id == id }
-    }
-
     override suspend fun getLanguage(id: UUID): Language? {
         return languages.find { it.id == id }
+    }
+
+    override suspend fun deleteAssignment(assignment: Assignment): Boolean {
+        return assignments.removeAll { it.id == assignment.id }
+    }
+
+    override suspend fun getLastStudentSubmissionForAssignment(assignmentID: UUID, studentId: String): Submission? {
+        return submissions.filter { it.assignmentId == assignmentID && it.studentId == studentId }
+            .maxByOrNull { it.attempt }
+    }
+
+    override suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission> {
+        return submissions.filter { it.assignmentId == assignmentID && it.studentId == studentId }
+    }
+
+    override suspend fun saveSubmission(submission: Submission) {
+        submissions.add(submission)
+    }
+
+    override suspend fun updateAssignment(assignment: Assignment): Boolean {
+        assignments.removeIf { it.id == assignment.id }
+        return assignments.add(assignment)
     }
 }

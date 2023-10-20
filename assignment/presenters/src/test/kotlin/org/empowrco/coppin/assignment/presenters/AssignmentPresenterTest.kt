@@ -10,6 +10,8 @@ import org.empowrco.coppin.assignment.presenters.ResponseApi.SubmitResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
+import org.empowrco.coppin.models.Subject
+import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.now
 import java.util.UUID
 import kotlin.test.AfterTest
@@ -36,15 +38,37 @@ class AssignmentPresenterTest {
 
     @Test
     fun submitTooManyAttempts() = runBlocking {
-        repo.assignments.add(assigment)
-        val request = submitRequest.copy(attempt = assigment.totalAttempts + 1)
-
-        val response = presenter.submit(request)
+        repo.assignments.add(assigment.copy(totalAttempts = 1))
+        repo.languages.add(lang)
+        repo.codeResponses.add(
+            AssignmentCodeResponse(
+                success = true,
+                output = "failure"
+            )
+        )
+        repo.submissions.add(
+            Submission(
+                id = UUID.randomUUID(),
+                assignmentId = assigment.id,
+                attempt = 1,
+                lastModifiedAt = LocalDateTime.now(),
+                createdAt = LocalDateTime.now(),
+                code = "code",
+                languageId = lang.id,
+                correct = false,
+                studentId = "student_id",
+            )
+        )
+        val response = presenter.submit(submitRequest)
         assertEquals(
-            response, SubmitResponse(
-                output = assigment.failureMessage,
+            response,
+            SubmitResponse(
+                output = "You have run out of attempts. \n ${assigment.failureMessage}",
                 success = false,
                 finalAttempt = true,
+                attemptsRemaining = 0,
+                solutionCode = null,
+                gradePoints = 5.0
             )
         )
     }
@@ -59,12 +83,15 @@ class AssignmentPresenterTest {
             )
         )
         repo.languages.add(lang)
-        val response = presenter.submit(submitRequest.copy(attempt = 2))
+        val response = presenter.submit(submitRequest)
         assertEquals(
             response, SubmitResponse(
                 output = "failure",
                 success = false,
                 finalAttempt = false,
+                attemptsRemaining = 3,
+                solutionCode = null,
+                gradePoints = 5.0
             )
         )
     }
@@ -79,12 +106,15 @@ class AssignmentPresenterTest {
             )
         )
         repo.languages.add(lang)
-        val response = presenter.submit(submitRequest.copy(attempt = 1))
+        val response = presenter.submit(submitRequest)
         assertEquals(
             response, SubmitResponse(
                 output = "code",
                 success = false,
                 finalAttempt = false,
+                attemptsRemaining = 3,
+                solutionCode = null,
+                gradePoints = 5.0
             )
         )
     }
@@ -99,7 +129,7 @@ class AssignmentPresenterTest {
             )
         )
         repo.languages.add(lang)
-        val response = presenter.submit(submitRequest.copy(attempt = 1))
+        val response = presenter.submit(submitRequest)
         with(response) {
             assertEquals(true, success)
         }
@@ -107,20 +137,17 @@ class AssignmentPresenterTest {
             response, SubmitResponse(
                 success = true,
                 finalAttempt = false,
-                output = "success"
+                output = "success",
+                attemptsRemaining = 3,
+                solutionCode = null,
+                gradePoints = 5.0
             )
         )
     }
 
 
     companion object {
-        val submitRequest = SubmitRequest(
-            attempt = 0,
-            code = "code",
-            referenceId = "reference",
-            language = "lang",
-            email = "email",
-        )
+
         val lang = Language(
             id = UUID.randomUUID(),
             lastModifiedAt = LocalDateTime.now(),
@@ -129,6 +156,12 @@ class AssignmentPresenterTest {
             url = "lang-url",
             createdAt = LocalDateTime.now(),
             unitTestRegex = "XCAssert"
+        )
+        val submitRequest = SubmitRequest(
+            code = "code",
+            referenceId = "reference",
+            language = lang.mime,
+            studentId = "student_id"
         )
         val assignmentId = UUID.randomUUID()
         val assignmentCode = AssignmentCode(
@@ -140,6 +173,7 @@ class AssignmentPresenterTest {
             primary = true,
             unitTest = "unit-test",
             injectable = false,
+            solutionVisibility = AssignmentCode.SolutionVisibility.never,
             lastModifiedAt = LocalDateTime.now(),
             createdAt = LocalDateTime.now(),
         )
@@ -155,6 +189,17 @@ class AssignmentPresenterTest {
             totalAttempts = 4,
             assignmentCodes = listOf(assignmentCode),
             title = "title",
+            archived = false,
+            blockId = "block_id",
+            courseId = UUID.randomUUID(),
+            points = 5.0,
+            subject = Subject(
+                id = UUID.randomUUID(),
+                name = "subject",
+                courseId = UUID.randomUUID(),
+                lastModifiedAt = LocalDateTime.now(),
+                createdAt = LocalDateTime.now(),
+            )
         )
     }
 
