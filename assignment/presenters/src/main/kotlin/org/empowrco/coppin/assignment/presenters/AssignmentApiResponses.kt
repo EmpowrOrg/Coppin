@@ -10,6 +10,7 @@ object ResponseApi {
         val finalAttempt: Boolean,
         val solutionCode: String?,
         val gradePoints: Double,
+        val attemptsRemaining: Int,
     )
 
     @Serializable
@@ -27,6 +28,7 @@ object ResponseApi {
         val title: String,
         val assignmentCodes: List<AssignmentCode>,
         val points: Double,
+        val attemptsRemaining: Int,
     ) {
         @Serializable
         data class AssignmentCode(

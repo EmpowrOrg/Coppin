@@ -83,6 +83,7 @@ internal class RealAssignmentApiPresenter(
         } else {
             null
         }
+        val attemptsRemaining = assignment.totalAttempts - attempt
         if (assignment.totalAttempts in 1 until attempt) {
             return SubmitResponse(
                 output = "You have run out of attempts. \n ${assignment.failureMessage}",
@@ -90,6 +91,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = true,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                attemptsRemaining = 0,
             )
         }
 
@@ -124,6 +126,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                attemptsRemaining = attemptsRemaining,
             )
         } else if (codeResponse.success == false) {
             SubmitResponse(
@@ -132,6 +135,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                attemptsRemaining = attemptsRemaining,
             )
         } else {
             SubmitResponse(
@@ -140,6 +144,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                attemptsRemaining = attemptsRemaining,
             )
         }
     }
@@ -185,7 +190,8 @@ internal class RealAssignmentApiPresenter(
             instructions = assignment.instructions,
             title = assignment.title,
             assignmentCodes = assignmentCodes,
-            points = assignment.points
+            points = assignment.points,
+            attemptsRemaining = assignment.totalAttempts - submissions.size,
         )
     }
 
