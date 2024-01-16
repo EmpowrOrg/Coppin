@@ -1,6 +1,8 @@
 package org.empowrco.coppin.assignment.presenters
 
 import kotlinx.serialization.Serializable
+import org.empowrco.coppin.utils.serialization.UUIDSerializer
+import java.util.UUID
 
 object RequestApi {
 
@@ -30,5 +32,12 @@ object RequestApi {
     @Serializable
     data class DeleteAssignmentRequest(
         val id: String,
+    )
+
+    @Serializable
+    data class GetAssignmentGrades(
+        val studentId: String,
+        @Serializable(with = UUIDSerializer::class)
+        val courseId: UUID,
     )
 }

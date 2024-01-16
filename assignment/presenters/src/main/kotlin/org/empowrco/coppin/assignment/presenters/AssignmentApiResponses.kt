@@ -41,6 +41,17 @@ object ResponseApi {
             val userCode: String?,
         )
     }
+
+    @Serializable
+    data class GetAssignmentGradesResponse(val grades: List<Grade>) {
+        @Serializable
+        data class Grade(
+            val value: Int,
+            val title: String,
+            val submitted: Boolean,
+            val hadMoreChances: Boolean,
+        )
+    }
 }
 
 

@@ -26,6 +26,7 @@ interface AssignmentApiPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
     suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse
+    suspend fun getGrades(request: RequestApi.GetAssignmentGrades): ResponseApi.GetAssignmentGradesResponse
 }
 
 internal class RealAssignmentApiPresenter(
@@ -213,4 +214,23 @@ internal class RealAssignmentApiPresenter(
         }
         return DeleteAssignmentResponse(assignment.courseId.toString())
     }
+
+    override suspend fun getGrades(request: RequestApi.GetAssignmentGrades): ResponseApi.GetAssignmentGradesResponse {
+        val assignments = repo.getAssignments(request.courseId)
+        val grades = assignments.map {
+            val lastSubmission = repo.getLastStudentSubmissionForAssignment(it.id, request.studentId)
+            ResponseApi.GetAssignmentGradesResponse.Grade(
+                value = if (lastSubmission?.correct == true) {
+                    100
+                } else {
+                    0
+                },
+                title = it.title,
+                submitted = lastSubmission != null,
+                hadMoreChances = (lastSubmission != null && lastSubmission.attempt < it.totalAttempts),
+            )
+        }
+        return ResponseApi.GetAssignmentGradesResponse(grades)
+    }
+
 }

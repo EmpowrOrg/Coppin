@@ -35,6 +35,7 @@ interface AssignmentApiRepository {
     suspend fun updateAssignment(assignment: Assignment): Boolean
     suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission>
     suspend fun getLastStudentSubmissionForAssignment(assignmentID: UUID, studentId: String): Submission?
+    suspend fun getAssignments(courseId: UUID): List<Assignment>
 
 }
 
@@ -114,6 +115,10 @@ internal class RealAssignmentApiRepository(
 
     override suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission> {
         return submissionSource.getSubmissionsForAssignment(assignmentID, studentId)
+    }
+
+    override suspend fun getAssignments(courseId: UUID): List<Assignment> {
+        return assignmentSource.getAssignmentsForCourse(courseId)
     }
 
     private suspend fun executeRequest(
