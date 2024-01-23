@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.update
 
 interface SettingsSource {
     suspend fun getSecuritySettings(): SecuritySettings?
-    suspend fun createSecuritySettings()
+    suspend fun createSecuritySettings(): SecuritySettings
     suspend fun updateSecuritySettings(settings: SecuritySettings): Boolean
 }
 
@@ -18,26 +18,41 @@ internal class RealSettingsSource : SettingsSource {
         org.empowrco.coppin.db.SecuritySettings.selectAll().map {
             SecuritySettings(
                 id = it[org.empowrco.coppin.db.SecuritySettings.id].value,
-                oktaEnabled = it[org.empowrco.coppin.db.SecuritySettings.okta],
+                oktaEnabled = it[org.empowrco.coppin.db.SecuritySettings.oktaEnabled],
+                oktaDomain = it[org.empowrco.coppin.db.SecuritySettings.oktaDomain],
+                oktaClientSecret = it[org.empowrco.coppin.db.SecuritySettings.oktaClientSecret],
+                oktaClientId = it[org.empowrco.coppin.db.SecuritySettings.oktaClientId],
+                oktaClientSecretDisplay = it[org.empowrco.coppin.db.SecuritySettings.oktaClientSecretDisplay],
                 createdAt = it[org.empowrco.coppin.db.SecuritySettings.createdAt],
                 lastModifiedAt = it[org.empowrco.coppin.db.SecuritySettings.lastModifiedAt],
             )
         }.firstOrNull()
     }
 
-    override suspend fun createSecuritySettings() = dbQuery {
-        val currentTime = LocalDateTime.now()
-        org.empowrco.coppin.db.SecuritySettings.insert {
-            it[okta] = false
-            it[lastModifiedAt] = currentTime
-            it[createdAt] = currentTime
+    override suspend fun createSecuritySettings(): SecuritySettings {
+        dbQuery {
+            val currentTime = LocalDateTime.now()
+            org.empowrco.coppin.db.SecuritySettings.insert {
+                it[oktaEnabled] = false
+                it[oktaDomain] = ""
+                it[oktaClientId] = ""
+                it[oktaClientSecret] = ""
+                it[oktaClientSecretDisplay] = ""
+                it[lastModifiedAt] = currentTime
+                it[createdAt] = currentTime
+            }
+            Unit
         }
-        Unit
+        return getSecuritySettings()!!
     }
 
     override suspend fun updateSecuritySettings(settings: SecuritySettings): Boolean = dbQuery {
         val result = org.empowrco.coppin.db.SecuritySettings.update {
-            it[okta] = false
+            it[oktaEnabled] = false
+            it[oktaDomain] = settings.oktaDomain
+            it[oktaClientId] = settings.oktaClientId
+            it[oktaClientSecret] = settings.oktaClientSecret
+            it[oktaClientSecretDisplay] = settings.oktaClientSecretDisplay
             it[lastModifiedAt] = settings.lastModifiedAt
         }
         result > 0
