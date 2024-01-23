@@ -17,6 +17,7 @@ import java.util.Base64
 import java.util.UUID
 
 interface UsersPresenters {
+    suspend fun getLogin(): Result<GetLoginResponse>
     suspend fun login(request: LoginRequest): Result<LoginResponse>
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse>
@@ -30,6 +31,11 @@ class RealUsersPresenters(
     private val repo: UsersRepository,
     private val authenticator: Authenticator,
 ) : UsersPresenters {
+
+    override suspend fun getLogin(): Result<GetLoginResponse> {
+        val showOkta = repo.getSecuritySettings().oktaEnabled
+        return GetLoginResponse(showOkta).toResult()
+    }
     override suspend fun login(request: LoginRequest): Result<LoginResponse> {
         if (request.email.isBlank()) {
             return failure("Please insert an email")

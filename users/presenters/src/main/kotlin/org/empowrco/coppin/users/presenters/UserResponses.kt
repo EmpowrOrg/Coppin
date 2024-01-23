@@ -3,6 +3,7 @@ package org.empowrco.coppin.users.presenters
 import kotlinx.serialization.Serializable
 
 
+data class GetLoginResponse(val okta: Boolean)
 data class LoginResponse(val id: String, val isAdmin: Boolean)
 
 data class RegisterResponse(val id: String, val isAdmin: Boolean)
