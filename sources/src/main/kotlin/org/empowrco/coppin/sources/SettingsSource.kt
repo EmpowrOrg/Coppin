@@ -48,7 +48,7 @@ internal class RealSettingsSource : SettingsSource {
 
     override suspend fun updateSecuritySettings(settings: SecuritySettings): Boolean = dbQuery {
         val result = org.empowrco.coppin.db.SecuritySettings.update {
-            it[oktaEnabled] = false
+            it[oktaEnabled] = settings.oktaEnabled
             it[oktaDomain] = settings.oktaDomain
             it[oktaClientId] = settings.oktaClientId
             it[oktaClientSecret] = settings.oktaClientSecret
