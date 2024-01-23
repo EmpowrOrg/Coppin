@@ -11,6 +11,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import org.empowrco.admin.api.adminRouting
 import org.empowrco.coppin.assignment.api.assignmentApi
 import org.empowrco.coppin.assignment.api.assignmentRouting
 import org.empowrco.coppin.languages.api.languagesApi
@@ -25,6 +26,7 @@ fun Application.configureRouting() {
     usersRouting()
     languagesApi()
     languagesRouting()
+    adminRouting()
     routing {
         authenticate("auth-session") {
             get("/") {
