@@ -8,12 +8,8 @@ data class GetSecuritySettingsResponse(
     val clientId: String,
     val clientSecret: String,
     val oktaDomain: String,
+    val userId: String,
 )
 
 @Serializable
-data class SaveSecuritySettingsResponse(
-    val oktaEnabled: Boolean,
-    val clientId: String,
-    val clientSecret: String,
-    val oktaDomain: String,
-)
+object SaveSecuritySettingsResponse

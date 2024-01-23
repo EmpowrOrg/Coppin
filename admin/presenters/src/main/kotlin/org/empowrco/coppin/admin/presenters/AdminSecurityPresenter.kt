@@ -30,6 +30,7 @@ internal class RealAdminSecurityPresenter(
             clientId = securitySettings.oktaClientId,
             oktaDomain = securitySettings.oktaDomain,
             clientSecret = securitySettings.oktaClientSecretDisplay,
+            userId = userId.toString(),
         ).toResult()
     }
 
@@ -50,21 +51,17 @@ internal class RealAdminSecurityPresenter(
                 return failure("You must specify your client secret")
             }
         }
+        val clientSecretDisplay = ("******************************" + request.clientSecret?.takeLast(4)) ?: ""
         val updatedSecuritySettings = securitySettings.copy(
             oktaEnabled = request.enableOkta,
             oktaDomain = request.oktaDomain ?: "",
             oktaClientId = request.clientId ?: "",
             oktaClientSecret = request.clientSecret ?: "",
-            oktaClientSecretDisplay = request.clientSecret?.takeLast(4) ?: "",
+            oktaClientSecretDisplay = clientSecretDisplay,
             lastModifiedAt = LocalDateTime.now(),
         )
         repo.saveSecuritySettings(updatedSecuritySettings)
-        return SaveSecuritySettingsResponse(
-            oktaEnabled = securitySettings.oktaEnabled,
-            clientId = securitySettings.oktaClientId,
-            oktaDomain = securitySettings.oktaDomain,
-            clientSecret = securitySettings.oktaClientSecret,
-        ).toResult()
+        return SaveSecuritySettingsResponse.toResult()
     }
 
     private suspend fun <T : Any> authorizeAdmin(userIdParam: String, password: String): Result<T>? {
