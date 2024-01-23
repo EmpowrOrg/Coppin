@@ -16,6 +16,18 @@ object Deps {
         val main by lazy { ":assignment" }
     }
 
+    object Admin {
+        val api by lazy { ":admin:api" }
+        val presenters by lazy { ":admin:presenters" }
+
+        object Backend {
+            val main by lazy { ":admin:backend" }
+            val fakes by lazy { ":admin:backend:fakes" }
+        }
+
+        val main by lazy { ":admin" }
+    }
+
     object Courses {
         val api by lazy { ":courses:api" }
         val presenters by lazy { ":courses:presenters" }

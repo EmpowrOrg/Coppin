@@ -57,3 +57,10 @@ include("courses:backend")
 findProject(":courses:backend")?.name = "backend"
 include("courses:presenters")
 findProject(":courses:presenters")?.name = "presenters"
+include("admin")
+include("admin:backend")
+findProject(":admin:backend")?.name = "backend"
+include("admin:api")
+findProject(":admin:api")?.name = "api"
+include("admin:presenters")
+findProject(":admin:presenters")?.name = "presenters"
