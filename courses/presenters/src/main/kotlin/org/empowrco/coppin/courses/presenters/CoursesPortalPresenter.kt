@@ -31,8 +31,8 @@ internal class RealCoursesPortalPresenter(
     private val repo: CoursesPortalRepository,
 ) : CoursesPortalPresenter {
     override suspend fun getCourses(request: GetCoursesRequest): Result<GetCoursesResponse> {
-        val userId = request.id.toUuid() ?: return failure("Invalid uuid")
-        val courses = repo.getLinkedCourses(userId)
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
+        val courses = repo.getLinkedCourses(user.id)
         if (courses.isEmpty()) {
             return GetCoursesResponse(
                 coursesCount = 0,
@@ -61,8 +61,8 @@ internal class RealCoursesPortalPresenter(
     }
 
     override suspend fun getManageCourses(request: GetCoursesRequest): Result<GetManagedCoursesResponse> {
-        val userId = request.id.toUuid() ?: return failure("Invalid uuid")
-        val linkedCourses = repo.getLinkedCourses(userId)
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
+        val linkedCourses = repo.getLinkedCourses(user.id)
         val edxCoursesResult =
             repo.getEdxCourses().getOrNull()?.results ?: return failure("Could not fetch edx courses")
         val edxCourses = if (edxCoursesResult.size <= 3) {
@@ -114,7 +114,7 @@ internal class RealCoursesPortalPresenter(
     }
 
     override suspend fun linkCourses(request: LinkCoursesRequest): Result<Unit> {
-        val userId = request.userId.toUuid() ?: return failure("Invalid user id")
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
         var failureStatement = ""
         val currentTime = LocalDateTime.now()
         val linkedCourses = mutableListOf<UUID>()
@@ -137,7 +137,7 @@ internal class RealCoursesPortalPresenter(
                 course.id
             }
             try {
-                repo.linkCourse(courseId, userId, currentTime)
+                repo.linkCourse(courseId, user.id, currentTime)
                 linkedCourses.add(courseId)
             } catch (ex: DuplicateKeyException) {
                 // Course is already linked
@@ -146,7 +146,7 @@ internal class RealCoursesPortalPresenter(
                 failureStatement += "Failure adding $edxId\n"
             }
         }
-        repo.unlinkCoursesNotIn(linkedCourses, userId)
+        repo.unlinkCoursesNotIn(linkedCourses, user.id)
         return Unit.toResult()
     }
 

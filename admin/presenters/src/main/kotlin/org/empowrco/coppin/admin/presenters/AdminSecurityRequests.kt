@@ -3,7 +3,7 @@ package org.empowrco.coppin.admin.presenters
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetSecuritySettingsRequest(val userId: String?)
+data class GetSecuritySettingsRequest(val email: String?)
 
 @Serializable
 data class SaveSecuritySettingsRequest(

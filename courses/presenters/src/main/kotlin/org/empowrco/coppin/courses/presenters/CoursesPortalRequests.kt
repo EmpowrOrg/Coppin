@@ -2,9 +2,9 @@ package org.empowrco.coppin.courses.presenters
 
 import kotlinx.serialization.Serializable
 
-data class GetCoursesRequest(val id: String)
+data class GetCoursesRequest(val email: String)
 data class GetCourseRequest(val id: String)
-data class LinkCoursesRequest(val classIds: List<String>, val userId: String)
+data class LinkCoursesRequest(val classIds: List<String>, val email: String)
 data class LinkCourse(val id: String)
 
 @Serializable

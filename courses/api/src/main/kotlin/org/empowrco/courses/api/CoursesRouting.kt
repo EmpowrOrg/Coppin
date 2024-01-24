@@ -34,8 +34,8 @@ fun Application.coursesRouting() {
             val presenter: CoursesPortalPresenter by inject()
             route("courses") {
                 get {
-                    val userId = call.sessions.get<UserSession>()!!.userId
-                    presenter.getCourses(GetCoursesRequest(userId)).fold({
+                    val email = call.sessions.get<UserSession>()!!.email
+                    presenter.getCourses(GetCoursesRequest(email)).fold({
                         call.respondFreemarker("courses.ftl", it)
                     }, {
                         call.errorRedirect(it)
@@ -44,8 +44,8 @@ fun Application.coursesRouting() {
 
                 route("link") {
                     get {
-                        val userId = call.sessions.get<UserSession>()!!.userId
-                        presenter.getManageCourses(GetCoursesRequest(userId)).fold({
+                        val email = call.sessions.get<UserSession>()!!.email
+                        presenter.getManageCourses(GetCoursesRequest(email)).fold({
                             call.respondFreemarker(
                                 "manage-courses.ftl", it,
                                 Breadcrumbs(
@@ -61,9 +61,9 @@ fun Application.coursesRouting() {
                     }
                     post {
                         val params = call.receiveParameters()
-                        val userId = call.sessions.get<UserSession>()!!.userId
+                        val email = call.sessions.get<UserSession>()!!.email
                         val classes = params.getAll("class") ?: emptyList()
-                        presenter.linkCourses(LinkCoursesRequest(classIds = classes, userId = userId)).fold({
+                        presenter.linkCourses(LinkCoursesRequest(classIds = classes, email = email)).fold({
                             call.respondRedirect("/courses")
                         }, {
                             call.errorRedirect("/courses")

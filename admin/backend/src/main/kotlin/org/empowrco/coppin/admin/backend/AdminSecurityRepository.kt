@@ -10,6 +10,7 @@ interface AdminSecurityRepository {
     suspend fun getSecuritySettings(): SecuritySettings
     suspend fun getUser(userId: UUID): User?
     suspend fun saveSecuritySettings(settings: SecuritySettings): Boolean
+    suspend fun getUserByEmail(email: String): User?
 }
 
 class RealAdminSecurityRepository(
@@ -26,5 +27,9 @@ class RealAdminSecurityRepository(
 
     override suspend fun saveSecuritySettings(settings: SecuritySettings): Boolean {
         return settingsSource.updateSecuritySettings(settings)
+    }
+
+    override suspend fun getUserByEmail(email: String): User? {
+        return usersSource.getUserByEmail(email)
     }
 }

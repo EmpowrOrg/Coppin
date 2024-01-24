@@ -23,8 +23,8 @@ internal fun Route.securityRouting() {
     val presenter: AdminSecurityPresenter = get()
     route("security") {
         get {
-            val userId = call.sessions.get<UserSession>()?.userId
-            presenter.getSecuritySettings(GetSecuritySettingsRequest(userId)).fold({
+            val email = call.sessions.get<UserSession>()?.email
+            presenter.getSecuritySettings(GetSecuritySettingsRequest(email)).fold({
                 call.respondFreemarker("/admin/security.ftl", it)
             }, {
                 call.errorRedirect(it.localizedMessage, "/")

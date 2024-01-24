@@ -5,6 +5,7 @@ import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.models.User
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
 import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
@@ -13,6 +14,7 @@ import org.empowrco.coppin.sources.CoursesSource
 import org.empowrco.coppin.sources.EdxSource
 import org.empowrco.coppin.sources.SubjectSource
 import org.empowrco.coppin.sources.SubmissionSource
+import org.empowrco.coppin.sources.UsersSource
 import java.util.UUID
 
 interface CoursesPortalRepository {
@@ -36,6 +38,7 @@ interface CoursesPortalRepository {
     suspend fun updateSubject(subject: Subject): Boolean
     suspend fun deleteSubject(subject: Subject): Boolean
     suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID)
+    suspend fun getUserByEmail(email: String): User?
 }
 
 internal class RealCoursesPortalRepository(
@@ -44,6 +47,7 @@ internal class RealCoursesPortalRepository(
     private val assignmentSource: AssignmentSource,
     private val submissionSource: SubmissionSource,
     private val subjectSource: SubjectSource,
+    private val usersSource: UsersSource,
 ) : CoursesPortalRepository {
 
     override suspend fun createSubject(subject: Subject) {
@@ -125,5 +129,9 @@ internal class RealCoursesPortalRepository(
 
     override suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID) {
         return coursesSource.unlinkCoursesNotIn(courseIds, userId)
+    }
+
+    override suspend fun getUserByEmail(email: String): User? {
+        return usersSource.getUserByEmail(email)
     }
 }

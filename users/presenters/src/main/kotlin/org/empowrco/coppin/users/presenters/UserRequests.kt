@@ -17,7 +17,11 @@ data class RegisterRequest(
 
 data class GetUserRequest(
     val id: String,
-    val currentUserId: String,
+    val currentUser: String,
+)
+
+data class GetCurrentUserRequest(
+    val email: String,
 )
 
 data class GetUsersRequest(

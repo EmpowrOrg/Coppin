@@ -20,8 +20,8 @@ internal class RealAdminSecurityPresenter(
 ) : AdminSecurityPresenter {
     override suspend fun getSecuritySettings(request: GetSecuritySettingsRequest): Result<GetSecuritySettingsResponse> {
         val securitySettings = repo.getSecuritySettings()
-        val userId = request.userId?.toUuid() ?: return failure("Unauthorized User")
-        val user = repo.getUser(userId) ?: return failure("Unauthorized User")
+        val email = request.email ?: return failure("Unauthorized user")
+        val user = repo.getUserByEmail(email) ?: return failure("Unauthorized user")
         if (user.type != User.Type.Admin) {
             return failure("Unauthorized User")
         }
@@ -30,7 +30,7 @@ internal class RealAdminSecurityPresenter(
             clientId = securitySettings.oktaClientId,
             oktaDomain = securitySettings.oktaDomain,
             clientSecret = securitySettings.oktaClientSecretDisplay,
-            userId = userId.toString(),
+            userId = user.id.toString(),
         ).toResult()
     }
 

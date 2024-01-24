@@ -112,6 +112,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     }
 
     override suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse> {
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
         val course = repo.getCourse(courseId) ?: return failure("Course not found")
         val subjects = repo.getSubjectsForCourse(courseId)
@@ -136,7 +137,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 submissions = emptyList(),
                 points = null,
                 courseName = course.title,
-                userId = request.userId,
+                userId = user.id.toString(),
                 showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
             ).toResult()
         }
@@ -183,7 +184,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     language = language?.name ?: "Unknown"
                 )
             },
-            userId = request.userId,
+            userId = user.id.toString(),
             showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
         ).toResult()
     }

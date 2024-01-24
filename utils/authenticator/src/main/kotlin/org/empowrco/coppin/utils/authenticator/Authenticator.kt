@@ -10,7 +10,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 interface Authenticator {
-    suspend fun validateSession(id: String): UserIdPrincipal?
+    suspend fun validateSession(email: String): UserIdPrincipal?
     suspend fun validateKey(accessKey: String): UserIdPrincipal?
     suspend fun hash(password: String): String
     suspend fun isValidPassword(password: String): Result<Boolean>
@@ -24,11 +24,10 @@ internal class RealAuthenticator(
     private val algorithm = "HmacSHA1"
 
 
-    override suspend fun validateSession(id: String): UserIdPrincipal? {
-        val uuid = UUID.fromString(id) ?: return null
-        val user = usersSource.getUser(uuid) ?: return null
+    override suspend fun validateSession(email: String): UserIdPrincipal? {
+        val user = usersSource.getUserByEmail(email) ?: return null
         if (!user.isAuthorized) {
-            logDebug("User not authorized for session $id")
+            logDebug("User not authorized for session $email")
             return null
         }
         return UserIdPrincipal(user.email)

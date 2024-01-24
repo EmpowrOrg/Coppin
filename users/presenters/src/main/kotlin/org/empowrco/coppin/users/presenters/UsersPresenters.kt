@@ -114,11 +114,15 @@ class RealUsersPresenters(
         ).toResult()
     }
 
+    override suspend fun getCurrentUser(request: GetCurrentUserRequest): Result<GetCurrentUserResponse> {
+        val user = repo.getUserByEmail(request.email) ?: return failure("No user found")
+        return GetCurrentUserResponse(user.id.toString()).toResult()
+    }
+
     override suspend fun getUser(request: GetUserRequest): Result<GetUserResponse> {
         val userId = request.id.toUuid() ?: return failure("Invalid User Id")
         val user = repo.getUser(userId) ?: return failure("No user found")
-        val currentUserId = request.currentUserId.toUuid() ?: return failure("Invalid Current User Id")
-        val currentUser = repo.getUser(currentUserId) ?: return failure("No Current User Found")
+        val currentUser = repo.getUserByEmail(request.currentUser) ?: return failure("No Current User Found")
         if (currentUser.id != user.id && currentUser.type != User.Type.Admin) {
             return failure("Unauthorized access to user")
         }

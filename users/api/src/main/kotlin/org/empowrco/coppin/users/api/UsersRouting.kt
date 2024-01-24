@@ -18,6 +18,7 @@ import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.CreateAccessKey
 import org.empowrco.coppin.users.presenters.DeleteAccessKey
+import org.empowrco.coppin.users.presenters.GetCurrentUserRequest
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.GetUsersRequest
 import org.empowrco.coppin.users.presenters.LoginRequest
@@ -47,18 +48,22 @@ fun Application.usersRouting() {
 
             }
             get("user") {
-                val userId = call.sessions.get<UserSession>()?.userId ?: run {
+                val email = call.sessions.get<UserSession>()?.email ?: run {
                     call.errorRedirect("User Id Not Found", "/login")
                     return@get
                 }
-                call.respondRedirect("/user/$userId")
+                presenter.getCurrentUser(GetCurrentUserRequest(email)).fold({
+                    call.respondRedirect("/user/${it.id}")
+                }, {
+                    call.errorRedirect(it.localizedMessage, "/login")
+                })
             }
             route("user/{uuid}") {
                 get {
-                    val currentUserId = call.sessions.get<UserSession>()?.userId.toString()
+                    val email = call.sessions.get<UserSession>()?.email.toString()
                     val request = GetUserRequest(
                         id = call.parameters["uuid"].toString(),
-                        currentUserId = currentUserId
+                        currentUser = email
                     )
                     presenter.getUser(request).fold({
                         call.respondFreemarker("user.ftl", it, Breadcrumbs(

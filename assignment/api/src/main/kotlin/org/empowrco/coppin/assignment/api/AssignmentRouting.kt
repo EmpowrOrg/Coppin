@@ -78,12 +78,12 @@ fun Application.assignmentRouting() {
                     }
                     route("{uuid?}") {
                         get {
-                            val userId = call.sessions.get<UserSession>()!!.userId
+                            val email = call.sessions.get<UserSession>()!!.email
                             presenter.getAssignment(
                                 GetAssignmentRequest(
                                     id = call.parameters["uuid"],
                                     courseId = call.parameters["courseId"].toString(),
-                                    userId = userId,
+                                    email = email,
                                 )
                             ).fold({
                                 call.respondFreemarker(

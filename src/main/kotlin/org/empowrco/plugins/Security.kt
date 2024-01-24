@@ -44,7 +44,7 @@ fun Application.configureSecurity() {
         }
         session<UserSession>("auth-session") {
             validate {
-                authenticator.validateSession(it.userId)
+                authenticator.validateSession(it.email)
             }
             challenge("/login")
         }

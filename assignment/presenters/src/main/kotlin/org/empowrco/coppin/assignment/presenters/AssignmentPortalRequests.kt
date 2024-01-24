@@ -17,7 +17,7 @@ data class CreateAssignmentPortalRequest(
 data class GetAssignmentRequest(
     val id: String?,
     val courseId: String,
-    val userId: String,
+    val email: String,
 )
 
 data class GetCodeRequest(
