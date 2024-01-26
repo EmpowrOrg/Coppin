@@ -22,6 +22,7 @@ interface UsersPresenters {
     suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse>
     suspend fun getUser(request: GetUserRequest): Result<GetUserResponse>
+    suspend fun getCurrentUser(request: GetCurrentUserRequest): Result<GetCurrentUserResponse>
     suspend fun updateUser(request: UpdateUserRequest): Result<PatchUserResponse>
     suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse>
     suspend fun deleteKey(request: DeleteAccessKey): Result<DeleteKeyResponse>
@@ -33,8 +34,8 @@ class RealUsersPresenters(
 ) : UsersPresenters {
 
     override suspend fun getLogin(): Result<GetLoginResponse> {
-        val showOkta = repo.getSecuritySettings().oktaEnabled
-        return GetLoginResponse(showOkta).toResult()
+        val security = repo.getSecuritySettings()
+        return GetLoginResponse(security.oktaEnabled, security.oktaDomain, "", security.oktaClientId).toResult()
     }
     override suspend fun login(request: LoginRequest): Result<LoginResponse> {
         if (request.email.isBlank()) {
@@ -98,8 +99,10 @@ class RealUsersPresenters(
     }
 
     override suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse> {
-        if (!request.isAdmin) {
-            return failure("")
+        request.email ?: return failure("Unauthorized user")
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
+        if (user.type != User.Type.Admin) {
+            return failure("Unauthorized user")
         }
         val users = repo.getUsers()
         return GetUsersResponse(

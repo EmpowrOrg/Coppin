@@ -25,7 +25,7 @@ data class GetCurrentUserRequest(
 )
 
 data class GetUsersRequest(
-    val isAdmin: Boolean,
+    val email: String?,
 )
 
 data class UpdateUserRequest(

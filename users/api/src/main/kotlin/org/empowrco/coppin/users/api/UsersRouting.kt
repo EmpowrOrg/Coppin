@@ -38,8 +38,8 @@ fun Application.usersRouting() {
         authenticate("auth-session") {
             route("users") {
                 get {
-                    val isAdmin = call.sessions.get<UserSession>()?.isAdmin ?: false
-                    presenter.getUsers(GetUsersRequest(isAdmin)).fold({
+                    val email = call.sessions.get<UserSession>()?.email
+                    presenter.getUsers(GetUsersRequest(email)).fold({
                         call.respondFreemarker("users.ftl", it)
                     }, {
                         call.errorRedirect(it.localizedMessage, "/")
@@ -122,9 +122,15 @@ fun Application.usersRouting() {
                 }
             }
         }
-        route("login") {
+
+        route("login2") {
             get {
-                call.respondFreemarker("login.ftl", mapOf("hideSideNav" to true))
+                presenter.getLogin().fold({
+                    call.respondFreemarker("login.ftl", mapOf("content" to it, "hideSideNav" to true))
+                }, {
+                    call.errorRedirect(it, "/register.ftl")
+                })
+
             }
             post {
                 val params = call.receiveParameters()
@@ -134,7 +140,7 @@ fun Application.usersRouting() {
                         password = params["password"].toString(),
                     )
                 ).fold({
-                    call.sessions.set(UserSession(it.id, it.isAdmin))
+                    call.sessions.set(UserSession(it.id, "", "", it.isAdmin))
                     call.respondRedirect("/")
                 }, {
                     call.errorRedirect(it.localizedMessage)
@@ -156,7 +162,7 @@ fun Application.usersRouting() {
                         confirmPassword = params["confirmPassword"].toString()
                     )
                 ).fold({
-                    call.sessions.set(UserSession(it.id, it.isAdmin))
+                    call.sessions.set(UserSession(it.id, "", "", it.isAdmin))
                     call.errorRedirect(
                         "Your account was created but must be authorized by your Administrator",
                         "/login"
