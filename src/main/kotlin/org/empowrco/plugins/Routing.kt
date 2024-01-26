@@ -28,7 +28,7 @@ fun Application.configureRouting() {
     languagesRouting()
     adminRouting()
     routing {
-        authenticate("auth-session") {
+        authenticate("keycloakOAuth") {
             get("/") {
                 call.respondRedirect("/courses")
             }

@@ -72,4 +72,4 @@ suspend fun ApplicationCall.error(exception: Throwable) {
 }
 
 
-data class UserSession(val email: String, val isAdmin: Boolean)
+data class UserSession(val email: String, val state: String, val token: String, val isAdmin: Boolean)
