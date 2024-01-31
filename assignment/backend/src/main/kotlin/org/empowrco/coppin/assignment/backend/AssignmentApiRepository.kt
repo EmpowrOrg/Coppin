@@ -18,6 +18,7 @@ import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.sources.SettingsSource
 import org.empowrco.coppin.sources.SubmissionSource
 import org.empowrco.coppin.utils.logs.logDebug
 import java.util.UUID
@@ -43,6 +44,7 @@ internal class RealAssignmentApiRepository(
     private val assignmentSource: AssignmentSource,
     private val languagesSource: LanguagesSource,
     private val submissionSource: SubmissionSource,
+    private val settingsSource: SettingsSource,
 ) : AssignmentApiRepository {
     @OptIn(ExperimentalSerializationApi::class)
     val client = HttpClient(Apache) {
@@ -125,7 +127,8 @@ internal class RealAssignmentApiRepository(
         path: String,
         body: JsonObject,
     ): AssignmentCodeResponse {
-        val url = System.getenv("DOCTOR_URL")
+        val url = settingsSource.getOrgSettings()?.doctorUrl
+            ?: throw Exception("Org Settings Not Found. This should never happen")
         val response = client.post("$url$path") {
             contentType(ContentType.Application.Json)
             setBody(body)
