@@ -71,6 +71,12 @@
         margin-bottom: 0 !important;
     }
 
+    #create-keys-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
 </style>
 <body class="bg-gray-200">
 <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg mt-4">
@@ -180,6 +186,24 @@
                              <input data-name="name" name="name" id="name" type="text"
                                     class="form-control" placeholder="Key Name" required>
                          </div>
+                <div id="create-keys-container" class="justify-content-between mt-3 ms-0 ps-0">
+                    <h6 class="required-field">Solution Code</h6>
+                    <div style="display: flex">
+                        <h6>Key Type</h6>
+                        <p>Application Key: Used for connecting grading applications such as Xblocks <br><br>Api Key: Used for connecting course applications. If you are unsure, use an Application Key.</p>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="keyType"
+                                   value="always">
+                            <label class="form-check-label" for="inlineRadio1">Application Key</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="keyType"
+                                   value="onFinish">
+                            <label class="form-check-label" for="inlineRadio2">Api Key</label>
+                        </div>
+                    </div>
+
+                </div>
 </form>`
 
         let dlg = new BsDialogs({
@@ -190,9 +214,12 @@
         if (result === undefined) {
             return
         }
+        const keyType = result.keyType
+        console.log(keyType)
         const body = JSON.stringify({
             id: '${content.id}',
             name: result.name,
+            type: keyType,
         })
         fetch('/user/${content.id}/keys', {
             method: "POST",

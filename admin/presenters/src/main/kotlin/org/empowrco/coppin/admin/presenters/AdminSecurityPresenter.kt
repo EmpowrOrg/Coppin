@@ -3,7 +3,6 @@ package org.empowrco.coppin.admin.presenters
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.admin.backend.AdminSecurityRepository
 import org.empowrco.coppin.models.User
-import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toResult
@@ -16,7 +15,6 @@ interface AdminSecurityPresenter {
 
 internal class RealAdminSecurityPresenter(
     private val repo: AdminSecurityRepository,
-    private val auth: Authenticator,
 ) : AdminSecurityPresenter {
     override suspend fun getSecuritySettings(request: GetSecuritySettingsRequest): Result<GetSecuritySettingsResponse> {
         val securitySettings = repo.getSecuritySettings()
@@ -51,13 +49,13 @@ internal class RealAdminSecurityPresenter(
                 return failure("You must specify your client secret")
             }
         }
-        val clientSecretDisplay = ("******************************" + request.clientSecret?.takeLast(4)) ?: ""
+        val secret = request.clientSecret ?: ""
         val updatedSecuritySettings = securitySettings.copy(
             oktaEnabled = request.enableOkta,
             oktaDomain = request.oktaDomain ?: "",
             oktaClientId = request.clientId ?: "",
-            oktaClientSecret = request.clientSecret ?: "",
-            oktaClientSecretDisplay = clientSecretDisplay,
+            oktaClientSecret = secret,
+            oktaClientSecretDisplay = secret.displaySecret(),
             lastModifiedAt = LocalDateTime.now(),
         )
         repo.saveSecuritySettings(updatedSecuritySettings)

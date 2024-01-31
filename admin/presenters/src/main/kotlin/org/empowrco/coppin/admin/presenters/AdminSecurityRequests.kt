@@ -14,3 +14,16 @@ data class SaveSecuritySettingsRequest(
     val oktaDomain: String?,
 )
 
+@Serializable
+data class GetOrgSettingsRequest(val email: String?)
+
+@Serializable
+data class SaveOrgSettingsRequest(
+    val userEmail: String,
+    val edxClientId: String?,
+    val edxClientSecret: String?,
+    val edxUsername: String?,
+    val edxApiUrl: String?,
+    val doctorUrl: String?,
+)
+

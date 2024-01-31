@@ -1,6 +1,7 @@
 package org.empowrco.coppin.sources
 
 import kotlinx.datetime.LocalDateTime
+import org.empowrco.coppin.models.OrgSettings
 import org.empowrco.coppin.models.SecuritySettings
 import org.empowrco.coppin.utils.now
 import org.jetbrains.exposed.sql.insert
@@ -11,6 +12,9 @@ interface SettingsSource {
     suspend fun getSecuritySettings(): SecuritySettings?
     suspend fun createSecuritySettings(): SecuritySettings
     suspend fun updateSecuritySettings(settings: SecuritySettings): Boolean
+    suspend fun getOrgSettings(): OrgSettings?
+    suspend fun createOrgSettings(settings: OrgSettings)
+    suspend fun updateOrgSettings(settings: OrgSettings): Boolean
 }
 
 internal class RealSettingsSource : SettingsSource {
@@ -56,5 +60,45 @@ internal class RealSettingsSource : SettingsSource {
             it[lastModifiedAt] = settings.lastModifiedAt
         }
         result > 0
+    }
+
+    override suspend fun getOrgSettings(): OrgSettings? = dbQuery {
+        org.empowrco.coppin.db.OrgSettings.selectAll().map {
+            return@map OrgSettings(
+                id = it[org.empowrco.coppin.db.OrgSettings.id].value,
+                doctorUrl = it[org.empowrco.coppin.db.OrgSettings.doctorUrl],
+                edxUsername = it[org.empowrco.coppin.db.OrgSettings.edxUsername],
+                edxApiUrl = it[org.empowrco.coppin.db.OrgSettings.edxApiUrl],
+                edxClientId = it[org.empowrco.coppin.db.OrgSettings.edxClientId],
+                edxClientSecret = it[org.empowrco.coppin.db.OrgSettings.edxClientSecret],
+                createdAt = it[org.empowrco.coppin.db.OrgSettings.createdAt],
+                lastModifiedAt = it[org.empowrco.coppin.db.OrgSettings.lastModifiedAt],
+            )
+        }.firstOrNull()
+    }
+
+    override suspend fun createOrgSettings(settings: OrgSettings) = dbQuery {
+        org.empowrco.coppin.db.OrgSettings.insert {
+            it[org.empowrco.coppin.db.OrgSettings.id] = settings.id
+            it[org.empowrco.coppin.db.OrgSettings.doctorUrl] = settings.doctorUrl
+            it[org.empowrco.coppin.db.OrgSettings.edxUsername] = settings.edxUsername
+            it[org.empowrco.coppin.db.OrgSettings.edxApiUrl] = settings.edxApiUrl
+            it[org.empowrco.coppin.db.OrgSettings.edxClientId] = settings.edxClientId
+            it[org.empowrco.coppin.db.OrgSettings.edxClientSecret] = settings.edxClientSecret
+            it[org.empowrco.coppin.db.OrgSettings.createdAt] = settings.createdAt
+            it[org.empowrco.coppin.db.OrgSettings.lastModifiedAt] = settings.lastModifiedAt
+        }
+        Unit
+    }
+
+    override suspend fun updateOrgSettings(settings: OrgSettings): Boolean = dbQuery {
+        org.empowrco.coppin.db.OrgSettings.update {
+            it[org.empowrco.coppin.db.OrgSettings.doctorUrl] = settings.doctorUrl
+            it[org.empowrco.coppin.db.OrgSettings.edxUsername] = settings.edxUsername
+            it[org.empowrco.coppin.db.OrgSettings.edxApiUrl] = settings.edxApiUrl
+            it[org.empowrco.coppin.db.OrgSettings.edxClientId] = settings.edxClientId
+            it[org.empowrco.coppin.db.OrgSettings.edxClientSecret] = settings.edxClientSecret
+            it[org.empowrco.coppin.db.OrgSettings.lastModifiedAt] = settings.lastModifiedAt
+        } > 0
     }
 }

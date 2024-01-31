@@ -14,11 +14,11 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="/admin/security">
+                <a class="nav-link" href="/admin">
                     <div class="text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">school</i>
+                        <i class="material-icons opacity-10">admin_panel_settings</i>
                     </div>
-                    <span class="nav-link-text ms-1">Security</span>
+                    <span class="nav-link-text ms-1">Org Settings</span>
                 </a>
             </li>
             <li class="nav-item">

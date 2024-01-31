@@ -116,10 +116,16 @@ class RealUsersPresenters(
         val suffix = Base64.getEncoder().encodeToString(randomKey.toByteArray(Charsets.UTF_8))
         val key = "$prefix.$suffix"
         val currentTime = LocalDateTime.now()
+        val type = try {
+            UserAccessKey.Type.valueOf(request.type)
+        } catch (ex: Exception) {
+            return failure("Invalid Key Type")
+        }
         val accessKey = UserAccessKey(
             userId = userId,
             id = keyId,
             key = key,
+            type = type,
             name = request.name,
             createdAt = currentTime,
             lastModifiedAt = currentTime,

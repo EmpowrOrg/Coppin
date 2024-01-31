@@ -13,3 +13,15 @@ data class GetSecuritySettingsResponse(
 
 @Serializable
 object SaveSecuritySettingsResponse
+
+@Serializable
+data class GetOrgSettingsResponse(
+    val edxClientId: String,
+    val edxClientSecretDisplay: String,
+    val edxUsername: String,
+    val edxApiUrl: String,
+    val doctorUrl: String,
+)
+
+@Serializable
+object SaveOrgSettingsResponse

@@ -6,4 +6,5 @@ import org.koin.dsl.module
 
 val adminPresenterModule = module {
     singleOf(::RealAdminSecurityPresenter) { bind<AdminSecurityPresenter>() }
+    singleOf(::RealAdminOrgPresenter) { bind<AdminOrgPresenter>() }
 }
