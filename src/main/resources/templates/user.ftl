@@ -180,10 +180,6 @@
                              <input data-name="name" name="name" id="name" type="text"
                                     class="form-control" placeholder="Key Name" required>
                          </div>
-                         <div class="input-group input-group-outline mt-3">
-                             <input data-name="password" name="password" id="password" type="password"
-                                    class="form-control" placeholder="Password" required>
-                         </div>
 </form>`
 
         let dlg = new BsDialogs({
@@ -194,9 +190,7 @@
         if (result === undefined) {
             return
         }
-        const password = result.password
         const body = JSON.stringify({
-            password: password,
             id: '${content.id}',
             name: result.name,
         })
@@ -233,30 +227,18 @@
 </script>
 <script>
     async function deleteKey(keyId) {
-        const frm = `<form>
-                         <div>This is a permanent action. Once you delete this access
-                             key, all applications and Xblocks utilizing this access key will no longer
-                             work.
-                         </div>
-                         <div class="input-group input-group-outline mt-3">
-                             <input data-name="password" name="password" id="password" type="password"
-                                    class="form-control" placeholder="Password" required>
-                         </div>
-</form>`
-        let dlg = new BsDialogs({close: true})
-        dlg.form('Delete Access Key', 'Delete', frm)
-        let result = await dlg.onsubmit()
-        if (result === undefined) {
+        let result = await new BsDialogs().yes_no('Are You Sure?', `This is a permanent action. Once you delete this access
+        key, all applications and Xblocks utilizing this access key will no longer
+        work.`)
+        if (result !== 'yes') {
             return
         }
-        const password = result.password
-        deleteAccessKey(keyId, password)
+        deleteAccessKey(keyId)
     }
 </script>
 <script>
-    function deleteAccessKey(keyId, password) {
+    function deleteAccessKey(keyId) {
         const body = JSON.stringify({
-            password: password,
             userId: '${content.id}',
             id: keyId,
         })

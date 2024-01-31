@@ -2,19 +2,6 @@ package org.empowrco.coppin.users.presenters
 
 import kotlinx.serialization.Serializable
 
-data class LoginRequest(
-    val email: String,
-    val password: String,
-)
-
-data class RegisterRequest(
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val password: String,
-    val confirmPassword: String,
-)
-
 data class GetUserRequest(
     val id: String,
     val currentUser: String,
@@ -40,7 +27,7 @@ data class UpdateUserRequest(
 @Serializable
 data class CreateAccessKey(
     val id: String,
-    val password: String,
+    val email: String,
     val name: String,
 )
 
@@ -48,5 +35,5 @@ data class CreateAccessKey(
 data class DeleteAccessKey(
     val userId: String,
     val id: String,
-    val password: String,
+    val email: String,
 )

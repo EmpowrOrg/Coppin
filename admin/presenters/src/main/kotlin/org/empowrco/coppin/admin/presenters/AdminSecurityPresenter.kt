@@ -35,7 +35,7 @@ internal class RealAdminSecurityPresenter(
     }
 
     override suspend fun updateSecuritySettings(request: SaveSecuritySettingsRequest): Result<SaveSecuritySettingsResponse> {
-        val failure = authorizeAdmin<SaveSecuritySettingsResponse>(request.userId, request.password)
+        val failure = authorizeAdmin<SaveSecuritySettingsResponse>(request.userId)
         if (failure != null) {
             return failure
         }
@@ -64,11 +64,10 @@ internal class RealAdminSecurityPresenter(
         return SaveSecuritySettingsResponse.toResult()
     }
 
-    private suspend fun <T : Any> authorizeAdmin(userIdParam: String, password: String): Result<T>? {
+    private suspend fun <T : Any> authorizeAdmin(userIdParam: String): Result<T>? {
         val userId = userIdParam.toUuid() ?: return failure("Invalid user id")
         val user = repo.getUser(userId) ?: return failure("No user found")
-        val passwordHash = auth.hash(password)
-        if (user.type != User.Type.Admin && passwordHash != user.passwordHash) {
+        if (user.type != User.Type.Admin) {
             return failure("Unauthorized User")
         }
         return null

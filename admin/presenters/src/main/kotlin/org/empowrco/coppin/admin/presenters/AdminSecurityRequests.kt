@@ -7,7 +7,6 @@ data class GetSecuritySettingsRequest(val email: String?)
 
 @Serializable
 data class SaveSecuritySettingsRequest(
-    val password: String,
     val userId: String,
     val enableOkta: Boolean,
     val clientId: String?,

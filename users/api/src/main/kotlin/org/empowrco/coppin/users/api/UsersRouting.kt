@@ -15,14 +15,11 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
-import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.CreateAccessKey
 import org.empowrco.coppin.users.presenters.DeleteAccessKey
 import org.empowrco.coppin.users.presenters.GetCurrentUserRequest
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.GetUsersRequest
-import org.empowrco.coppin.users.presenters.LoginRequest
-import org.empowrco.coppin.users.presenters.RegisterRequest
 import org.empowrco.coppin.users.presenters.UpdateUserRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
 import org.empowrco.coppin.utils.routing.Breadcrumbs
@@ -120,56 +117,6 @@ fun Application.usersRouting() {
                         })
                     }
                 }
-            }
-        }
-
-        route("login2") {
-            get {
-                presenter.getLogin().fold({
-                    call.respondFreemarker("login.ftl", mapOf("content" to it, "hideSideNav" to true))
-                }, {
-                    call.errorRedirect(it, "/register.ftl")
-                })
-
-            }
-            post {
-                val params = call.receiveParameters()
-                presenter.login(
-                    LoginRequest(
-                        email = params["email"].toString(),
-                        password = params["password"].toString(),
-                    )
-                ).fold({
-                    call.sessions.set(UserSession(it.id, "", "", it.isAdmin))
-                    call.respondRedirect("/")
-                }, {
-                    call.errorRedirect(it.localizedMessage)
-                })
-            }
-        }
-        route("register") {
-            get {
-                call.respondFreemarker("register.ftl", mapOf("hideSideNav" to true))
-            }
-            post {
-                val params = call.receiveParameters()
-                presenter.register(
-                    RegisterRequest(
-                        firstName = params["firstName"].toString(),
-                        lastName = params["lastName"].toString(),
-                        email = params["email"].toString(),
-                        password = params["password"].toString(),
-                        confirmPassword = params["confirmPassword"].toString()
-                    )
-                ).fold({
-                    call.sessions.set(UserSession(it.id, "", "", it.isAdmin))
-                    call.errorRedirect(
-                        "Your account was created but must be authorized by your Administrator",
-                        "/login"
-                    )
-                }, {
-                    call.errorRedirect(it.localizedMessage)
-                })
             }
         }
         get("signout") {

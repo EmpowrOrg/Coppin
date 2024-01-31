@@ -4,8 +4,6 @@ import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.models.User
 import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.users.backend.UsersRepository
-import org.empowrco.coppin.utils.DuplicateKeyException
-import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.capitalize
 import org.empowrco.coppin.utils.failure
 import org.empowrco.coppin.utils.monthDayYear
@@ -18,8 +16,6 @@ import java.util.UUID
 
 interface UsersPresenters {
     suspend fun getLogin(): Result<GetLoginResponse>
-    suspend fun login(request: LoginRequest): Result<LoginResponse>
-    suspend fun register(request: RegisterRequest): Result<RegisterResponse>
     suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse>
     suspend fun getUser(request: GetUserRequest): Result<GetUserResponse>
     suspend fun getCurrentUser(request: GetCurrentUserRequest): Result<GetCurrentUserResponse>
@@ -30,72 +26,11 @@ interface UsersPresenters {
 
 class RealUsersPresenters(
     private val repo: UsersRepository,
-    private val authenticator: Authenticator,
 ) : UsersPresenters {
 
     override suspend fun getLogin(): Result<GetLoginResponse> {
         val security = repo.getSecuritySettings()
         return GetLoginResponse(security.oktaEnabled, security.oktaDomain, "", security.oktaClientId).toResult()
-    }
-    override suspend fun login(request: LoginRequest): Result<LoginResponse> {
-        if (request.email.isBlank()) {
-            return failure("Please insert an email")
-        } else if (request.password.isBlank()) {
-            return failure("Please insert a password")
-        }
-        val user = repo.getUserByEmail(request.email) ?: return failure("No user found with this email")
-        val passwordHash = authenticator.hash(request.password)
-        if (passwordHash != user.passwordHash) {
-            return failure("Incorrect password")
-        } else if (!user.isAuthorized) {
-            return failure("Your account has not been authorized. Pleased contact your administrator.")
-        }
-        return LoginResponse(user.id.toString(), user.type == User.Type.Admin).toResult()
-    }
-
-    override suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
-        if (request.firstName.isBlank()) {
-            return failure("Please enter your first name")
-        } else if (request.lastName.isBlank()) {
-            return failure("Please enter your last name")
-        } else if (request.email.isBlank()) {
-            return failure("Please enter your email")
-        } else if (request.password.isBlank()) {
-            return failure("Please enter your password")
-        } else if (request.confirmPassword.isBlank()) {
-            return failure("Please confirm your password")
-        } else if (request.password != request.confirmPassword) {
-            return failure("Please ensure your passwords match")
-        } else if (!request.email.isEmail()) {
-            return failure("Please enter a valid email")
-        }
-        authenticator.isValidPassword(request.password).onFailure {
-            return failure("Please enter a valid password")
-        }
-        val passwordHash = authenticator.hash(request.password)
-        val currentTime = LocalDateTime.now()
-        val user = User(
-            id = UUID.randomUUID(),
-            firstName = request.firstName,
-            lastName = request.lastName,
-            email = request.email,
-            type = User.Type.Teacher,
-            isAuthorized = false,
-            keys = emptyList(),
-            passwordHash = passwordHash,
-            createdAt = currentTime,
-            lastModifiedAt = currentTime,
-        )
-        try {
-            repo.createUser(user)
-        } catch (ex: DuplicateKeyException) {
-            return failure("An account with this info already exists")
-        }
-        return RegisterResponse(user.id.toString(), user.type == User.Type.Admin).toResult()
-    }
-
-    private fun String.isEmail(): Boolean {
-        return "^[a-zA-Z0-9_!#\$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+\$".toRegex().matches(this)
     }
 
     override suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse> {
@@ -174,12 +109,8 @@ class RealUsersPresenters(
 
     override suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse> {
         val userId = request.id.toUuid() ?: return failure("Invalid User Id")
-        val user = repo.getUser(userId) ?: return failure("User Not Found")
-        val passwordHash = authenticator.hash(request.password)
-        if (user.passwordHash != passwordHash) {
-            return failure("Invalid password")
-        }
-        val randomKey = generateRandomPassword()
+        repo.getUser(userId) ?: return failure("User Not Found")
+        val randomKey = generateRandomKey()
         val keyId = UUID.randomUUID()
         val prefix = Base64.getEncoder().encodeToString(keyId.toString().toByteArray(Charsets.UTF_8))
         val suffix = Base64.getEncoder().encodeToString(randomKey.toByteArray(Charsets.UTF_8))
@@ -197,7 +128,7 @@ class RealUsersPresenters(
         return CreateKeyResponse(key).toResult()
     }
 
-    private fun generateRandomPassword(): String {
+    private fun generateRandomKey(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         val random = SecureRandom();
         val sb = StringBuilder();
@@ -211,11 +142,7 @@ class RealUsersPresenters(
     override suspend fun deleteKey(request: DeleteAccessKey): Result<DeleteKeyResponse> {
         val userId = request.userId.toUuid() ?: return failure("Invalid user id")
         val keyId = request.id.toUuid() ?: return failure("Invalid key id")
-        val user = repo.getUser(userId) ?: return failure("User not found")
-        val passwordHash = authenticator.hash(request.password)
-        if (passwordHash != user.passwordHash) {
-            return failure("Invalid password")
-        }
+        repo.getUser(userId) ?: return failure("User not found")
         val result = repo.deleteKey(keyId)
         if (!result) {
             return failure("Error deleting key")

@@ -66,24 +66,6 @@
 </script>
 <script>
     async function saveSecuritySettings() {
-        const frm = `<form>
-                         <div>Update security settings
-                         </div>
-                         <div class="input-group input-group-outline mt-3">
-                             <input data-name="password" name="password" id="password" type="password"
-                                    class="form-control" placeholder="Password" required>
-                         </div>
-</form>`
-
-        let dlg = new BsDialogs({
-            close: true
-        })
-        dlg.form('Update Security Settings', 'Save', frm)
-        let result = await dlg.onsubmit()
-        if (result === undefined) {
-            return
-        }
-        const password = result.password
         const oktaEnabled = document.getElementById("oktaEnabled").checked
         const oktaDomain = document.getElementById("oktaDomain").value
         const clientId = document.getElementById("oktaClientId").value
@@ -92,7 +74,6 @@
             oktaDomain: oktaDomain,
             clientId: clientId,
             clientSecret: secret,
-            password: password,
             enableOkta: oktaEnabled,
             userId: "${content.userId}",
         })

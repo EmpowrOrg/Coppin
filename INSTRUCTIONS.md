@@ -16,8 +16,7 @@ We recommend hosting the server on AWS Elastic Beanstalk, but you can use hostin
 | DATABASE_NAME         | Name of the database                                                                               |
 | DATABASE_PORT         | Port of the database                                                                               |
 | DATABASE_SERVER       | Server url of the database                                                                         |
-| PORT                  | Port that the server will attach to                                                                |
-| SECRET_KEY            | Key used to generate user passwords                                                                |
+| PORT                  | Port that the server will attach to                                                                | |
 | DOCTOR_URL            | Url for Doctor Server                                                                              |
 | SESSION_SIGN_KEY      | Key used to sign user session cookies                                                              |
 | SESSION_ENCRYPT_KEY   | Key used to encrypt user session cookies                                                           |
