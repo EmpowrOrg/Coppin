@@ -7,4 +7,5 @@ import org.koin.dsl.module
 val adminBackendModule = module {
     singleOf(::RealAdminSecurityRepository) { bind<AdminSecurityRepository>() }
     singleOf(::RealAdminOrgRepository) { bind<AdminOrgRepository>() }
+    singleOf(::RealAdminAiRepository) { bind<AdminAiRepository>() }
 }

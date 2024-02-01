@@ -86,11 +86,11 @@ internal class RealAdminOrgPresenter(
         }
 
         val updateOrgSettings = orgSettings.copy(
-            edxUsername = request.edxUsername,
-            edxClientId = request.edxClientId,
-            edxClientSecret = request.edxClientSecret,
-            edxApiUrl = request.edxApiUrl,
-            doctorUrl = request.doctorUrl,
+            edxUsername = request.edxUsername.trim(),
+            edxClientId = request.edxClientId.trim(),
+            edxClientSecret = request.edxClientSecret.trim(),
+            edxApiUrl = request.edxApiUrl.trim(),
+            doctorUrl = request.doctorUrl.trim(),
             lastModifiedAt = currentTime,
         )
         repo.saveOrgSettings(updateOrgSettings)

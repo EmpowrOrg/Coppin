@@ -5,6 +5,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val adminPresenterModule = module {
-    singleOf(::RealAdminSecurityPresenter) { bind<AdminSecurityPresenter>() }
     singleOf(::RealAdminOrgPresenter) { bind<AdminOrgPresenter>() }
+    singleOf(::RealAdminAiPresenter) { bind<AdminAiPresenter>() }
 }

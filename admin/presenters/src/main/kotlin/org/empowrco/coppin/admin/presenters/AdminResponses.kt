@@ -25,3 +25,14 @@ data class GetOrgSettingsResponse(
 
 @Serializable
 object SaveOrgSettingsResponse
+
+@Serializable
+data class GetAiSettingsResponse(
+    val org: String,
+    val model: String,
+    val key: String,
+    val prePrompt: String,
+)
+
+@Serializable
+object SaveAiSettingsResponse

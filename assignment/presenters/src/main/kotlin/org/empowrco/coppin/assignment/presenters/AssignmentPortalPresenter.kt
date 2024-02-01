@@ -138,7 +138,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 points = null,
                 courseName = course.title,
                 userId = user.id.toString(),
-                showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
+                showGenerate = repo.isAiEnabled(),
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -185,7 +185,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 )
             },
             userId = user.id.toString(),
-            showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
+            showGenerate = repo.isAiEnabled(),
         ).toResult()
     }
 
@@ -387,13 +387,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("You must specify a prompt")
         } else if (request.userId.isBlank()) {
             return failure("Please try logging in again.")
-        }
-        if (System.getenv("OPEN_AI_KEY") == null) {
-            return failure("OPEN_AI_KEY is missing from environment")
-        } else if (System.getenv("OPEN_AI_MODEL") == null) {
-            return failure("OPEN_AI_MODEL is missing from environment")
-        } else if (System.getenv("OPEN_AI_ORG_KEY") == null) {
-            return failure("OPEN_AI_ORG_KEY is missing from environment")
         }
         val response = repo.generateAssignment(request.prompt, request.userId)
         if (response.response.isNullOrBlank()) {

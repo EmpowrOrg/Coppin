@@ -1,6 +1,7 @@
 package org.empowrco.coppin.sources
 
 import kotlinx.datetime.LocalDateTime
+import org.empowrco.coppin.models.AiSettings
 import org.empowrco.coppin.models.OrgSettings
 import org.empowrco.coppin.models.SecuritySettings
 import org.empowrco.coppin.utils.now
@@ -15,6 +16,9 @@ interface SettingsSource {
     suspend fun getOrgSettings(): OrgSettings?
     suspend fun createOrgSettings(settings: OrgSettings)
     suspend fun updateOrgSettings(settings: OrgSettings): Boolean
+    suspend fun getAiSettings(): AiSettings?
+    suspend fun createAiSettings(settings: AiSettings)
+    suspend fun updateAiSettings(settings: AiSettings): Boolean
 }
 
 internal class RealSettingsSource : SettingsSource {
@@ -99,6 +103,44 @@ internal class RealSettingsSource : SettingsSource {
             it[org.empowrco.coppin.db.OrgSettings.edxClientId] = settings.edxClientId
             it[org.empowrco.coppin.db.OrgSettings.edxClientSecret] = settings.edxClientSecret
             it[org.empowrco.coppin.db.OrgSettings.lastModifiedAt] = settings.lastModifiedAt
+        } > 0
+    }
+
+    override suspend fun getAiSettings(): AiSettings? = dbQuery {
+        org.empowrco.coppin.db.AiSettings.selectAll().map {
+            AiSettings(
+                id = it[org.empowrco.coppin.db.AiSettings.id].value,
+                model = it[org.empowrco.coppin.db.AiSettings.model],
+                orgKey = it[org.empowrco.coppin.db.AiSettings.orgKey],
+                key = it[org.empowrco.coppin.db.AiSettings.key],
+                prePrompt = it[org.empowrco.coppin.db.AiSettings.prePrompt],
+                createdAt = it[org.empowrco.coppin.db.AiSettings.createdAt],
+                lastModifiedAt = it[org.empowrco.coppin.db.AiSettings.lastModifiedAt],
+            )
+        }.firstOrNull()
+    }
+
+    override suspend fun createAiSettings(settings: AiSettings) = dbQuery {
+        org.empowrco.coppin.db.AiSettings.insert {
+            it[org.empowrco.coppin.db.AiSettings.id] = settings.id
+            it[org.empowrco.coppin.db.AiSettings.model] = settings.model
+            it[org.empowrco.coppin.db.AiSettings.orgKey] = settings.orgKey
+            it[org.empowrco.coppin.db.AiSettings.prePrompt] = settings.prePrompt
+            it[org.empowrco.coppin.db.AiSettings.key] = settings.key
+            it[org.empowrco.coppin.db.AiSettings.createdAt] = settings.createdAt
+            it[org.empowrco.coppin.db.AiSettings.lastModifiedAt] = settings.lastModifiedAt
+        }
+        Unit
+    }
+
+    override suspend fun updateAiSettings(settings: AiSettings): Boolean = dbQuery {
+        org.empowrco.coppin.db.AiSettings.update {
+            it[org.empowrco.coppin.db.AiSettings.id] = settings.id
+            it[org.empowrco.coppin.db.AiSettings.model] = settings.model
+            it[org.empowrco.coppin.db.AiSettings.orgKey] = settings.orgKey
+            it[org.empowrco.coppin.db.AiSettings.prePrompt] = settings.prePrompt
+            it[org.empowrco.coppin.db.AiSettings.key] = settings.key
+            it[org.empowrco.coppin.db.AiSettings.lastModifiedAt] = settings.lastModifiedAt
         } > 0
     }
 }

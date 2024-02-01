@@ -47,7 +47,7 @@ fun Application.adminRouting() {
                     call.errorRedirect(it.localizedMessage)
                 })
             }
-            securityRouting()
+            aiRouting()
         }
     }
 

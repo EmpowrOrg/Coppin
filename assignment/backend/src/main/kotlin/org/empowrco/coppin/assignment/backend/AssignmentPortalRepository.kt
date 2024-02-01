@@ -41,6 +41,7 @@ interface AssignmentPortalRepository {
     suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long
     suspend fun generateAssignment(prompt: String, userId: String): AiResponse
     suspend fun getUserByEmail(email: String): User?
+    suspend fun isAiEnabled(): Boolean
 }
 
 internal class RealAssignmentPortalRepository(
@@ -137,5 +138,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun getUserByEmail(email: String): User? {
         return usersSource.getUserByEmail(email)
+    }
+
+    override suspend fun isAiEnabled(): Boolean {
+        return openAiSource.isEnabled()
     }
 }

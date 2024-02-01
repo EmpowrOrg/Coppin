@@ -16,14 +16,11 @@ We recommend hosting the server on AWS Elastic Beanstalk, but you can use hostin
 | DATABASE_NAME       | Name of the database                                                                               |
 | DATABASE_PORT       | Port of the database                                                                               |
 | DATABASE_SERVER     | Server url of the database                                                                         |
-| PORT                | Port that the server will attach to                                                                | |                                                                            |
+| PORT                | Port that the server will attach to                                                                |                                                                       |
 | SESSION_SIGN_KEY    | Key used to sign user session cookies                                                              |
 | SESSION_ENCRYPT_KEY | Key used to encrypt user session cookies                                                           |
 | REDIS_URL           | Url of the redis cluster instance.                                                                 |
-| REDIS_PORT          | Port of the redis cluster instance. This isn't needed for AWS but is needed for local environments | | |                                                                     |                                               |
-| OPEN_AI_KEY         | Optional key to support AI generated assignments                                                   |
-| OPEN_AI_ORG_KEY     | Optional org key to support AI generated assignments                                               |
-| OPEN_AI_MODEL       | Optional AI model to be specified to support AI generated assignments (gpt-3.5-turbo-16k)          |
+| REDIS_PORT          | Port of the redis cluster instance. This isn't needed for AWS but is needed for local environments |                                                                    |                                               |         |
 
 5. Ensure you have the database created before you first run the server
 6. Ensure you created a Redis Cluster instance.

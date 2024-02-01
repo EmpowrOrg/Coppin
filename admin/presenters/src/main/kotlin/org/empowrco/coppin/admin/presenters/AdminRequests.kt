@@ -27,3 +27,14 @@ data class SaveOrgSettingsRequest(
     val doctorUrl: String?,
 )
 
+@Serializable
+data class GetAiSettingsRequest(val email: String?)
+
+@Serializable
+data class SaveAiSettingsRequest(
+    val model: String?,
+    val orgKey: String?,
+    val key: String?,
+    val prePrompt: String?,
+    val userEmail: String,
+)

@@ -80,45 +80,4 @@
         </div>
     </div>
 </main>
-<script>
-
-
-    function saveClicked() {
-        document.getElementById("save-button").enabled = false
-        toggleElements(false)
-        /*        const edxClientId = document.getElementById("edxClientId").value
-                const edxClientSecret = document.getElementById("edxClientSecret").value
-                const edxApiUrl = document.getElementById("edxApiUrl").value
-                const edxUsername = document.getElementById("userName").value
-                const doctorUrl = document.getElementById("doctorUrl").value
-                const body = JSON.stringify({
-                    id: '{content.id}',
-                    name: result.name,
-                    type: keyType,
-                })
-                    val edxClientId: String,
-                    val edxClientSecret: String,
-                    val edxUsername: String,
-                    val edxApiUrl: String,
-                    val doctorUrl: String,
-                fetch('/admin', {
-                    method: "POST",
-                    headers: {'Content-Type': 'application/json'},
-                    body: body
-                }).then(async response => {
-                    return await parseResponse(response)
-                }).then(async res => {
-                    if (res.error) {
-                        throw new Error(res.error)
-                    } else {
-                        await new BsDialogs().ok('Access Key Created', 'New access key created');
-                        window.location.replace("/user/{content.id}")
-                    }
-                }).catch(async error => {
-                    await showError(error)
-                });*/
-    }
-</script>
-
-
 </@layout.header>

@@ -13,23 +13,33 @@ import kotlin.time.Duration.Companion.seconds
 
 interface OpenAiSource {
     suspend fun prompt(query: String, user: String): AiResponse
+    suspend fun isEnabled(): Boolean
 }
 
-internal class RealOpenAiSource : OpenAiSource {
-    private val config = OpenAIConfig(
-        token = System.getenv("OPEN_AI_KEY") ?: "",
-        timeout = Timeout(socket = 60.seconds),
-        organization = System.getenv("OPEN_AI_ORG_KEY") ?: "",
-    )
-    private val openAI = OpenAI(config)
-    private val model = ModelId(System.getenv("OPEN_AI_MODEL") ?: "")
+internal class RealOpenAiSource(private val settingsSource: SettingsSource) : OpenAiSource {
+
 
     @OptIn(BetaOpenAI::class)
     override suspend fun prompt(query: String, user: String): AiResponse {
-        val prePrompt =
-            "Please ensure that the instructions are written in Markdown language. Do not return any text other than the instructions. Use syntax highlighting with code blocks. "
+        val aiNotEnabledResponse = AiResponse(
+            response = null,
+            stopReason = "Ai is not enabled for your Coppin account. Please contact your administrator",
+            promptTokens = 0,
+            responseTokens = 0,
+        )
+        val aiSettings = settingsSource.getAiSettings() ?: return aiNotEnabledResponse
+        if (!isEnabled()) {
+            return aiNotEnabledResponse
+        }
+        val config = OpenAIConfig(
+            token = aiSettings.key,
+            timeout = Timeout(socket = 60.seconds),
+            organization = aiSettings.orgKey,
+        )
+        val openAI = OpenAI(config)
+        val model = ModelId(aiSettings.model)
         val promptRestriction = ChatMessage(
-            content = prePrompt,
+            content = aiSettings.prePrompt,
             role = ChatRole.System,
         )
 
@@ -39,7 +49,7 @@ internal class RealOpenAiSource : OpenAiSource {
                 promptRestriction,
                 promptRestriction.copy(role = ChatRole.User),
                 ChatMessage(
-                    content = "$prePrompt. Now answer the following query: $query",
+                    content = query,
                     role = ChatRole.User,
                     name = user,
                 )
@@ -56,5 +66,10 @@ internal class RealOpenAiSource : OpenAiSource {
             responseTokens = completion.usage?.completionTokens ?: 0,
             stopReason = completion.choices.firstOrNull()?.finishReason
         )
+    }
+
+    override suspend fun isEnabled(): Boolean {
+        val aiSettings = settingsSource.getAiSettings() ?: return false
+        return aiSettings.key.isNotBlank() && aiSettings.orgKey.isNotBlank() && aiSettings.model.isNotBlank()
     }
 }

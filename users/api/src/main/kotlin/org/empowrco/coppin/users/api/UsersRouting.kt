@@ -37,7 +37,7 @@ fun Application.usersRouting() {
                 get {
                     val email = call.sessions.get<UserSession>()?.email
                     presenter.getUsers(GetUsersRequest(email)).fold({
-                        call.respondFreemarker("users.ftl", it)
+                        call.respondFreemarker("users.ftl", it, isAdminPanel = true)
                     }, {
                         call.errorRedirect(it.localizedMessage, "/")
                     })
@@ -63,22 +63,26 @@ fun Application.usersRouting() {
                         currentUser = email
                     )
                     presenter.getUser(request).fold({
-                        call.respondFreemarker("user.ftl", it, Breadcrumbs(
-                            crumbs = buildList {
-                                if (it.isAdmin) {
-                                    add(Breadcrumbs.Crumb("manage_accounts", "Users", "/users"))
-                                }
-                                add(
-                                    Breadcrumbs.Crumb(
-                                        if (it.isAdmin) {
-                                            null
-                                        } else {
-                                            "account_circle"
-                                        }, it.firstName, null
+                        call.respondFreemarker(
+                            "user.ftl", it,
+                            Breadcrumbs(
+                                crumbs = buildList {
+                                    if (it.isAdmin) {
+                                        add(Breadcrumbs.Crumb("manage_accounts", "Users", "/users"))
+                                    }
+                                    add(
+                                        Breadcrumbs.Crumb(
+                                            if (it.isAdmin) {
+                                                null
+                                            } else {
+                                                "account_circle"
+                                            }, it.firstName, null
+                                        )
                                     )
-                                )
-                            }
-                        ))
+                                }
+                            ),
+                            isAdminPanel = it.isAdmin,
+                        )
                     }, {
                         call.errorRedirect(it.localizedMessage)
                     })
