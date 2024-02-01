@@ -18,6 +18,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
+import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.routing.UserSession
 import org.koin.ktor.ext.inject
@@ -54,9 +55,14 @@ fun Application.configureSecurity() {
                 "http://localhost:3000/callback"
             }
         }
-        bearer("key") {
+        bearer("api") {
             authenticate {
-                authenticator.validateKey(it.token)
+                authenticator.validateKey(it.token, UserAccessKey.Type.Api)
+            }
+        }
+        bearer("application") {
+            authenticate {
+                authenticator.validateKey(it.token, UserAccessKey.Type.Application)
             }
         }
         session<UserSession>("auth-session") {

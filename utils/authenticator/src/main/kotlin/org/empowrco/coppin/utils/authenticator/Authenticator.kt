@@ -1,6 +1,7 @@
 package org.empowrco.coppin.utils.authenticator
 
 import io.ktor.server.auth.UserIdPrincipal
+import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.sources.UsersSource
 import org.empowrco.coppin.utils.logs.logDebug
 import java.util.Base64
@@ -8,7 +9,7 @@ import java.util.UUID
 
 interface Authenticator {
     suspend fun validateSession(email: String): UserIdPrincipal?
-    suspend fun validateKey(accessKey: String): UserIdPrincipal?
+    suspend fun validateKey(accessKey: String, type: UserAccessKey.Type): UserIdPrincipal?
 }
 
 internal class RealAuthenticator(
@@ -24,7 +25,7 @@ internal class RealAuthenticator(
         return UserIdPrincipal(user.email)
     }
 
-    override suspend fun validateKey(accessKey: String): UserIdPrincipal? {
+    override suspend fun validateKey(accessKey: String, type: UserAccessKey.Type): UserIdPrincipal? {
         val keyParts = accessKey.split(".")
         if (keyParts.size != 2) {
             return null
@@ -51,6 +52,10 @@ internal class RealAuthenticator(
         }
         if (accessKey != userAccessKey.key) {
             logDebug("User access key does not match db $userAccessKey")
+            return null
+        }
+        if (userAccessKey.type != type) {
+            logDebug("Incorrect key type for api $userAccessKey")
             return null
         }
         return UserIdPrincipal(user.email)

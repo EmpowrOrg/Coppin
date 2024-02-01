@@ -17,7 +17,7 @@ fun Application.assignmentApi() {
     val presenter: AssignmentApiPresenter by inject()
     routing {
         route("/assignment") {
-            authenticate("key") {
+            authenticate("api") {
                 post("/submit") {
                     call.respond(presenter.submit(call.receive()))
                 }
