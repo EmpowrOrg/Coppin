@@ -18,6 +18,6 @@ data class User(
     val fullName: String = "$firstName $lastName"
 
     enum class Type {
-        Admin, Teacher
+        Admin, Teacher, Student
     }
 }
