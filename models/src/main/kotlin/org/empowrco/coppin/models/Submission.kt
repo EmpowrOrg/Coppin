@@ -16,6 +16,7 @@ data class Submission(
     val correct: Boolean,
     val code: String,
     val attempt: Int,
+    val feedback: String,
     val studentId: String,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,

@@ -17,6 +17,7 @@ import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
+import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
@@ -39,7 +40,10 @@ internal class RealAssignmentApiPresenter(
         if (request.code.isBlank()) {
             throw BadRequestException("The code is not blank")
         }
-
+        logDebug("Empowr Extras")
+        logDebug(request.studentExtras?.toString() ?: "No empowr extras")
+        logDebug("Empowr Emails")
+        logDebug(request.studentEmails?.toString() ?: "No empowr emails")
         val response = repo.runCode(language.mime, request.code)
         return RunResponse(response.output, response.success ?: true)
     }
@@ -108,19 +112,8 @@ internal class RealAssignmentApiPresenter(
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()
-        val submission = Submission(
-            id = UUID.randomUUID(),
-            code = request.code,
-            assignmentId = assignment.id,
-            languageId = language.id,
-            studentId = request.studentId,
-            attempt = attempt,
-            createdAt = currentTime,
-            correct = matches.isEmpty() && codeResponse.success != false,
-            lastModifiedAt = currentTime,
-        )
-        repo.saveSubmission(submission)
-        return if (matches.isNotEmpty()) {
+
+        val response = if (matches.isNotEmpty()) {
             SubmitResponse(
                 output = matches.first().value,
                 success = false,
@@ -148,6 +141,20 @@ internal class RealAssignmentApiPresenter(
                 attemptsRemaining = attemptsRemaining,
             )
         }
+        val submission = Submission(
+            id = UUID.randomUUID(),
+            code = request.code,
+            assignmentId = assignment.id,
+            languageId = language.id,
+            studentId = request.studentId,
+            attempt = attempt,
+            feedback = response.output,
+            createdAt = currentTime,
+            correct = matches.isEmpty() && codeResponse.success != false,
+            lastModifiedAt = currentTime,
+        )
+        repo.saveSubmission(submission)
+        return response
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {

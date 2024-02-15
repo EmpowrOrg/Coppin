@@ -7,7 +7,7 @@ object Submissions : BaseTable() {
     val code = text("code")
     val attempt = integer("attempt")
     val studentId = text("student_id")
-
+    val feedback = text("feedback")
     init {
         uniqueIndex(assignment, attempt, studentId)
     }
