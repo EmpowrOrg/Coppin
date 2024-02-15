@@ -33,11 +33,4 @@ object RequestApi {
     data class DeleteAssignmentRequest(
         val id: String,
     )
-
-    @Serializable
-    data class GetAssignmentGrades(
-        val studentId: String,
-        @Serializable(with = UUIDSerializer::class)
-        val courseId: UUID,
-    )
 }
