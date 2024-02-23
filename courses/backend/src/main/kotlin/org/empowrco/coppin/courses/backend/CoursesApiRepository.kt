@@ -1,5 +1,6 @@
 package org.empowrco.coppin.courses.backend
 
+import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Course
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
@@ -14,6 +15,7 @@ interface CoursesApiRepository {
     suspend fun getLatestSubmissionForEachAssignment(courseId: UUID, studentId: String): List<Submission>
     suspend fun doesCourseExist(id: UUID): Boolean
     suspend fun getLanguage(id: UUID): Language?
+    suspend fun getAssignment(id: UUID): Assignment?
 
 }
 
@@ -41,6 +43,10 @@ internal class RealCoursesApiRepository(
 
     override suspend fun getLanguage(id: UUID): Language? {
         return languagesSource.getLanguage(id)
+    }
+
+    override suspend fun getAssignment(id: UUID): Assignment? {
+        return assignmentSource.getAssignment(id)
     }
 
 }

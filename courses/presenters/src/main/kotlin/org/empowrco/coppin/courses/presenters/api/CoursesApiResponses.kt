@@ -9,12 +9,13 @@ data class GetStudentAssignmentsResponse(
 
     @Serializable
     data class Assignment(
+        val title: String,
         val score: Int,
         val feedback: String,
         val code: String,
         val language: Language,
         val attempts: Int,
-        val assignmentId: String,
+        val id: String,
     ) {
         @Serializable
         data class Language(

@@ -22,9 +22,10 @@ internal class RealCoursesApiPresenter(
         return GetStudentAssignmentsResponse(
             assignments = submissions.mapNotNull {
                 val language = repo.getLanguage(it.languageId) ?: return@mapNotNull null
+                val assignment = repo.getAssignment(it.assignmentId) ?: return@mapNotNull null
                 GetStudentAssignmentsResponse.Assignment(
                     score = if (it.correct) 100 else 0,
-                    assignmentId = it.assignmentId.toString(),
+                    id = it.assignmentId.toString(),
                     feedback = it.feedback,
                     code = it.code,
                     language = GetStudentAssignmentsResponse.Assignment.Language(
@@ -32,6 +33,7 @@ internal class RealCoursesApiPresenter(
                         name = language.name,
                     ),
                     attempts = it.attempt,
+                    title = assignment.title,
                 )
             }
         )
