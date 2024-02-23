@@ -1,7 +1,6 @@
 package org.empowrco.coppin.assignment.presenters
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 
 
 object RequestApi {
@@ -12,7 +11,6 @@ object RequestApi {
         val language: String,
         val referenceId: String,
         val studentId: String,
-        val studentExtras: JsonObject?,
         val studentEmails: List<String>?,
     )
 
@@ -22,7 +20,6 @@ object RequestApi {
         val referenceId: String,
         val language: String,
         val studentId: String,
-        val studentExtras: JsonObject?,
         val studentEmails: List<String>?,
     )
 

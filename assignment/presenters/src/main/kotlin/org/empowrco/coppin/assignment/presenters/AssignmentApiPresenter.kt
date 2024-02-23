@@ -17,7 +17,6 @@ import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
-import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
@@ -40,10 +39,6 @@ internal class RealAssignmentApiPresenter(
         if (request.code.isBlank()) {
             throw BadRequestException("The code is not blank")
         }
-        logDebug("Empowr Extras")
-        logDebug(request.studentExtras?.toString() ?: "No empowr extras")
-        logDebug("Empowr Emails")
-        logDebug(request.studentEmails?.toString() ?: "No empowr emails")
         val response = repo.runCode(language.mime, request.code)
         return RunResponse(response.output, response.success ?: true)
     }

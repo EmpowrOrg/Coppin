@@ -57,6 +57,7 @@ class AssignmentPresenterTest {
                 languageId = lang.id,
                 correct = false,
                 studentId = "student_id",
+                feedback = "",
             )
         )
         val response = presenter.submit(submitRequest)
@@ -161,7 +162,8 @@ class AssignmentPresenterTest {
             code = "code",
             referenceId = "reference",
             language = lang.mime,
-            studentId = "student_id"
+            studentId = "student_id",
+            studentEmails = emptyList()
         )
         val assignmentId = UUID.randomUUID()
         val assignmentCode = AssignmentCode(
