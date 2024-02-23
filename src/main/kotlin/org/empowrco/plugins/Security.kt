@@ -20,6 +20,7 @@ import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
 import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.utils.authenticator.Authenticator
+import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.routing.UserSession
 import org.koin.ktor.ext.inject
 
@@ -52,7 +53,7 @@ fun Application.configureSecurity() {
                 )
             }
             urlProvider = {
-                "http://localhost:3000/callback"
+                System.getenv("SERVER_CALLBACK_URL")
             }
         }
         bearer("api") {
@@ -93,6 +94,7 @@ fun Application.configureSecurity() {
                             )
                         )
                         redirects[state]?.let { redirect ->
+                            logDebug("Login redirecting to $redirect")
                             call.respondRedirect(redirect)
                             return@get
                         }
