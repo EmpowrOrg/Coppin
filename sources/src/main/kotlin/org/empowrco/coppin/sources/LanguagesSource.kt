@@ -10,7 +10,6 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
@@ -118,10 +117,10 @@ private class DatabaseLanguagesSource : LanguagesSource {
 
 
     override suspend fun getLanguage(id: UUID): Language? = dbQuery {
-        Languages.select { Languages.id eq id }.map { it.toLanguage() }.firstOrNull()
+        Languages.selectAll().where { Languages.id eq id }.map { it.toLanguage() }.firstOrNull()
     }
     override suspend fun getLanguageByMime(mime: String): Language? = dbQuery {
-        Languages.select { Languages.mime eq mime }.map { it.toLanguage() }.firstOrNull()
+        Languages.selectAll().where { Languages.mime eq mime }.map { it.toLanguage() }.firstOrNull()
     }
 
     override suspend fun deleteLanguage(language: Language): Boolean = dbQuery {

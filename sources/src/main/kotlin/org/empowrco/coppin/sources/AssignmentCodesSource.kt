@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -136,7 +136,7 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
     }
 
     override suspend fun getByAssigment(assignmentId: UUID): List<AssignmentCode> = dbQuery {
-        AssignmentCodes.select { AssignmentCodes.assignment eq assignmentId }.map {
+        AssignmentCodes.selectAll().where { AssignmentCodes.assignment eq assignmentId }.map {
             val languageId = it[AssignmentCodes.language].value
             val language = languagesSource.getLanguage(languageId)!!
             it.toStarterCode(language)
@@ -144,7 +144,7 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
     }
 
     override suspend fun get(id: UUID): AssignmentCode? = dbQuery {
-        AssignmentCodes.select { AssignmentCodes.id eq id }.map {
+        AssignmentCodes.selectAll().where { AssignmentCodes.id eq id }.map {
             val languageId = it[AssignmentCodes.language].value
             val language = languagesSource.getLanguage(languageId)!!
             it.toStarterCode(language)
@@ -152,7 +152,7 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
     }
 
     override suspend fun getCodeCountForLanguage(id: UUID): Long = dbQuery {
-        AssignmentCodes.select { AssignmentCodes.language eq id }.count()
+        AssignmentCodes.selectAll().where { AssignmentCodes.language eq id }.count()
     }
 
     override suspend fun delete(assignmentCode: AssignmentCode): Boolean = dbQuery {

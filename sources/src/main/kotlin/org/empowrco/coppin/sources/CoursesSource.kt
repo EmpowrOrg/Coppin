@@ -14,7 +14,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.notInList
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
@@ -149,11 +148,11 @@ private class DatabaseCoursesSource : CoursesSource {
     }
 
     override suspend fun getCourse(id: UUID): Course? = dbQuery {
-        Courses.select { Courses.id eq id }.limit(1).map { it.toCourse() }.firstOrNull()
+        Courses.selectAll().where { Courses.id eq id }.limit(1).map { it.toCourse() }.firstOrNull()
     }
 
     override suspend fun getCourseByEdxId(id: String): Course? = dbQuery {
-        Courses.select { Courses.edxId eq id }.limit(1).map { it.toCourse() }.firstOrNull()
+        Courses.selectAll().where { Courses.edxId eq id }.limit(1).map { it.toCourse() }.firstOrNull()
     }
 
     override suspend fun getCourses(): List<Course> = dbQuery {
@@ -161,8 +160,9 @@ private class DatabaseCoursesSource : CoursesSource {
     }
 
     override suspend fun getLinkedCourses(userId: UUID): List<Course> = dbQuery {
-        val courseIds = CoursesUsers.select { CoursesUsers.user eq userId }.map { it[CoursesUsers.course].value }
-        Courses.select { Courses.id inList courseIds }.map { it.toCourse() }
+        val courseIds =
+            CoursesUsers.selectAll().where { CoursesUsers.user eq userId }.map { it[CoursesUsers.course].value }
+        Courses.selectAll().where { Courses.id inList courseIds }.map { it.toCourse() }
     }
 
     override suspend fun linkCourse(courseId: UUID, userId: UUID, currentTime: LocalDateTime) = dbQuery {

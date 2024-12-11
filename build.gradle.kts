@@ -28,10 +28,11 @@ allprojects {
     }
 
     tasks.withType(KotlinCompile::class.java).all {
-        kotlinOptions.freeCompilerArgs = listOf(
-            "-Xuse-experimental=io.ktor.locations.KtorExperimentalLocationsAPI",
-            "-opt-in=kotlin.RequiresOptIn"
-        ) + kotlinOptions.freeCompilerArgs
+        compilerOptions {
+            // jvmTarget.set(JvmTarget.JVM_1_8)
+            freeCompilerArgs.add("-Xuse-experimental=io.ktor.locations.KtorExperimentalLocationsAPI")
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+        }
     }
 
     dependencies {
@@ -105,11 +106,11 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+/*val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_1_8)
 }
 val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
+compileTestKotlin.compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_1_8)
+}*/

@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -133,33 +133,33 @@ private class DatabaseAssignmentSource(
     private val subjectSource: SubjectSource,
 ) : AssignmentSource {
     override suspend fun getAssignment(id: UUID): Assignment? = dbQuery {
-        Assignments.select { (Assignments.id eq id) and (Assignments.archived eq false) }.limit(1)
+        Assignments.selectAll().where { (Assignments.id eq id) and (Assignments.archived eq false) }.limit(1)
             .map { buildAssigment(it) }.firstOrNull()
     }
 
     override suspend fun getAssignmentsForSubject(id: UUID): List<Assignment> = dbQuery {
-        Assignments.select { (Assignments.subject eq id) and (Assignments.archived eq false) }
+        Assignments.selectAll().where { (Assignments.subject eq id) and (Assignments.archived eq false) }
             .map { buildAssigment(it) }
     }
 
     override suspend fun assignmentsWithReferenceStartingWithCount(name: String): Long = dbQuery {
-        Assignments.select { (Assignments.referenceId like "$name%") }.count()
+        Assignments.selectAll().where { (Assignments.referenceId like "$name%") }.count()
     }
 
     override suspend fun getAssignmentCountBySubject(id: UUID): Long = dbQuery {
-        Assignments.select { Assignments.subject eq id }.count()
+        Assignments.selectAll().where { Assignments.subject eq id }.count()
     }
 
     override suspend fun getAssignmentsForCourse(id: UUID) = dbQuery {
-        Assignments.select { (Assignments.courseId eq id) and (Assignments.archived eq false) }
+        Assignments.selectAll().where { (Assignments.courseId eq id) and (Assignments.archived eq false) }
             .map { buildAssigment(it) }
     }
 
     override suspend fun getAssignmentByReferenceId(id: String): Assignment? = dbQuery {
-        Assignments.select { (Assignments.referenceId eq id) and (Assignments.archived eq false) }
+        Assignments.selectAll().where { (Assignments.referenceId eq id) and (Assignments.archived eq false) }
             .limit(1).map {
-            buildAssigment(it)
-        }.firstOrNull()
+                buildAssigment(it)
+            }.firstOrNull()
     }
 
     private suspend fun buildAssigment(result: ResultRow): Assignment {

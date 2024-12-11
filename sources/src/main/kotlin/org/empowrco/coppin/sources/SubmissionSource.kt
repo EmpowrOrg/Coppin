@@ -15,7 +15,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import java.util.UUID
 
 interface SubmissionSource {
@@ -108,7 +108,7 @@ private class CacheSubmissionSource(private val cache: Cache) : SubmissionSource
 private class DatabaseSubmissionsSource : SubmissionSource {
 
     override suspend fun getSubmissionsForAssignment(id: UUID, studentId: String): List<Submission> = dbQuery {
-        Submissions.select { (Submissions.assignment eq id) and (Submissions.studentId eq studentId) }
+        Submissions.selectAll().where { (Submissions.assignment eq id) and (Submissions.studentId eq studentId) }
             .orderBy(Submissions.attempt, SortOrder.DESC).map { it.toSubmission() }
     }
 
@@ -120,17 +120,18 @@ private class DatabaseSubmissionsSource : SubmissionSource {
         val selectWhere: Op<Boolean> = (Submissions.assignment eq id)
 
         val query: Query = Submissions
-            .slice(
+
+            .select(
                 selectDistinctOn,
                 *selectColumns.toTypedArray()
             )
-            .select { selectWhere }
+            .where { selectWhere }
             .orderBy(Submissions.studentId).orderBy(Submissions.attempt, order = SortOrder.DESC)
         query.map { it.toSubmission() }
     }
 
     override suspend fun getLastStudentSubmissionForAssignment(id: UUID, studentId: String): Submission? = dbQuery {
-        Submissions.select { (Submissions.assignment eq id) and (Submissions.studentId eq studentId) }
+        Submissions.selectAll().where { (Submissions.assignment eq id) and (Submissions.studentId eq studentId) }
             .orderBy(Submissions.attempt, SortOrder.DESC).limit(1).map { it.toSubmission() }.firstOrNull()
     }
 
@@ -151,7 +152,7 @@ private class DatabaseSubmissionsSource : SubmissionSource {
     }
 
     override suspend fun getSubmission(id: UUID): Submission? = dbQuery {
-        Submissions.select { Submissions.id eq id }.limit(1).firstNotNullOfOrNull { it.toSubmission() }
+        Submissions.selectAll().where { Submissions.id eq id }.limit(1).firstNotNullOfOrNull { it.toSubmission() }
     }
 
     private fun ResultRow.toSubmission(): Submission {

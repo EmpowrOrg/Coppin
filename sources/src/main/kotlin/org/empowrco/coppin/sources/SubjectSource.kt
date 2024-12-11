@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -96,11 +96,11 @@ private class CacheSubjectSource(private val cache: Cache) : SubjectSource {
 
 private class DatabaseSubjectSource : SubjectSource {
     override suspend fun getSubjectsForCourse(id: UUID): List<Subject> = dbQuery {
-        Subjects.select { Subjects.course eq id }.orderBy(Subjects.name).map { it.toSubject() }
+        Subjects.selectAll().where { Subjects.course eq id }.orderBy(Subjects.name).map { it.toSubject() }
     }
 
     override suspend fun getSubject(id: UUID): Subject? = dbQuery {
-        Subjects.select { Subjects.id eq id }.limit(1).map { it.toSubject() }.firstOrNull()
+        Subjects.selectAll().where { Subjects.id eq id }.limit(1).map { it.toSubject() }.firstOrNull()
     }
 
     override suspend fun createSubject(subject: Subject) = dbQuery {

@@ -1,7 +1,7 @@
 object Deps {
 
     object Apache {
-        val commonsText by lazy { "org.apache.commons:commons-text:1.10.0" }
+        val commonsText by lazy { "org.apache.commons:commons-text:${Versions.commonsText}" }
     }
 
     object Assignment {
@@ -26,6 +26,10 @@ object Deps {
         }
 
         val main by lazy { ":admin" }
+    }
+
+    object Aws {
+        val s3 by lazy { "aws.sdk.kotlin:s3:1.3.37" }
     }
 
     object Courses {
@@ -80,11 +84,11 @@ object Deps {
     }
 
     object Hikari {
-        val main by lazy { "com.zaxxer:HikariCP:5.0.1" }
+        val main by lazy { "com.zaxxer:HikariCP:${Versions.hikari}" }
     }
 
     object Postgresql {
-        val main by lazy { "org.postgresql:postgresql:42.6.0" }
+        val main by lazy { "org.postgresql:postgresql:${Versions.postgresql}" }
     }
 
     object Models {
@@ -106,8 +110,8 @@ object Deps {
     }
 
     object Kotlin {
-        val coroutines by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4" }
-        val dateTime by lazy { "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0" }
+        val coroutines by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesCore}" }
+        val dateTime by lazy { "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.dateTime}" }
     }
 
     object Ktor {
@@ -150,6 +154,6 @@ object Deps {
     }
 
     object OpenAi {
-        val chatGpt by lazy { "com.aallam.openai:openai-client:3.3.2" }
+        val chatGpt by lazy { "com.aallam.openai:openai-client:${Versions.openAi}" }
     }
 }

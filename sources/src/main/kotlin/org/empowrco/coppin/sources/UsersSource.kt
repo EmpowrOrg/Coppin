@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.update
@@ -30,7 +29,7 @@ interface UsersSource {
 
 internal class RealUsersSource : UsersSource {
     override suspend fun getUser(id: UUID): User? = dbQuery {
-        Users.select { Users.id eq id }.limit(1).firstNotNullOfOrNull { it.toUser() }
+        Users.selectAll().where { Users.id eq id }.limit(1).firstNotNullOfOrNull { it.toUser() }
     }
 
     override suspend fun getUsers(): List<User> = dbQuery {
@@ -38,7 +37,7 @@ internal class RealUsersSource : UsersSource {
     }
 
     override suspend fun getUserByEmail(email: String): User? = dbQuery {
-        Users.select { Users.email eq email }.limit(1).firstNotNullOfOrNull { it.toUser() }
+        Users.selectAll().where { Users.email eq email }.limit(1).firstNotNullOfOrNull { it.toUser() }
     }
 
     override suspend fun createUser(user: User) = dbQuery {
@@ -93,20 +92,20 @@ internal class RealUsersSource : UsersSource {
     }
 
     override suspend fun getKey(id: UUID): UserAccessKey? = dbQuery {
-        UserAccessKeys.select { UserAccessKeys.id eq id }.map { it.toUserAccessKey() }.firstOrNull()
+        UserAccessKeys.selectAll().where { UserAccessKeys.id eq id }.map { it.toUserAccessKey() }.firstOrNull()
     }
 
     override suspend fun getKeysForUser(userId: UUID): List<UserAccessKey> = dbQuery {
-        UserAccessKeys.select { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
+        UserAccessKeys.selectAll().where { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
     }
 
     override suspend fun getKeyByValue(value: String): UserAccessKey? = dbQuery {
-        UserAccessKeys.select { UserAccessKeys.key eq value }.firstNotNullOfOrNull { it.toUserAccessKey() }
+        UserAccessKeys.selectAll().where { UserAccessKeys.key eq value }.firstNotNullOfOrNull { it.toUserAccessKey() }
     }
 
     private fun ResultRow.toUser(): User {
         val userId = this[Users.id].value
-        val keys = UserAccessKeys.select { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
+        val keys = UserAccessKeys.selectAll().where { UserAccessKeys.user eq userId }.map { it.toUserAccessKey() }
         return User(
             id = userId,
             firstName = this[Users.firstName],
