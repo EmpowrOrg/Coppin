@@ -11,6 +11,7 @@ dependencies {
     implementation(project(Deps.Utils.main))
     implementation(Deps.Apache.commonsText)
     implementation(project(Deps.Utils.serialization))
+    implementation(project(Deps.Utils.files))
 
     testImplementation(project(Deps.Assignment.Backend.fakes))
 }

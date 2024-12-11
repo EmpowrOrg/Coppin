@@ -52,6 +52,9 @@ object ResponseApi {
             val hadMoreChances: Boolean,
         )
     }
+
+    @Serializable
+    data class UploadImageResponse(val url: String)
 }
 
 

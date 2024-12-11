@@ -17,6 +17,7 @@ import org.empowrco.coppin.models.AssignmentCode
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.utils.AssignmentLanguageSupportException
+import org.empowrco.coppin.utils.files.FileUploader
 import org.empowrco.coppin.utils.now
 import org.empowrco.coppin.utils.toUuid
 import java.util.UUID
@@ -26,11 +27,13 @@ interface AssignmentApiPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
     suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse
+    suspend fun uploadImage(request: RequestApi.UploadImageRequest): ResponseApi.UploadImageResponse
 
 }
 
 internal class RealAssignmentApiPresenter(
     private val repo: AssignmentApiRepository,
+    private val fileUploader: FileUploader,
 ) : AssignmentApiPresenter {
 
     override suspend fun run(request: RunRequest): RunResponse {
@@ -136,6 +139,12 @@ internal class RealAssignmentApiPresenter(
                 attemptsRemaining = attemptsRemaining,
             )
         }
+        val aiFeedback = repo.getAiFeedback(
+            solution = assignmentCode.solutionCode,
+            instructions = assignment.instructions,
+            submission = request.code,
+            user = request.studentId,
+        ).response ?: response.output
         val submission = Submission(
             id = UUID.randomUUID(),
             code = request.code,
@@ -143,7 +152,7 @@ internal class RealAssignmentApiPresenter(
             languageId = language.id,
             studentId = request.studentId,
             attempt = attempt,
-            feedback = response.output,
+            feedback = aiFeedback,
             createdAt = currentTime,
             correct = matches.isEmpty() && codeResponse.success != false,
             lastModifiedAt = currentTime,
@@ -215,6 +224,13 @@ internal class RealAssignmentApiPresenter(
             throw Exception("Unknown error")
         }
         return DeleteAssignmentResponse(assignment.courseId.toString())
+    }
+
+    override suspend fun uploadImage(request: RequestApi.UploadImageRequest): ResponseApi.UploadImageResponse {
+        request.body ?: throw Exception("No File Body Found")
+        val imageUrl = fileUploader.uploadImage(request.body, request.fileName)
+        imageUrl ?: throw Exception("Error uploading image")
+        return ResponseApi.UploadImageResponse(imageUrl)
     }
 
 }
