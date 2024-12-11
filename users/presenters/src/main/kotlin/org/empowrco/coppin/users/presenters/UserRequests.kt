@@ -38,3 +38,8 @@ data class DeleteAccessKey(
     val id: String,
     val email: String,
 )
+
+@Serializable
+data class IsUserCompleteRequest(
+    val email: String,
+)

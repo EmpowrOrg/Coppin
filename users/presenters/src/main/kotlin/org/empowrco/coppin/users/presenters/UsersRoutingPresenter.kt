@@ -1,5 +1,6 @@
 package org.empowrco.coppin.users.presenters
 
+import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.models.User
 import org.empowrco.coppin.models.UserAccessKey
@@ -14,7 +15,7 @@ import java.security.SecureRandom
 import java.util.Base64
 import java.util.UUID
 
-interface UsersPresenters {
+interface UsersRoutingPresenter {
     suspend fun getLogin(): Result<GetLoginResponse>
     suspend fun getUsers(request: GetUsersRequest): Result<GetUsersResponse>
     suspend fun getUser(request: GetUserRequest): Result<GetUserResponse>
@@ -22,11 +23,12 @@ interface UsersPresenters {
     suspend fun updateUser(request: UpdateUserRequest): Result<PatchUserResponse>
     suspend fun createKey(request: CreateAccessKey): Result<CreateKeyResponse>
     suspend fun deleteKey(request: DeleteAccessKey): Result<DeleteKeyResponse>
+    suspend fun isUserInfoComplete(request: IsUserCompleteRequest): IsUserCompleteResponse
 }
 
-class RealUsersPresenters(
+class RealUsersRoutingPresenter(
     private val repo: UsersRepository,
-) : UsersPresenters {
+) : UsersRoutingPresenter {
 
     override suspend fun getLogin(): Result<GetLoginResponse> {
         val security = repo.getSecuritySettings()
@@ -154,5 +156,13 @@ class RealUsersPresenters(
             return failure("Error deleting key")
         }
         return DeleteKeyResponse.toResult()
+    }
+
+    override suspend fun isUserInfoComplete(request: IsUserCompleteRequest): IsUserCompleteResponse {
+        val user = repo.getUserByEmail(request.email) ?: throw NotFoundException("User not found")
+        if (user.firstName.isBlank() || user.lastName.isBlank() || user.email.isBlank()) {
+            return IsUserCompleteResponse(false)
+        }
+        return IsUserCompleteResponse(true)
     }
 }

@@ -45,3 +45,6 @@ data class CreateKeyResponse(val key: String)
 
 @Serializable
 object DeleteKeyResponse
+
+@Serializable
+data class IsUserCompleteResponse(val complete: Boolean)

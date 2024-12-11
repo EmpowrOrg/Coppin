@@ -21,7 +21,7 @@ import org.empowrco.coppin.users.presenters.GetCurrentUserRequest
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.GetUsersRequest
 import org.empowrco.coppin.users.presenters.UpdateUserRequest
-import org.empowrco.coppin.users.presenters.UsersPresenters
+import org.empowrco.coppin.users.presenters.UsersRoutingPresenter
 import org.empowrco.coppin.utils.routing.Breadcrumbs
 import org.empowrco.coppin.utils.routing.UserSession
 import org.empowrco.coppin.utils.routing.error
@@ -30,7 +30,7 @@ import org.empowrco.coppin.utils.routing.respondFreemarker
 import org.koin.ktor.ext.inject
 
 fun Application.usersRouting() {
-    val presenter: UsersPresenters by inject()
+    val presenter: UsersRoutingPresenter by inject()
     routing {
         authenticate("auth-session") {
             route("users") {
