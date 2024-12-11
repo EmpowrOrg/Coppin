@@ -1,4 +1,4 @@
-package org.empowrco.coppin.assignment.backend
+﻿package org.empowrco.coppin.assignment.backend
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,8 +16,10 @@ import kotlinx.serialization.json.JsonPrimitive
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.models.responses.AiResponse
 import org.empowrco.coppin.sources.AssignmentSource
 import org.empowrco.coppin.sources.LanguagesSource
+import org.empowrco.coppin.sources.OpenAiSource
 import org.empowrco.coppin.sources.SettingsSource
 import org.empowrco.coppin.sources.SubmissionSource
 import org.empowrco.coppin.utils.logs.logDebug
@@ -37,6 +39,7 @@ interface AssignmentApiRepository {
     suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission>
     suspend fun getLastStudentSubmissionForAssignment(assignmentID: UUID, studentId: String): Submission?
     suspend fun getAssignments(courseId: UUID): List<Assignment>
+    suspend fun getAiFeedback(solution: String, instructions: String, submission: String, user: String): AiResponse
 
 }
 
@@ -45,6 +48,7 @@ internal class RealAssignmentApiRepository(
     private val languagesSource: LanguagesSource,
     private val submissionSource: SubmissionSource,
     private val settingsSource: SettingsSource,
+    private val openAiSource: OpenAiSource,
 ) : AssignmentApiRepository {
     @OptIn(ExperimentalSerializationApi::class)
     val client = HttpClient(Apache) {
@@ -121,6 +125,35 @@ internal class RealAssignmentApiRepository(
 
     override suspend fun getAssignments(courseId: UUID): List<Assignment> {
         return assignmentSource.getAssignmentsForCourse(courseId)
+    }
+
+    override suspend fun getAiFeedback(
+        solution: String,
+        instructions: String,
+        submission: String,
+        user: String,
+    ): AiResponse {
+        var query = """
+            You are a helpful teaching assistant reviewing a beginner-level Swift programming assignment. 
+            The student has submitted their code, and you also have access to a reference solution. 
+            Your goal is to give the student supportive, detailed feedback on what they did wrong, 
+            how they might improve, and suggest official documentation for further study. 
+            Do not provide the direct solution. 
+            Instead, focus on guiding the student toward discovering it themselves.
+            
+            Instructions provided to the student: 
+            $instructions
+            
+            Student Submission: 
+            $submission
+            
+            Solution:
+            $solution
+        """.trimIndent()
+        if (solution.isNotBlank()) {
+            query += solution
+        }
+        return openAiSource.rawPrompt(query, user)
     }
 
     private suspend fun executeRequest(
