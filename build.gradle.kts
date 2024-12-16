@@ -27,13 +27,20 @@ allprojects {
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     }
 
-    tasks.withType(KotlinCompile::class.java).all {
+    tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             // jvmTarget.set(JvmTarget.JVM_1_8)
             freeCompilerArgs.add("-Xuse-experimental=io.ktor.locations.KtorExperimentalLocationsAPI")
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
         }
     }
+    /*    tasks.withType(KotlinCompile::class.java).all {
+            compilerOptions {
+                // jvmTarget.set(JvmTarget.JVM_1_8)
+                freeCompilerArgs.add("-Xuse-experimental=io.ktor.locations.KtorExperimentalLocationsAPI")
+                freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            }
+        }*/
 
     dependencies {
         implementation(kotlin("stdlib"))

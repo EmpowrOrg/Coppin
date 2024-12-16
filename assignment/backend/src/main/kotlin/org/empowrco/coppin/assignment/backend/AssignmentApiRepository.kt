@@ -39,7 +39,13 @@ interface AssignmentApiRepository {
     suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission>
     suspend fun getLastStudentSubmissionForAssignment(assignmentID: UUID, studentId: String): Submission?
     suspend fun getAssignments(courseId: UUID): List<Assignment>
-    suspend fun getAiFeedback(solution: String, instructions: String, submission: String, user: String): AiResponse
+    suspend fun getAiFeedback(
+        solution: String,
+        instructions: String,
+        submission: String,
+        user: String,
+        language: String,
+    ): AiResponse
 
 }
 
@@ -132,27 +138,106 @@ internal class RealAssignmentApiRepository(
         instructions: String,
         submission: String,
         user: String,
+        language: String,
     ): AiResponse {
         var query = """
-            You are a helpful teaching assistant reviewing a beginner-level Swift programming assignment. 
-            The student has submitted their code, and you also have access to a reference solution. 
-            Your goal is to give the student supportive, detailed feedback on what they did wrong, 
-            how they might improve, and suggest official documentation for further study. 
-            Do not provide the direct solution. 
-            Instead, focus on guiding the student toward discovering it themselves.
-            
+            You are a helpful teaching assistant reviewing a beginner-level $language programming assignment. 
+            The student has submitted their code${if (solution.isNotBlank()) ", and you also have access to the reference solution." else "."} 
+            Do not reveal or provide any part of the reference solution. 
+            Instead, provide supportive, detailed feedback on what the student did wrong and how they might improve. 
+            Do not show the correct or fixed code; just guide the student toward discovering it themselves.
+
+Use the following structure for your JSON output:
+	•	acknowledgement: A short statement acknowledging the student’s effort, maintaining a supportive and encouraging tone.
+	•	errors: An array where each object describes an individual error or misunderstanding. Each error object should have:
+	•	type (e.g., “syntax”, “logic”, etc.)
+	•	description: A brief explanation of what went wrong.
+	•	hint: How the student can think about correcting or improving that particular issue, without providing the direct solution code.
+	•	conceptual_guidance: A short explanation of the underlying concept(s) the student should revisit or understand more deeply.
+	•	next_steps: Concrete steps or questions the student can consider to self-correct, again, without providing the actual final code.
+	•	resources: A brief list of links or references (e.g., official $language documentation) to guide further learning.
+
+Student Submission:
+
+$submission
+
+${
+            if (solution.isNotBlank()) "Reference Solution (for instructor use only – do not reveal directly):\n" +
+                    "\n" +
+                    solution else ""
+        }
+
+
+            Output Requirements
+            	1.	Produce your feedback as Markdown text.
+            	2.	Maintain a supportive and encouraging tone.
+            	3.	Identify syntax errors, logic errors, or conceptual misunderstandings.
+            	4.	Provide hints on how to fix these issues, without revealing the correct code.
+            	5.	Suggest official $language resources (e.g., $language documentation) for further study.
+            	6.	Focus on guiding the student to understand the underlying concepts.
+
+            Markdown Structure Example
+
+            Use the following Markdown headings and lists to structure your output:
+
+            ## Feedback
+
+            A short supportive statement acknowledging the student’s effort.
+
+            ### Errors
+            1. **Type**: e.g., syntax / logic / etc.
+               - **Description**: A short explanation of what went wrong.
+               - **Hint**: Guidance on how the student might fix or rethink that issue, without giving the direct solution.
+
+            2. **Type**: ...
+               - **Description**: ...
+               - **Hint**: ...
+
+            ### Conceptual Guidance
+            A paragraph or two explaining which key $language concept(s) the student should revisit.
+
+            ### Next Steps
+            Specific actions or questions the student can explore to self-correct or deepen their understanding.
+
+            ### Resources
+            A bulleted list of official $language or other reputable documentation links.
+
+            Example Markdown Output
+
+            Below is an example of what your final Markdown output might look like for a student who made simple syntax and logic errors in $language. Note that this example is not referencing real code—it’s just a template to illustrate the format:
+
+            ## Feedback
+
+            Excellent start! It’s clear you put effort into learning ${language}’s syntax.
+
+            ### Errors
+            1. **Type**: Syntax
+               - **Description**: You used a misspelled print function (`prnit`), causing a compile-time error.
+               - **Hint**: Revisit your spelling for built-in $language functions. Accurate keywords and function names are crucial.
+
+            2. **Type**: Logic
+               - **Description**: Your loop runs indefinitely because the loop variable never changes inside the loop.
+               - **Hint**: Consider how modifying the loop variable each iteration helps the loop eventually terminate.
+
+            ### Conceptual Guidance
+            Loops in $language rely on certain conditions to start and end. Make sure you understand how those conditions are updated on each pass.
+
+            ### Next Steps
+            - Review how to update variables within a loop to ensure the stopping condition will be reached.
+            - After making changes, test your code with different values to confirm the loop behaves as expected.
+
+            ### Resources
+            - [$language Language Guide: Control Flow](https://docs.$language.org/$language-book/LanguageGuide/ControlFlow.html)
+            - [$language Documentation](https://developer.apple.com/documentation/$language)
+
+            Use this structure as a guide. The exact content will naturally vary based on the student’s specific code submission. Remember, do not provide the exact corrected code—only guide them to it.
+                       
             Instructions provided to the student: 
             $instructions
             
             Student Submission: 
             $submission
-            
-            Solution:
-            $solution
         """.trimIndent()
-        if (solution.isNotBlank()) {
-            query += solution
-        }
         return openAiSource.rawPrompt(query, user)
     }
 
@@ -166,6 +251,10 @@ internal class RealAssignmentApiRepository(
             contentType(ContentType.Application.Json)
             setBody(body)
         }
+        return AssignmentCodeResponse(
+            output = "Expected \"Hello, World!\" but got \"Hi, World!\"",
+            success = false,
+        )
         val code = response.body<AssignmentCodeResponse>()
         logDebug(code.toString())
         return code

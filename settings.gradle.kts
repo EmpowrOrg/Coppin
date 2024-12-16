@@ -1,3 +1,6 @@
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 rootProject.name = "Coppin"
 findProject(":command:fakes")?.name = "fakes"
 include("models")
@@ -64,3 +67,5 @@ include("admin:api")
 findProject(":admin:api")?.name = "api"
 include("admin:presenters")
 findProject(":admin:presenters")?.name = "presenters"
+include("utils:files:fakes")
+findProject(":utils:files:fakes")?.name = "fakes"

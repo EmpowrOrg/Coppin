@@ -92,6 +92,7 @@ internal class RealAssignmentApiPresenter(
                 output = "You have run out of attempts. \n ${assignment.failureMessage}",
                 success = false,
                 finalAttempt = true,
+                feedback = "",
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
                 attemptsRemaining = 0,
@@ -110,7 +111,13 @@ internal class RealAssignmentApiPresenter(
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()
-
+        val aiFeedback = repo.getAiFeedback(
+            solution = assignmentCode.solutionCode,
+            instructions = assignment.instructions,
+            submission = request.code,
+            user = request.studentId,
+            language = language.name,
+        ).response ?: ""
         val response = if (matches.isNotEmpty()) {
             SubmitResponse(
                 output = matches.first().value,
@@ -118,6 +125,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else if (codeResponse.success == false) {
@@ -127,6 +135,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else {
@@ -136,15 +145,11 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         }
-        val aiFeedback = repo.getAiFeedback(
-            solution = assignmentCode.solutionCode,
-            instructions = assignment.instructions,
-            submission = request.code,
-            user = request.studentId,
-        ).response ?: response.output
+
         val submission = Submission(
             id = UUID.randomUUID(),
             code = request.code,

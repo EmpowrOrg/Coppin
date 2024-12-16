@@ -9,6 +9,7 @@ object ResponseApi {
         val success: Boolean,
         val finalAttempt: Boolean,
         val solutionCode: String?,
+        val feedback: String,
         val gradePoints: Double,
         val attemptsRemaining: Int,
     )

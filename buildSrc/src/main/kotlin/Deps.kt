@@ -71,7 +71,11 @@ object Deps {
     object Utils {
         val routing by lazy { ":utils:routing" }
         val main by lazy { ":utils" }
-        val files by lazy { ":utils:files" }
+
+        object Files {
+            val main by lazy { ":utils:files" }
+            val fakes by lazy { ":utils:files:fakes" }
+        }
         val authenticator by lazy { ":utils:authenticator" }
         val logs by lazy { ":utils:logs" }
         val serialization by lazy { ":utils:serialization" }
