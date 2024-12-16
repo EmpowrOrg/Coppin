@@ -1,5 +1,6 @@
 package org.empowrco.coppin.assignment.presenters
 
+import co.dvzn.coppin.utils.files.fakes.FakeFileUploader
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDateTime
@@ -21,7 +22,8 @@ import kotlin.test.assertFailsWith
 
 class AssignmentPresenterTest {
     private val repo = FakeAssignmentRepoApi()
-    private val presenter = RealAssignmentApiPresenter(repo)
+    private val fileUploader = FakeFileUploader()
+    private val presenter = RealAssignmentApiPresenter(repo, fileUploader)
 
     @AfterTest
     fun teardown() {
@@ -69,7 +71,8 @@ class AssignmentPresenterTest {
                 finalAttempt = true,
                 attemptsRemaining = 0,
                 solutionCode = null,
-                gradePoints = 5.0
+                gradePoints = 5.0,
+                feedback = "",
             )
         )
     }
@@ -92,7 +95,8 @@ class AssignmentPresenterTest {
                 finalAttempt = false,
                 attemptsRemaining = 3,
                 solutionCode = null,
-                gradePoints = 5.0
+                gradePoints = 5.0,
+                feedback = "",
             )
         )
     }
@@ -115,7 +119,8 @@ class AssignmentPresenterTest {
                 finalAttempt = false,
                 attemptsRemaining = 3,
                 solutionCode = null,
-                gradePoints = 5.0
+                gradePoints = 5.0,
+                feedback = "",
             )
         )
     }
@@ -141,7 +146,8 @@ class AssignmentPresenterTest {
                 output = "success",
                 attemptsRemaining = 3,
                 solutionCode = null,
-                gradePoints = 5.0
+                gradePoints = 5.0,
+                feedback = "",
             )
         )
     }

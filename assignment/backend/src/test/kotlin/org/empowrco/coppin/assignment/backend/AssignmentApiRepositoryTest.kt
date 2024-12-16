@@ -6,6 +6,8 @@ import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.sources.fakes.FakeAssignmentSource
 import org.empowrco.coppin.sources.fakes.FakeLanguagesSource
+import org.empowrco.coppin.sources.fakes.FakeOpenAiSource
+import org.empowrco.coppin.sources.fakes.FakeSettingsSource
 import org.empowrco.coppin.sources.fakes.FakeSubmissionSource
 import org.empowrco.coppin.utils.now
 import java.util.UUID
@@ -16,7 +18,10 @@ class AssignmentApiRepositoryTest {
     private val assignmentSource = FakeAssignmentSource()
     private val languagesSource = FakeLanguagesSource()
     private val submissionSource = FakeSubmissionSource()
-    private val repo = RealAssignmentApiRepository(assignmentSource, languagesSource, submissionSource)
+    private val settingsSource = FakeSettingsSource()
+    private val openAiSource = FakeOpenAiSource()
+    private val repo =
+        RealAssignmentApiRepository(assignmentSource, languagesSource, submissionSource, settingsSource, openAiSource)
 
     @Test
     fun getAssignment() = runBlocking {

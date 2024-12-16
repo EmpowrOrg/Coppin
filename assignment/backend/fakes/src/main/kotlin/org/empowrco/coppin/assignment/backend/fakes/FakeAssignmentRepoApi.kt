@@ -5,6 +5,7 @@ import org.empowrco.coppin.assignment.backend.AssignmentCodeResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.models.responses.AiResponse
 import java.util.UUID
 
 class FakeAssignmentRepoApi : AssignmentApiRepository {
@@ -13,6 +14,7 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
     val languages = mutableListOf<Language>()
     val codeResponses = mutableListOf<AssignmentCodeResponse>()
     val submissions = mutableListOf<Submission>()
+    val aiFeedbacks = mutableListOf<AiResponse>()
 
     override suspend fun getAssignment(referenceId: String): Assignment? {
         return assignments.find { it.referenceId == referenceId }
@@ -49,6 +51,20 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
     override suspend fun getLastStudentSubmissionForAssignment(assignmentID: UUID, studentId: String): Submission? {
         return submissions.filter { it.assignmentId == assignmentID && it.studentId == studentId }
             .maxByOrNull { it.attempt }
+    }
+
+    override suspend fun getAssignments(courseId: UUID): List<Assignment> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAiFeedback(
+        solution: String,
+        instructions: String,
+        submission: String,
+        user: String,
+        language: String,
+    ): AiResponse {
+        return aiFeedbacks.first()
     }
 
     override suspend fun getStudentSubmissionsForAssignment(assignmentID: UUID, studentId: String): List<Submission> {
