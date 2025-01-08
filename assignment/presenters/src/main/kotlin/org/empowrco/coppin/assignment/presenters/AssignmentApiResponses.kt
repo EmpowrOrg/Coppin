@@ -11,6 +11,7 @@ object ResponseApi {
         val solutionCode: String?,
         val gradePoints: Double,
         val attemptsRemaining: Int,
+        val feedback: String,
     )
 
     @Serializable

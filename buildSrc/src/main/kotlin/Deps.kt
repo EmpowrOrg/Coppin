@@ -150,6 +150,6 @@ object Deps {
     }
 
     object OpenAi {
-        val chatGpt by lazy { "com.aallam.openai:openai-client:3.3.2" }
+        val chatGpt by lazy { "com.aallam.openai:openai-client:3.8.2" }
     }
 }

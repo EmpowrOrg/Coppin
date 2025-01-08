@@ -93,6 +93,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = true,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = "",
                 attemptsRemaining = 0,
             )
         }
@@ -105,23 +106,49 @@ internal class RealAssignmentApiPresenter(
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()
+        // Get AI Feedback only if the user has an error
+        val aiFeedback = if (matches.isNotEmpty() || codeResponse.success == false) {
+            """
+                
+                ---
+                
+                ${
+                repo.getAiFeedback(
+                    solution = assignmentCode.solutionCode,
+                    instructions = assignment.instructions,
+                    submission = request.code,
+                    user = request.studentId,
+                    language = language.name,
+                    error = matches.firstOrNull()?.value ?: codeResponse.output,
+                ).response
+            }
+                
+                ---
+                Raw Output:
+                ${matches.firstOrNull()?.value ?: codeResponse.output}
+            """.trimEnd()
 
+        } else {
+            ""
+        }
         val response = if (matches.isNotEmpty()) {
             SubmitResponse(
-                output = matches.first().value,
+                output = aiFeedback,
                 success = false,
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else if (codeResponse.success == false) {
             SubmitResponse(
-                output = codeResponse.output,
+                output = aiFeedback,
                 success = false,
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else {
@@ -131,6 +158,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         }
@@ -141,7 +169,7 @@ internal class RealAssignmentApiPresenter(
             languageId = language.id,
             studentId = request.studentId,
             attempt = attempt,
-            feedback = response.output,
+            feedback = if (aiFeedback.isNotEmpty()) aiFeedback else assignment.successMessage,
             createdAt = currentTime,
             correct = matches.isEmpty() && codeResponse.success != false,
             lastModifiedAt = currentTime,
