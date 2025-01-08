@@ -34,12 +34,14 @@ internal class RealAssignmentApiPresenter(
 ) : AssignmentApiPresenter {
 
     override suspend fun run(request: RunRequest): RunResponse {
-        repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
+        val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
         val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
         if (request.code.isBlank()) {
             throw BadRequestException("The code is not blank")
         }
-        val response = repo.runCode(language.mime, request.code)
+        val assignmentCode = getAssignmentCode(assignment, language.name)
+        val code = getCode(assignmentCode, request.code)
+        val response = repo.runCode(language.mime, code)
         return RunResponse(response.output, response.success ?: true)
     }
 
@@ -98,11 +100,7 @@ internal class RealAssignmentApiPresenter(
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
-        val code = if (assignmentCode.injectable) {
-            assignmentCode.starterCode.replace("{{code}}", request.code)
-        } else {
-            request.code
-        }
+        val code = getCode(assignmentCode, request.code)
         val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
@@ -150,6 +148,18 @@ internal class RealAssignmentApiPresenter(
         )
         repo.saveSubmission(submission)
         return response
+    }
+
+    private fun getCode(
+        assignmentCode: AssignmentCode,
+        requestCode: String,
+    ): String {
+        val code = if (assignmentCode.injectable) {
+            assignmentCode.starterCode.replace("{{code}}", requestCode)
+        } else {
+            requestCode
+        }
+        return code
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
