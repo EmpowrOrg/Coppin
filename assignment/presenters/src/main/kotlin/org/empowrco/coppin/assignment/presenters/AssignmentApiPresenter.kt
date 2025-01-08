@@ -34,13 +34,24 @@ internal class RealAssignmentApiPresenter(
 ) : AssignmentApiPresenter {
 
     override suspend fun run(request: RunRequest): RunResponse {
-        repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
+        val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
         val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
         if (request.code.isBlank()) {
             throw BadRequestException("The code is not blank")
         }
-        val response = repo.runCode(language.mime, request.code)
+        val assignmentCode = getAssignmentCode(assignment, language.name)
+        val code = getExecutableCode(assignmentCode, request.code)
+        val response = repo.runCode(language.mime, code)
         return RunResponse(response.output, response.success ?: true)
+    }
+
+    private fun getExecutableCode(
+        assignmentCode: AssignmentCode,
+        requestCode: String,
+    ): String = if (assignmentCode.injectable) {
+        assignmentCode.starterCode.replace("{{code}}", requestCode)
+    } else {
+        requestCode
     }
 
     private suspend fun getLanguage(language: String): Language? {
@@ -98,13 +109,9 @@ internal class RealAssignmentApiPresenter(
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
-        val code = if (assignmentCode.injectable) {
-            assignmentCode.starterCode.replace("{{code}}", request.code)
-        } else {
-            request.code
-        }
+        val code = getExecutableCode(assignmentCode, request.code)
         val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
-        val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
+        val languageRegex = assignmentCode.testFramework.parsingRegex
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()
 
