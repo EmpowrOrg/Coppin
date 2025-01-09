@@ -3,6 +3,7 @@ package org.empowrco.coppin.users.presenters
 import kotlinx.serialization.Serializable
 
 
+data class GetLoginResponse(val okta: Boolean, val oktaDomain: String, val redirectUri: String, val clientId: String)
 data class LoginResponse(val id: String, val isAdmin: Boolean)
 
 data class RegisterResponse(val id: String, val isAdmin: Boolean)
@@ -31,6 +32,10 @@ data class GetUserResponse(
 ) {
     data class Key(val name: String, val key: String, val id: String, val createdAt: String)
 }
+
+data class GetCurrentUserResponse(
+    val id: String,
+)
 
 
 object PatchUserResponse

@@ -15,13 +15,11 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
-import io.ktor.server.sessions.set
 import org.empowrco.coppin.users.presenters.CreateAccessKey
 import org.empowrco.coppin.users.presenters.DeleteAccessKey
+import org.empowrco.coppin.users.presenters.GetCurrentUserRequest
 import org.empowrco.coppin.users.presenters.GetUserRequest
 import org.empowrco.coppin.users.presenters.GetUsersRequest
-import org.empowrco.coppin.users.presenters.LoginRequest
-import org.empowrco.coppin.users.presenters.RegisterRequest
 import org.empowrco.coppin.users.presenters.UpdateUserRequest
 import org.empowrco.coppin.users.presenters.UsersPresenters
 import org.empowrco.coppin.utils.routing.Breadcrumbs
@@ -37,9 +35,9 @@ fun Application.usersRouting() {
         authenticate("auth-session") {
             route("users") {
                 get {
-                    val isAdmin = call.sessions.get<UserSession>()?.isAdmin ?: false
-                    presenter.getUsers(GetUsersRequest(isAdmin)).fold({
-                        call.respondFreemarker("users.ftl", it)
+                    val email = call.sessions.get<UserSession>()?.email
+                    presenter.getUsers(GetUsersRequest(email)).fold({
+                        call.respondFreemarker("users.ftl", it, isAdminPanel = true)
                     }, {
                         call.errorRedirect(it.localizedMessage, "/")
                     })
@@ -47,36 +45,44 @@ fun Application.usersRouting() {
 
             }
             get("user") {
-                val userId = call.sessions.get<UserSession>()?.userId ?: run {
+                val email = call.sessions.get<UserSession>()?.email ?: run {
                     call.errorRedirect("User Id Not Found", "/login")
                     return@get
                 }
-                call.respondRedirect("/user/$userId")
+                presenter.getCurrentUser(GetCurrentUserRequest(email)).fold({
+                    call.respondRedirect("/user/${it.id}")
+                }, {
+                    call.errorRedirect(it.localizedMessage, "/login")
+                })
             }
             route("user/{uuid}") {
                 get {
-                    val currentUserId = call.sessions.get<UserSession>()?.userId.toString()
+                    val email = call.sessions.get<UserSession>()?.email.toString()
                     val request = GetUserRequest(
                         id = call.parameters["uuid"].toString(),
-                        currentUserId = currentUserId
+                        currentUser = email
                     )
                     presenter.getUser(request).fold({
-                        call.respondFreemarker("user.ftl", it, Breadcrumbs(
-                            crumbs = buildList {
-                                if (it.isAdmin) {
-                                    add(Breadcrumbs.Crumb("manage_accounts", "Users", "/users"))
-                                }
-                                add(
-                                    Breadcrumbs.Crumb(
-                                        if (it.isAdmin) {
-                                            null
-                                        } else {
-                                            "account_circle"
-                                        }, it.firstName, null
+                        call.respondFreemarker(
+                            "user.ftl", it,
+                            Breadcrumbs(
+                                crumbs = buildList {
+                                    if (it.isAdmin) {
+                                        add(Breadcrumbs.Crumb("manage_accounts", "Users", "/users"))
+                                    }
+                                    add(
+                                        Breadcrumbs.Crumb(
+                                            if (it.isAdmin) {
+                                                null
+                                            } else {
+                                                "account_circle"
+                                            }, it.firstName, null
+                                        )
                                     )
-                                )
-                            }
-                        ))
+                                }
+                            ),
+                            isAdminPanel = it.isAdmin,
+                        )
                     }, {
                         call.errorRedirect(it.localizedMessage)
                     })
@@ -115,50 +121,6 @@ fun Application.usersRouting() {
                         })
                     }
                 }
-            }
-        }
-        route("login") {
-            get {
-                call.respondFreemarker("login.ftl", mapOf("hideSideNav" to true))
-            }
-            post {
-                val params = call.receiveParameters()
-                presenter.login(
-                    LoginRequest(
-                        email = params["email"].toString(),
-                        password = params["password"].toString(),
-                    )
-                ).fold({
-                    call.sessions.set(UserSession(it.id, it.isAdmin))
-                    call.respondRedirect("/")
-                }, {
-                    call.errorRedirect(it.localizedMessage)
-                })
-            }
-        }
-        route("register") {
-            get {
-                call.respondFreemarker("register.ftl", mapOf("hideSideNav" to true))
-            }
-            post {
-                val params = call.receiveParameters()
-                presenter.register(
-                    RegisterRequest(
-                        firstName = params["firstName"].toString(),
-                        lastName = params["lastName"].toString(),
-                        email = params["email"].toString(),
-                        password = params["password"].toString(),
-                        confirmPassword = params["confirmPassword"].toString()
-                    )
-                ).fold({
-                    call.sessions.set(UserSession(it.id, it.isAdmin))
-                    call.errorRedirect(
-                        "Your account was created but must be authorized by your Administrator",
-                        "/login"
-                    )
-                }, {
-                    call.errorRedirect(it.localizedMessage)
-                })
             }
         }
         get("signout") {

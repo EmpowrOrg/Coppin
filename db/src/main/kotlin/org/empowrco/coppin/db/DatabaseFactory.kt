@@ -9,11 +9,14 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object DatabaseFactory {
 
     private val tables = listOf(
+        AiSettings,
         AssignmentCodes,
         Assignments,
         Courses,
         CoursesUsers,
         Languages,
+        OrgSettings,
+        SecuritySettings,
         Subjects,
         Submissions,
         UserAccessKeys,

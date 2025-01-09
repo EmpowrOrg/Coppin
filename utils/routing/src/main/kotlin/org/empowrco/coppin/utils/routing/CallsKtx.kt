@@ -15,8 +15,13 @@ import io.ktor.server.util.url
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
-suspend fun ApplicationCall.respondFreemarker(template: String, content: Any, breadcrumbs: Breadcrumbs? = null) {
-    respondFreemarker(template, mapOf("content" to content), breadcrumbs)
+suspend fun ApplicationCall.respondFreemarker(
+    template: String,
+    content: Any,
+    breadcrumbs: Breadcrumbs? = null,
+    isAdminPanel: Boolean = false,
+) {
+    respondFreemarker(template, mapOf("content" to content), breadcrumbs, isAdminPanel)
 }
 
 
@@ -24,9 +29,11 @@ suspend fun ApplicationCall.respondFreemarker(
     template: String,
     content: Map<String, Any?> = mapOf(),
     breadcrumbs: Breadcrumbs? = null,
+    isAdminPanel: Boolean = false,
 ) {
     val updatedContent = content.toMutableMap()
     updatedContent["isAdmin"] = sessions.get<UserSession>()?.isAdmin ?: false
+    updatedContent["isAdminPanel"] = isAdminPanel
     if (breadcrumbs != null) {
         updatedContent["breadcrumbs"] = breadcrumbs
     }
@@ -65,4 +72,4 @@ suspend fun ApplicationCall.error(exception: Throwable) {
 }
 
 
-data class UserSession(val userId: String, val isAdmin: Boolean)
+data class UserSession(val email: String, val state: String, val token: String, val isAdmin: Boolean)

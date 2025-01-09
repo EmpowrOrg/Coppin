@@ -1,7 +1,9 @@
 package org.empowrco.coppin.users.backend
 
+import org.empowrco.coppin.models.SecuritySettings
 import org.empowrco.coppin.models.User
 import org.empowrco.coppin.models.UserAccessKey
+import org.empowrco.coppin.sources.SettingsSource
 import org.empowrco.coppin.sources.UsersSource
 import java.util.UUID
 
@@ -14,10 +16,12 @@ interface UsersRepository {
     suspend fun createKey(key: UserAccessKey)
     suspend fun deleteKey(id: UUID): Boolean
     suspend fun getKey(id: UUID): UserAccessKey?
+    suspend fun getSecuritySettings(): SecuritySettings
 }
 
 internal class RealUsersRepository(
     private val usersSource: UsersSource,
+    private val securitySettings: SettingsSource,
 ) : UsersRepository {
     override suspend fun getUser(id: UUID): User? {
         return usersSource.getUser(id)
@@ -49,5 +53,9 @@ internal class RealUsersRepository(
 
     override suspend fun getKey(id: UUID): UserAccessKey? {
         return usersSource.getKey(id)
+    }
+
+    override suspend fun getSecuritySettings(): SecuritySettings {
+        return securitySettings.getSecuritySettings() ?: securitySettings.createSecuritySettings()
     }
 }

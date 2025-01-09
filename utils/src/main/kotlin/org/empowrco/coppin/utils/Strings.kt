@@ -1,5 +1,6 @@
 package org.empowrco.coppin.utils
 
+import java.net.URI
 import java.util.Locale
 import java.util.UUID
 
@@ -34,5 +35,14 @@ fun String.toUuid(): UUID? {
         UUID.fromString(this)
     } catch (ex: IllegalArgumentException) {
         null
+    }
+}
+
+fun String.isValidUrl(): Boolean {
+    return try {
+        URI(this)
+        true
+    } catch (ex: Exception) {
+        false
     }
 }

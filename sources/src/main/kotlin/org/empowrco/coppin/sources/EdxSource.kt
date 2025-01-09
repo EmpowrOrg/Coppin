@@ -6,7 +6,6 @@ import io.ktor.client.engine.apache.Apache
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -49,7 +48,7 @@ interface EdxSource {
 
 @OptIn(InternalSerializationApi::class)
 
-internal class RealEdxSource(private val cache: Cache) : EdxSource {
+internal class RealEdxSource(private val cache: Cache, private val settingsSource: SettingsSource) : EdxSource {
 
     private val client = HttpClient(Apache) {
         install(ContentNegotiation) {
@@ -64,10 +63,6 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
             requestTimeoutMillis = timeout
             socketTimeoutMillis = timeout
             connectTimeoutMillis = timeout
-        }
-        defaultRequest {
-            url(System.getenv("EDX_API_URL"))
-            header("Referer", System.getenv("EDX_API_URL"))
         }
     }
 
@@ -139,7 +134,8 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
         params: Map<String, String> = mapOf(),
         auth: Boolean = false,
     ): Result<T> {
-        val response = client.get(path) {
+        val apiUrl = settingsSource.getOrgSettings()?.edxApiUrl
+        val response = client.get(apiUrl + path) {
             params.forEach { (key, value) ->
                 parameter(key, value)
             }
@@ -147,6 +143,7 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
             if (auth) {
                 header(shouldAuthKey, true)
             }
+            header("Referer", apiUrl)
         }
         return handleResponse(response)
     }
@@ -156,11 +153,13 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
         body: JsonObject,
         auth: Boolean = false,
     ): Result<T> {
-        val response = client.post(path) {
+        val apiUrl = settingsSource.getOrgSettings()?.edxApiUrl
+        val response = client.post(apiUrl + path) {
             contentType(ContentType.Application.Json)
             if (auth) {
                 header(shouldAuthKey, true)
             }
+            header("Referer", apiUrl)
             setBody(body)
         }
         return handleResponse<T>(response)
@@ -182,9 +181,11 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
     }
 
     private suspend inline fun obtainCsrf() {
-        val response = client.get("login") {
+        val apiUrl = settingsSource.getOrgSettings()?.edxApiUrl
+        val response = client.get(apiUrl + "login") {
             contentType(ContentType.Application.Json)
             header(skipKey, true)
+            header("Referer", apiUrl)
         }
         val cookies = response.setCookie()
         val result = cookies.find {
@@ -196,13 +197,16 @@ internal class RealEdxSource(private val cache: Cache) : EdxSource {
     }
 
     private suspend inline fun obtainJwt() {
+        val orgSettings = settingsSource.getOrgSettings() ?: return
         val response: HttpResponse =
-            client.submitForm(url = "oauth2/access_token/", formParameters = parameters {
-                append("client_id", System.getenv("EDX_API_CLIENT_ID"))
-                append("client_secret", System.getenv("EDX_API_CLIENT_SECRET"))
+            client.submitForm(url = "${orgSettings.edxApiUrl}oauth2/access_token/", formParameters = parameters {
+                append("client_id", orgSettings.edxClientId)
+                append("client_secret", orgSettings.edxClientSecret)
                 append("grant_type", "client_credentials")
                 append("token_type", "jwt")
-            })
+            }) {
+                header("Referer", orgSettings.edxApiUrl)
+            }
         when (response.status) {
             HttpStatusCode.OK -> {
                 try {

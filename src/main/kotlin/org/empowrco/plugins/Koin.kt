@@ -2,6 +2,7 @@ package org.empowrco.plugins
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import org.empowrco.coppin.admin.adminModule
 import org.empowrco.coppin.assignment.assignmentModule
 import org.empowrco.coppin.courses.coursesModules
 import org.empowrco.coppin.languages.languagesModule
@@ -17,7 +18,7 @@ fun Application.configureKoin() {
         slf4jLogger()
         modules(
             assignmentModule + authenticatorModule + coursesModules + sourcesModule + utilsModule + languagesModule +
-                    usersModule
+                    usersModule + adminModule
         )
     }
 }

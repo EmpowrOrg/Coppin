@@ -11,6 +11,7 @@ object ResponseApi {
         val solutionCode: String?,
         val gradePoints: Double,
         val attemptsRemaining: Int,
+        val feedback: String,
     )
 
     @Serializable
@@ -39,6 +40,17 @@ object ResponseApi {
             val solutionCode: String?,
             val url: String,
             val userCode: String?,
+        )
+    }
+
+    @Serializable
+    data class GetAssignmentGradesResponse(val grades: List<Grade>) {
+        @Serializable
+        data class Grade(
+            val value: Int,
+            val title: String,
+            val submitted: Boolean,
+            val hadMoreChances: Boolean,
         )
     }
 }

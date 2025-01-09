@@ -6,4 +6,5 @@ import org.koin.dsl.module
 
 val coursesBackendModule = module {
     singleOf(::RealCoursesPortalRepository) { bind<CoursesPortalRepository>() }
+    singleOf(::RealCoursesApiRepository) { bind<CoursesApiRepository>() }
 }

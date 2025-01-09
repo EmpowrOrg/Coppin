@@ -62,7 +62,6 @@ internal class RealUsersSource : UsersSource {
         it[Users.firstName] = user.firstName
         it[Users.lastName] = user.lastName
         it[Users.isAuthorized] = user.isAuthorized
-        it[Users.passwordHash] = user.passwordHash
         it[Users.lastModifiedAt] = user.lastModifiedAt
     }
 
@@ -81,6 +80,7 @@ internal class RealUsersSource : UsersSource {
             it[UserAccessKeys.id] = key.id
             it[user] = key.userId
             it[UserAccessKeys.name] = key.name
+            it[UserAccessKeys.type] = key.type
             it[UserAccessKeys.key] = key.key
             it[UserAccessKeys.createdAt] = key.createdAt
             it[UserAccessKeys.lastModifiedAt] = key.lastModifiedAt
@@ -112,7 +112,6 @@ internal class RealUsersSource : UsersSource {
             firstName = this[Users.firstName],
             lastName = this[Users.lastName],
             email = this[Users.email],
-            passwordHash = this[Users.passwordHash],
             type = this[Users.type],
             isAuthorized = this[Users.isAuthorized],
             keys = keys,
@@ -126,6 +125,7 @@ internal class RealUsersSource : UsersSource {
             userId = this[UserAccessKeys.user].value,
             key = this[UserAccessKeys.key],
             id = this[UserAccessKeys.id].value,
+            type = this[UserAccessKeys.type],
             name = this[UserAccessKeys.name],
             createdAt = this[UserAccessKeys.createdAt],
             lastModifiedAt = this[UserAccessKeys.lastModifiedAt],

@@ -8,6 +8,11 @@ data class UserAccessKey(
     val id: UUID,
     val key: String,
     val name: String,
+    val type: Type,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
-)
+) {
+    enum class Type {
+        Application, Api
+    }
+}

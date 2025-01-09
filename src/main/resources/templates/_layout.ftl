@@ -1,7 +1,5 @@
 <#-- @ftlvariable name="breadcrumbs" type="org.empowrco.coppin.utils.routing.Breadcrumbs" -->
 <#macro header>
-
-
     <!DOCTYPE html>
     <html lang="en">
 
@@ -89,7 +87,11 @@
     <body class="g-sidenav-show  bg-gray-200 p-0">
     <#if hideSideNav??>
     <#else>
-        <#include "sidenav.ftl">
+        <#if isAdminPanel>
+            <#include "admin-sidenav.ftl">
+        <#else>
+            <#include "sidenav.ftl">
+        </#if>
     </#if>
 
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">

@@ -8,7 +8,6 @@ data class User(
     val firstName: String,
     val lastName: String,
     val email: String,
-    val passwordHash: String,
     val type: Type,
     val isAuthorized: Boolean,
     val keys: List<UserAccessKey>,
@@ -19,6 +18,6 @@ data class User(
     val fullName: String = "$firstName $lastName"
 
     enum class Type {
-        Admin, Teacher
+        Admin, Teacher, Student
     }
 }

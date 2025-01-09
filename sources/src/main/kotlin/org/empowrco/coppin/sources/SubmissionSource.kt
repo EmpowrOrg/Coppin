@@ -142,6 +142,7 @@ private class DatabaseSubmissionsSource : SubmissionSource {
             it[Submissions.code] = submission.code
             it[Submissions.attempt] = submission.attempt
             it[Submissions.studentId] = submission.studentId
+            it[Submissions.feedback] = submission.feedback
             it[Submissions.correct] = submission.correct
             it[Submissions.createdAt] = submission.createdAt
             it[Submissions.lastModifiedAt] = submission.lastModifiedAt
@@ -161,6 +162,7 @@ private class DatabaseSubmissionsSource : SubmissionSource {
             code = this[Submissions.code],
             attempt = this[Submissions.attempt],
             studentId = this[Submissions.studentId],
+            feedback = this[Submissions.feedback],
             correct = this[Submissions.correct],
             createdAt = this[Submissions.createdAt],
             lastModifiedAt = this[Submissions.lastModifiedAt],

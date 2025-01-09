@@ -112,6 +112,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
     }
 
     override suspend fun getAssignment(request: GetAssignmentRequest): Result<GetAssignmentPortalResponse> {
+        val user = repo.getUserByEmail(request.email) ?: return failure("Unauthorized user")
         val courseId = request.courseId.toUuid() ?: return failure("Invalid course id")
         val course = repo.getCourse(courseId) ?: return failure("Course not found")
         val subjects = repo.getSubjectsForCourse(courseId)
@@ -136,8 +137,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 submissions = emptyList(),
                 points = null,
                 courseName = course.title,
-                userId = request.userId,
-                showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
+                userId = user.id.toString(),
+                showGenerate = repo.isAiEnabled(),
             ).toResult()
         }
         val assignmentId = request.id.toUuid() ?: return failure("invalid id")
@@ -183,8 +184,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                     language = language?.name ?: "Unknown"
                 )
             },
-            userId = request.userId,
-            showGenerate = !System.getenv("OPEN_AI_MODEL").isNullOrBlank(),
+            userId = user.id.toString(),
+            showGenerate = repo.isAiEnabled(),
         ).toResult()
     }
 
@@ -386,13 +387,6 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             return failure("You must specify a prompt")
         } else if (request.userId.isBlank()) {
             return failure("Please try logging in again.")
-        }
-        if (System.getenv("OPEN_AI_KEY") == null) {
-            return failure("OPEN_AI_KEY is missing from environment")
-        } else if (System.getenv("OPEN_AI_MODEL") == null) {
-            return failure("OPEN_AI_MODEL is missing from environment")
-        } else if (System.getenv("OPEN_AI_ORG_KEY") == null) {
-            return failure("OPEN_AI_ORG_KEY is missing from environment")
         }
         val response = repo.generateAssignment(request.prompt, request.userId)
         if (response.response.isNullOrBlank()) {

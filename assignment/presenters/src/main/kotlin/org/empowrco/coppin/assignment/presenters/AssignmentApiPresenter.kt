@@ -26,6 +26,7 @@ interface AssignmentApiPresenter {
     suspend fun submit(request: SubmitRequest): SubmitResponse
     suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse
     suspend fun deleteAssignment(request: DeleteAssignmentRequest): DeleteAssignmentResponse
+
 }
 
 internal class RealAssignmentApiPresenter(
@@ -33,13 +34,14 @@ internal class RealAssignmentApiPresenter(
 ) : AssignmentApiPresenter {
 
     override suspend fun run(request: RunRequest): RunResponse {
-        repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
+        val assignment = repo.getAssignment(request.referenceId) ?: throw NotFoundException("Assignment not found")
         val language = getLanguage(request.language) ?: throw NotFoundException("Language not found")
         if (request.code.isBlank()) {
             throw BadRequestException("The code is not blank")
         }
-
-        val response = repo.runCode(language.mime, request.code)
+        val assignmentCode = getAssignmentCode(assignment, language.name)
+        val code = getCode(assignmentCode, request.code)
+        val response = repo.runCode(language.mime, code)
         return RunResponse(response.output, response.success ?: true)
     }
 
@@ -91,6 +93,7 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = true,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = "",
                 attemptsRemaining = 0,
             )
         }
@@ -98,43 +101,54 @@ internal class RealAssignmentApiPresenter(
         if (assignmentCode.unitTest.isBlank()) {
             throw RuntimeException("No unit test created for this assignment")
         }
-        val code = if (assignmentCode.injectable) {
-            assignmentCode.starterCode.replace("{{code}}", request.code)
-        } else {
-            request.code
-        }
+        val code = getCode(assignmentCode, request.code)
         val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()
-        val submission = Submission(
-            id = UUID.randomUUID(),
-            code = request.code,
-            assignmentId = assignment.id,
-            languageId = language.id,
-            studentId = request.studentId,
-            attempt = attempt,
-            createdAt = currentTime,
-            correct = matches.isEmpty() && codeResponse.success != false,
-            lastModifiedAt = currentTime,
-        )
-        repo.saveSubmission(submission)
-        return if (matches.isNotEmpty()) {
+        // Get AI Feedback only if the user has an error
+        val aiFeedback = if (matches.isNotEmpty() || codeResponse.success == false) {
+            """
+                
+                ---
+                
+                ${
+                repo.getAiFeedback(
+                    solution = assignmentCode.solutionCode,
+                    instructions = assignment.instructions,
+                    submission = request.code,
+                    user = request.studentId,
+                    language = language.name,
+                    error = matches.firstOrNull()?.value ?: codeResponse.output,
+                ).response
+            }
+                
+                ---
+                Raw Output:
+                ${matches.firstOrNull()?.value ?: codeResponse.output}
+            """.trimEnd()
+
+        } else {
+            ""
+        }
+        val response = if (matches.isNotEmpty()) {
             SubmitResponse(
-                output = matches.first().value,
+                output = aiFeedback,
                 success = false,
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else if (codeResponse.success == false) {
             SubmitResponse(
-                output = codeResponse.output,
+                output = aiFeedback,
                 success = false,
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         } else {
@@ -144,9 +158,36 @@ internal class RealAssignmentApiPresenter(
                 finalAttempt = isFinalAttempt,
                 solutionCode = solutionCode,
                 gradePoints = assignment.points,
+                feedback = aiFeedback,
                 attemptsRemaining = attemptsRemaining,
             )
         }
+        val submission = Submission(
+            id = UUID.randomUUID(),
+            code = request.code,
+            assignmentId = assignment.id,
+            languageId = language.id,
+            studentId = request.studentId,
+            attempt = attempt,
+            feedback = if (aiFeedback.isNotEmpty()) aiFeedback else assignment.successMessage,
+            createdAt = currentTime,
+            correct = matches.isEmpty() && codeResponse.success != false,
+            lastModifiedAt = currentTime,
+        )
+        repo.saveSubmission(submission)
+        return response
+    }
+
+    private fun getCode(
+        assignmentCode: AssignmentCode,
+        requestCode: String,
+    ): String {
+        val code = if (assignmentCode.injectable) {
+            assignmentCode.starterCode.replace("{{code}}", requestCode)
+        } else {
+            requestCode
+        }
+        return code
     }
 
     override suspend fun get(request: GetAssignmentRequest): GetAssignmentResponse {
@@ -213,4 +254,5 @@ internal class RealAssignmentApiPresenter(
         }
         return DeleteAssignmentResponse(assignment.courseId.toString())
     }
+
 }

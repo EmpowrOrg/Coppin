@@ -2,6 +2,7 @@ package org.empowrco.coppin.assignment.presenters
 
 import kotlinx.serialization.Serializable
 
+
 object RequestApi {
 
     @Serializable
@@ -10,6 +11,7 @@ object RequestApi {
         val language: String,
         val referenceId: String,
         val studentId: String,
+        val studentEmails: List<String>?,
     )
 
     @Serializable
@@ -18,6 +20,7 @@ object RequestApi {
         val referenceId: String,
         val language: String,
         val studentId: String,
+        val studentEmails: List<String>?,
     )
 
     @Serializable
