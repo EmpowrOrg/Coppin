@@ -16,5 +16,11 @@ fun Route.coursesApi() {
             val response = presenter.getGrades(call.receive())
             call.respond(response)
         }
+        route("{id}") {
+            get {
+                val response = presenter.getCourse(call.receive())
+                call.respond(response)
+            }
+        }
     }
 }
