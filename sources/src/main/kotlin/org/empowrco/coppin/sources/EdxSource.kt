@@ -31,6 +31,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
+import org.empowrco.coppin.models.responses.EdxBlocksResponse
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
 import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
@@ -44,6 +45,7 @@ interface EdxSource {
     suspend fun getCourse(id: String): Result<EdxCourse>
     suspend fun getGrades(id: String): Result<EdxGradeResponse>
     suspend fun getStudentsForCourse(id: String): Result<EdxEnrollmentsResponse>
+    suspend fun getBlocks(courseId: String): Result<EdxBlocksResponse>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -125,6 +127,14 @@ internal class RealEdxSource(private val cache: Cache, private val settingsSourc
         return get<EdxEnrollmentsResponse>(
             "api/enrollment/v1/enrollments",
             params = mapOf("course_id" to id),
+            auth = true,
+        )
+    }
+
+    override suspend fun getBlocks(courseId: String): Result<EdxBlocksResponse> {
+        return get<EdxBlocksResponse>(
+            "/courses/v2/blocks/",
+            params = mapOf("course_id" to courseId, "depth" to "all"),
             auth = true,
         )
     }
