@@ -7,3 +7,8 @@ data class GetStudentAssignmentsRequest(
     val courseId: String,
     val studentId: String,
 )
+
+@Serializable
+data class GetCourseRequest(
+    val id: String,
+)
