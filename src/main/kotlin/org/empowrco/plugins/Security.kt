@@ -1,5 +1,6 @@
 package org.empowrco.plugins
 
+import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
@@ -10,6 +11,7 @@ import io.ktor.server.auth.OAuthServerSettings
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.bearer
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.auth.oauth
 import io.ktor.server.auth.principal
 import io.ktor.server.auth.session
@@ -23,6 +25,8 @@ import org.empowrco.coppin.utils.authenticator.Authenticator
 import org.empowrco.coppin.utils.logs.logDebug
 import org.empowrco.coppin.utils.routing.UserSession
 import org.koin.ktor.ext.inject
+import java.net.URL
+import java.util.concurrent.TimeUnit
 
 private val keycloakAddress = System.getenv("KEYCLOAK_ADDRESS")
 
@@ -33,6 +37,28 @@ fun Application.configureSecurity() {
     val authenticator: Authenticator by inject()
     val redirects = mutableMapOf<String, String>()
     authentication {
+        // Authentication for all apps
+        jwt("apps") {
+            val jwkProvider = JwkProviderBuilder(
+                URL("$keycloakAddress/realms/${System.getenv("KEYCLOAK_REALM")}/protocol/openid-connect/certs")
+            )
+                .cached(10, 24, TimeUnit.HOURS)
+                .rateLimited(10, 1, TimeUnit.MINUTES)
+                .build()
+
+            val issuer = "$keycloakAddress/realms/${System.getenv("KEYCLOAK_REALM")}"
+
+            verifier(jwkProvider, issuer) {
+                acceptLeeway(3)
+            }
+
+            validate { credential ->
+                // Optional: check audience or other claims:
+                // e.g., does the 'aud' claim match one of the user’s client IDs?
+                authenticator.validateApp(credential)
+                JWTPrincipal(credential.payload)
+            }
+        }
         oauth(keycloakOAuth) {
             client = HttpClient()
             providerLookup = {

@@ -1,6 +1,7 @@
 package org.empowrco.coppin.utils.authenticator
 
 import io.ktor.server.auth.UserIdPrincipal
+import io.ktor.server.auth.jwt.*
 import org.empowrco.coppin.models.UserAccessKey
 import org.empowrco.coppin.sources.UsersSource
 import org.empowrco.coppin.utils.logs.logDebug
@@ -10,6 +11,7 @@ import java.util.UUID
 interface Authenticator {
     suspend fun validateSession(email: String): UserIdPrincipal?
     suspend fun validateKey(accessKey: String, type: UserAccessKey.Type): UserIdPrincipal?
+    suspend fun validateApp(credential: JWTCredential): JWTPrincipal?
 }
 
 internal class RealAuthenticator(
@@ -59,5 +61,9 @@ internal class RealAuthenticator(
             return null
         }
         return UserIdPrincipal(user.email)
+    }
+
+    override suspend fun validateApp(credential: JWTCredential): JWTPrincipal? {
+        TODO("Not yet implemented")
     }
 }
