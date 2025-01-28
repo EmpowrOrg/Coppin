@@ -168,6 +168,7 @@ ${matches.firstOrNull()?.value ?: codeResponse.output}
             languageId = language.id,
             studentId = request.studentId,
             attempt = attempt,
+            fullCodeSent = code,
             feedback = if (aiFeedback.isNotEmpty()) aiFeedback else assignment.successMessage,
             createdAt = currentTime,
             correct = matches.isEmpty() && codeResponse.success != false,

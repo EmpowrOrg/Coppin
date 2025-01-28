@@ -95,7 +95,9 @@ data class GetSubmissionResponse(
     data class Submission(
         val code: String,
         val language: Language,
+        val fullCode: String,
         val attempt: Int,
+        val feedback: String,
     )
 }
 

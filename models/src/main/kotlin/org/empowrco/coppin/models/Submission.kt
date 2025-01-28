@@ -18,6 +18,7 @@ data class Submission(
     val attempt: Int,
     val feedback: String,
     val studentId: String,
+    val fullCodeSent: String,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 )

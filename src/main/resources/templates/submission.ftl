@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/display/autorefresh.min.js"
             integrity="sha512-vAsKB7xXQAWMn5kcwda0HkFVKUxSYwrmrGprVhmbGFNAG1Ij+2epT3zzdwjHTJyDsKXsiEdrUdhIxh7loHyX+A=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
     <script>
         $(document).ready(function () {
             const codeMirrorConfig = {
@@ -41,21 +42,35 @@
                     return replacements[match];
                 });
             }
+
             const submissions = JSON.parse("${content.submissionsJson}")
             const submissionsSize = submissions.length
-            console.log(submissionsSize)
+            const converter = new showdown.Converter()
             for (let i = 0; i < submissionsSize; i++) {
-                console.log("student-code-editor-" + i)
-                const studentCodeTextArea = document.getElementById("student-code-editor-" + i);
-                console.log(studentCodeTextArea)
+
                 const submission = submissions[i]
+
+                // Setup student code
+                const studentCodeTextArea = document.getElementById("student-code-editor-" + i);
                 codeMirrorConfig.value = unescape(submission.code)
                 codeMirrorConfig.mode = submission.language.mime
-                console.log(codeMirrorConfig)
                 const studentCodeCodeMirror = CodeMirror(function (elt) {
                     studentCodeTextArea.parentNode.replaceChild(elt, studentCodeTextArea);
                 }, codeMirrorConfig);
                 studentCodeCodeMirror.setSize('100%');
+
+                // Setup tested code
+                const studentTestedCodeTextArea = document.getElementById("student-tested-code-editor-" + i);
+                codeMirrorConfig.value = unescape(submission.fullCode)
+                const studentTestedCodeCodeMirror = CodeMirror(function (elt) {
+                    studentTestedCodeTextArea.parentNode.replaceChild(elt, studentTestedCodeTextArea);
+                }, codeMirrorConfig);
+                studentTestedCodeCodeMirror.setSize('100%');
+
+                // Setup feedback
+                const feedBackHtml = converter.makeHtml(submission.feedback);
+                const studentFeedback = document.getElementById("feedback-" + i);
+                studentFeedback.innerHTML = feedBackHtml;
             }
 
             $('#submission-select').on('change', function () {
@@ -80,6 +95,12 @@
         }
 
         #submission-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        #submission-tested-header {
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
@@ -114,9 +135,30 @@
 
                     </div>
                     <div id="student-code" class="ms-0 ps-0">
-                <textarea id="student-code-editor-${submission?index}"
-                          class="form-control"
-                          rows="5"></textarea>
+                    <textarea id="student-code-editor-${submission?index}"
+                              class="form-control"
+                              rows="5"></textarea>
+                    </div>
+                    <div id="submission-tested-${submission?index}">
+                        <div id="submission-tested-header" class="justify-content-between">
+                            <h6>
+                                Tested Code
+                            </h6>
+
+                            <h6 id="submission-tested-language">
+                                ${submission.language.name}
+                            </h6>
+
+                        </div>
+                        <div id="student-code" class="ms-0 ps-0">
+                        <textarea id="student-tested-code-editor-${submission?index}"
+                                  class="form-control"
+                                  rows="5"></textarea>
+                        </div>
+                    </div>
+                    <div id="feedback-container-${submission?index}">
+                        <h4>Feedback</h4>
+                        <div id="feedback-${submission?index}"></div>
                     </div>
                 </div>
             </#list>
