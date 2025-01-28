@@ -108,11 +108,10 @@ internal class RealAssignmentApiPresenter(
         val currentTime = LocalDateTime.now()
         // Get AI Feedback only if the user has an error
         val aiFeedback = if (matches.isNotEmpty() || codeResponse.success == false) {
-            """
+            """         
+---
                 
-                ---
-                
-                ${
+${
                 repo.getAiFeedback(
                     solution = assignmentCode.solutionCode,
                     instructions = assignment.instructions,
@@ -123,9 +122,9 @@ internal class RealAssignmentApiPresenter(
                 ).response
             }
                 
-                ---
-                Raw Output:
-                ${matches.firstOrNull()?.value ?: codeResponse.output}
+---
+Raw Output:
+${matches.firstOrNull()?.value ?: codeResponse.output}
             """.trimEnd()
 
         } else {
