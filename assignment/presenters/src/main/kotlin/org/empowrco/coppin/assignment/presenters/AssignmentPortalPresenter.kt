@@ -359,6 +359,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
             GetSubmissionResponse.Submission(
                 code = StringEscapeUtils.escapeJava(it.code),
                 attempt = it.attempt,
+                fullCode = it.fullCodeSent,
                 language = GetSubmissionResponse.Language(
                     url = language.url,
                     name = language.name,
