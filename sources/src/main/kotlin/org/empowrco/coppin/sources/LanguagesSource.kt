@@ -157,6 +157,8 @@ private fun ResultRow.toLanguage(): Language {
         name = this[Languages.name],
         mime = this[Languages.mime],
         url = this[Languages.url],
+        testFrameworks = emptyList<Language.TestFramework>(),
+        versions = emptyList<String>(),
         unitTestRegex = this[Languages.unitTestRegex],
         lastModifiedAt = this[Languages.lastModifiedAt],
         createdAt = this[Languages.createdAt],

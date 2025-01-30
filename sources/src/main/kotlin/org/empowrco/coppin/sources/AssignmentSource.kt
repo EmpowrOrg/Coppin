@@ -236,3 +236,8 @@ private fun ResultRow.toAssignment(assignmentCodes: List<AssignmentCode>, subjec
     )
 }
 
+interface TestFrameworksVersionsSource {
+    suspend fun supportsLanguageVersion(language: String): Boolean
+    suspend fun getTestFrameworksVersions(): List<String>
+    suspend fun getInstructions(): String
+}
