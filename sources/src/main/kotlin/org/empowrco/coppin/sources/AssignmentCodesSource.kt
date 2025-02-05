@@ -28,10 +28,14 @@ interface AssignmentCodesSource {
     suspend fun getCodeCountForLanguage(id: UUID): Long
 }
 
-internal class RealAssignmentCodesSource(cache: Cache, languagesSource: LanguagesSource) : AssignmentCodesSource {
+internal class RealAssignmentCodesSource(
+    cache: Cache,
+    languagesSource: LanguagesSource,
+    frameworksSource: FrameworksSource,
+) : AssignmentCodesSource {
 
     private val cache = CacheAssignmentCodesSource(cache)
-    private val database = DatabaseAssignmentCodesSource(languagesSource)
+    private val database = DatabaseAssignmentCodesSource(languagesSource, frameworksSource)
     override suspend fun create(assignmentCode: AssignmentCode) {
         database.create(assignmentCode)
         cache.create(assignmentCode)
@@ -127,7 +131,10 @@ private class CacheAssignmentCodesSource(private val cache: Cache) : AssignmentC
     }
 }
 
-private class DatabaseAssignmentCodesSource(private val languagesSource: LanguagesSource) : AssignmentCodesSource {
+private class DatabaseAssignmentCodesSource(
+    private val languagesSource: LanguagesSource,
+    private val frameworksSource: FrameworksSource,
+) : AssignmentCodesSource {
     override suspend fun create(assignmentCode: AssignmentCode) = dbQuery {
         AssignmentCodes.insert {
             it.build(assignmentCode)
@@ -139,7 +146,7 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
         AssignmentCodes.select { AssignmentCodes.assignment eq assignmentId }.map {
             val languageId = it[AssignmentCodes.language].value
             val language = languagesSource.getLanguage(languageId)!!
-            it.toStarterCode(language)
+            it.toStarterCode(language, frameworksSource)
         }
     }
 
@@ -147,7 +154,7 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
         AssignmentCodes.select { AssignmentCodes.id eq id }.map {
             val languageId = it[AssignmentCodes.language].value
             val language = languagesSource.getLanguage(languageId)!!
-            it.toStarterCode(language)
+            it.toStarterCode(language, frameworksSource)
         }.firstOrNull()
     }
 
@@ -177,7 +184,8 @@ private class DatabaseAssignmentCodesSource(private val languagesSource: Languag
     }
 }
 
-private fun ResultRow.toStarterCode(language: Language): AssignmentCode {
+private suspend fun ResultRow.toStarterCode(language: Language, frameworksSource: FrameworksSource): AssignmentCode {
+    val framework = frameworksSource.getFramework(this[AssignmentCodes.framework].value)!!
     return AssignmentCode(
         id = this[AssignmentCodes.id].value,
         assignmentId = this[AssignmentCodes.assignment].value,
@@ -187,6 +195,7 @@ private fun ResultRow.toStarterCode(language: Language): AssignmentCode {
         primary = this[AssignmentCodes.primary],
         unitTest = this[AssignmentCodes.unitTest],
         injectable = this[AssignmentCodes.injectable],
+        framework = framework,
         solutionVisibility = this[AssignmentCodes.solutionVisibility],
         createdAt = this[AssignmentCodes.createdAt],
         lastModifiedAt = this[AssignmentCodes.lastModifiedAt],

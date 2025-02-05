@@ -11,8 +11,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
@@ -32,7 +34,7 @@ interface AssignmentApiRepository {
     suspend fun getLanguage(id: UUID): Language?
     suspend fun getLanguages(): List<Language>
     suspend fun runCode(language: String, code: String): AssignmentCodeResponse
-    suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse
+    suspend fun testCode(language: String, code: String, tests: String, framework: String, commands: List<String>): AssignmentCodeResponse
     suspend fun deleteAssignment(assignment: Assignment): Boolean
     suspend fun saveSubmission(submission: Submission)
     suspend fun updateAssignment(assignment: Assignment): Boolean
@@ -210,13 +212,17 @@ ${
         )
     }
 
-    override suspend fun testCode(language: String, code: String, tests: String): AssignmentCodeResponse {
+    override suspend fun testCode(language: String, code: String, tests: String, framework: String, commands: List<String>): AssignmentCodeResponse {
         return executeRequest(
             "test", JsonObject(
                 mapOf(
                     "language" to JsonPrimitive(language),
                     "code" to JsonPrimitive(code),
                     "unitTests" to JsonPrimitive(tests),
+                    "data" to buildJsonObject {
+                        put("framework", JsonPrimitive(framework))
+                        put("commands", JsonArray(commands.map { JsonPrimitive(it) }))
+                    }
                 )
             )
         )

@@ -12,6 +12,7 @@ object AssignmentCodes : BaseTable() {
     val unitTest = text("unit_test")
     val primary = bool("primary")
     val injectable = bool("injectable")
+    val framework = reference("framework", Frameworks.id)
 
     init {
         uniqueIndex(assignment, language)

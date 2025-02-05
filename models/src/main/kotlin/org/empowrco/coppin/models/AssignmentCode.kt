@@ -14,6 +14,7 @@ data class AssignmentCode(
     val solutionVisibility: SolutionVisibility,
     val unitTest: String,
     val language: Language,
+    val framework: Language.Framework,
     @Serializable(with = UUIDSerializer::class)
     val assignmentId: UUID,
     val primary: Boolean,
