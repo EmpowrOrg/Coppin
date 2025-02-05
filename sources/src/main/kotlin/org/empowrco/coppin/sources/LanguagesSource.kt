@@ -25,10 +25,10 @@ interface LanguagesSource {
     suspend fun getLanguages(): List<Language>
 }
 
-internal class RealLanguagesSource(cache: Cache) : LanguagesSource {
+internal class RealLanguagesSource(cache: Cache, frameworksSource: FrameworksSource) : LanguagesSource {
 
     private val cache = CacheLanguagesSource(cache)
-    private val database = DatabaseLanguagesSource()
+    private val database = DatabaseLanguagesSource(frameworksSource)
     override suspend fun create(language: Language) {
         database.create(language)
         cache.create(language)
@@ -108,7 +108,7 @@ private class CacheLanguagesSource(private val cache: Cache) : LanguagesSource {
     }
 }
 
-private class DatabaseLanguagesSource : LanguagesSource {
+private class DatabaseLanguagesSource(private val frameworksSource: FrameworksSource): LanguagesSource {
     override suspend fun create(language: Language) = dbQuery {
         Languages.insert {
             it.build(language, false)
@@ -118,10 +118,10 @@ private class DatabaseLanguagesSource : LanguagesSource {
 
 
     override suspend fun getLanguage(id: UUID): Language? = dbQuery {
-        Languages.select { Languages.id eq id }.map { it.toLanguage() }.firstOrNull()
+        Languages.select { Languages.id eq id }.map { it.toLanguage(frameworksSource) }.firstOrNull()
     }
     override suspend fun getLanguageByMime(mime: String): Language? = dbQuery {
-        Languages.select { Languages.mime eq mime }.map { it.toLanguage() }.firstOrNull()
+        Languages.select { Languages.mime eq mime }.map { it.toLanguage(frameworksSource) }.firstOrNull()
     }
 
     override suspend fun deleteLanguage(language: Language): Boolean = dbQuery {
@@ -135,32 +135,38 @@ private class DatabaseLanguagesSource : LanguagesSource {
     }
 
     override suspend fun getLanguages(): List<Language> = dbQuery {
-        Languages.selectAll().map { it.toLanguage() }
+        Languages.selectAll().map { it.toLanguage(frameworksSource) }
+    }
+
+    private suspend fun ResultRow.toLanguage(frameworksSource: FrameworksSource): Language {
+        val languageId = this[Languages.id].value
+        val frameworks = frameworksSource.getFrameworksForLanguage(languageId)
+        return Language(
+            id = languageId,
+            name = this[Languages.name],
+            mime = this[Languages.mime],
+            url = this[Languages.url],
+            frameworks = emptyList<Language.Framework>(),
+            versions = emptyList<String>(),
+            unitTestRegex = this[Languages.unitTestRegex],
+            lastModifiedAt = this[Languages.lastModifiedAt],
+            createdAt = this[Languages.createdAt],
+        )
+    }
+
+    private fun UpdateBuilder<*>.build(language: Language, isUpdate: Boolean) {
+        this[Languages.id] = language.id
+        this[Languages.mime] = language.mime
+        this[Languages.name] = language.name
+        this[Languages.url] = language.url
+        this[Languages.unitTestRegex] = language.unitTestRegex
+        if (!isUpdate) {
+            this[Languages.createdAt] = language.createdAt
+        }
+        this[Languages.lastModifiedAt] = language.lastModifiedAt
     }
 }
 
-private fun UpdateBuilder<*>.build(language: Language, isUpdate: Boolean) {
-    this[Languages.id] = language.id
-    this[Languages.mime] = language.mime
-    this[Languages.name] = language.name
-    this[Languages.url] = language.url
-    this[Languages.unitTestRegex] = language.unitTestRegex
-    if (!isUpdate) {
-        this[Languages.createdAt] = language.createdAt
-    }
-    this[Languages.lastModifiedAt] = language.lastModifiedAt
-}
 
-private fun ResultRow.toLanguage(): Language {
-    return Language(
-        id = this[Languages.id].value,
-        name = this[Languages.name],
-        mime = this[Languages.mime],
-        url = this[Languages.url],
-        testFrameworks = emptyList<Language.TestFramework>(),
-        versions = emptyList<String>(),
-        unitTestRegex = this[Languages.unitTestRegex],
-        lastModifiedAt = this[Languages.lastModifiedAt],
-        createdAt = this[Languages.createdAt],
-    )
-}
+
+
