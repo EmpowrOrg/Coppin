@@ -113,3 +113,13 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+
+tasks.jar {
+    // for the case if inside your project there is some duplicate
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest.attributes["Main-Class"] = "org.empowrco.ApplicationKt"
+    configurations["compileClasspath"].forEach { file: File ->
+        from(zipTree(file.absoluteFile))
+    }
+    archiveBaseName.set(project.name + "-all")
+}
