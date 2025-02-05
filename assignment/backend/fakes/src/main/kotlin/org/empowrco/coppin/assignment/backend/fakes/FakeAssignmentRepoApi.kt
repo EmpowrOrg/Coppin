@@ -5,6 +5,7 @@ import org.empowrco.coppin.assignment.backend.AssignmentCodeResponse
 import org.empowrco.coppin.models.Assignment
 import org.empowrco.coppin.models.Language
 import org.empowrco.coppin.models.Submission
+import org.empowrco.coppin.models.responses.AiResponse
 import java.util.UUID
 
 class FakeAssignmentRepoApi : AssignmentApiRepository {
@@ -62,5 +63,20 @@ class FakeAssignmentRepoApi : AssignmentApiRepository {
     override suspend fun updateAssignment(assignment: Assignment): Boolean {
         assignments.removeIf { it.id == assignment.id }
         return assignments.add(assignment)
+    }
+
+    override suspend fun getAssignments(courseId: UUID): List<Assignment> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAiFeedback(
+        solution: String,
+        instructions: String,
+        submission: String,
+        user: String,
+        language: String,
+        error: String?
+    ): AiResponse {
+        TODO("Not yet implemented")
     }
 }
