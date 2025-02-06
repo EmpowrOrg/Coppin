@@ -5,10 +5,7 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.respondRedirect
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.server.routing.*
 import org.empowrco.coppin.languages.presenters.GetLanguageRequest
 import org.empowrco.coppin.languages.presenters.LanguagesPresenter
 import org.empowrco.coppin.languages.presenters.UpsertLanguageRequest
@@ -69,6 +66,43 @@ fun Application.languagesRouting() {
                         })
 
                     }
+
+                    route("framework") {
+                        route("{uuid}") {
+
+                            get {
+
+                            }
+
+                            put {
+
+                            }
+                        }
+                        post {
+                            val uuid = call.parameters["uuid"]
+                            val formParameters = call.receiveParameters()
+                            val name = formParameters["name"].toString()
+                            val mime = formParameters["mime"].toString()
+                            val url = formParameters["url"].toString()
+                            val unitTestRegex = formParameters["regex"].toString()
+                            presenter.upsertLanguage(
+                                UpsertLanguageRequest(
+                                    name = name,
+                                    mime = mime,
+                                    url = url,
+                                    id = uuid,
+                                    unitTestRegex = unitTestRegex,
+                                )
+                            ).fold({
+                                call.respondRedirect("/languages")
+                            }, {
+                                call.errorRedirect(it)
+                            })
+                        }
+
+
+                    }
+
                 }
             }
         }

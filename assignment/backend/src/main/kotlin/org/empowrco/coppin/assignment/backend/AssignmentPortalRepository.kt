@@ -8,14 +8,7 @@ import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.Submission
 import org.empowrco.coppin.models.User
 import org.empowrco.coppin.models.responses.AiResponse
-import org.empowrco.coppin.sources.AssignmentCodesSource
-import org.empowrco.coppin.sources.AssignmentSource
-import org.empowrco.coppin.sources.CoursesSource
-import org.empowrco.coppin.sources.LanguagesSource
-import org.empowrco.coppin.sources.OpenAiSource
-import org.empowrco.coppin.sources.SubjectSource
-import org.empowrco.coppin.sources.SubmissionSource
-import org.empowrco.coppin.sources.UsersSource
+import org.empowrco.coppin.sources.*
 import java.util.UUID
 
 
@@ -42,6 +35,7 @@ interface AssignmentPortalRepository {
     suspend fun generateAssignment(prompt: String, userId: String): AiResponse
     suspend fun getUserByEmail(email: String): User?
     suspend fun isAiEnabled(): Boolean
+    suspend fun getFramework(id: UUID): Language.Framework?
 }
 
 internal class RealAssignmentPortalRepository(
@@ -53,6 +47,7 @@ internal class RealAssignmentPortalRepository(
     private val submissionSource: SubmissionSource,
     private val openAiSource: OpenAiSource,
     private val usersSource: UsersSource,
+    private val frameworksSource: FrameworksSource,
 ) : AssignmentPortalRepository {
 
     override suspend fun getSubject(id: UUID): Subject? {
@@ -142,5 +137,9 @@ internal class RealAssignmentPortalRepository(
 
     override suspend fun isAiEnabled(): Boolean {
         return openAiSource.isEnabled()
+    }
+
+    override suspend fun getFramework(id: UUID): Language.Framework? {
+        return frameworksSource.getFramework(id)
     }
 }

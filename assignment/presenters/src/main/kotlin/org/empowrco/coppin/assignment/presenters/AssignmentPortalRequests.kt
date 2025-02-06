@@ -47,6 +47,7 @@ data class UpdateCodePortalRequest(
     val injectable: String,
     val assignmentId: String,
     val unitTest: String?,
+    val frameworkId: String,
     val solutionVisibility: String,
 )
 

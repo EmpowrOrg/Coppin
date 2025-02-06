@@ -102,7 +102,7 @@ internal class RealAssignmentApiPresenter(
             throw RuntimeException("No unit test created for this assignment")
         }
         val code = getCode(assignmentCode, request.code)
-        val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest)
+        val codeResponse = repo.testCode(language.mime, code, assignmentCode.unitTest, assignmentCode.framework.name, assignmentCode.framework.commands.map { it.command })
         val languageRegex = assignmentCode.language.unitTestRegex.toRegex()
         val matches = languageRegex.findAll(codeResponse.output).toList()
         val currentTime = LocalDateTime.now()

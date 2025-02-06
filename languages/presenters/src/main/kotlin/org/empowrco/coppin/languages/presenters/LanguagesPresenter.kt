@@ -16,6 +16,7 @@ interface LanguagesPresenter {
     suspend fun getLanguages(): Result<GetLanguagesResponse>
     suspend fun getLanguage(request: GetLanguageRequest): Result<GetLanguageResponse>
     suspend fun upsertLanguage(request: UpsertLanguageRequest): Result<UpsertLanguageResponse>
+
 }
 
 internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : LanguagesPresenter {
@@ -70,6 +71,8 @@ internal class RealLanguagesPresenter(private val repo: LanguagesRepository) : L
                 name = request.name,
                 unitTestRegex = request.unitTestRegex,
                 createdAt = currentTime,
+                versions = emptyList(),
+                frameworks = emptyList(),
                 lastModifiedAt = currentTime,
             )
             repo.createLanguage(language)

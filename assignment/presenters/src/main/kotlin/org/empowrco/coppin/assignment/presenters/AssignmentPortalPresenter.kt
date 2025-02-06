@@ -270,6 +270,8 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
         // new assignment code
         val assignmentId = request.assignmentId.toUuid() ?: return failure("Invalid assignment id")
         val assignment = repo.getAssignment(assignmentId) ?: return failure("No assignment found")
+        val frameworkId = request.frameworkId.toUuid() ?: return failure("Invalid framework id")
+        val framework = repo.getFramework(frameworkId) ?: return failure("Framework not found")
         val codeIdString = request.id?.nonEmpty()
         val solutionVisibility = try {
             AssignmentCode.SolutionVisibility.valueOf(request.solutionVisibility)
@@ -290,6 +292,7 @@ internal class RealAssignmentPortalPresenter(private val repo: AssignmentPortalR
                 solutionCode = request.solutionCode,
                 unitTest = request.unitTest ?: "",
                 injectable = injectable,
+                framework = framework,
                 solutionVisibility = solutionVisibility,
                 createdAt = currentTime,
                 lastModifiedAt = currentTime,
