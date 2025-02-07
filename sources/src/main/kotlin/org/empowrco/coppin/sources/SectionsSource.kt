@@ -118,6 +118,7 @@ private class DatabaseSectionsSource: SectionsSource {
             this[Sections.createdAt] = section.createdAt
         }
         this[Sections.subject] = section.subjectId
+        this[Sections.order] = section.order
         this[Sections.name] = section.name
         this[Sections.lastModifiedAt] = section.lastModifiedAt
     }
@@ -127,6 +128,7 @@ private class DatabaseSectionsSource: SectionsSource {
             id = this[Sections.id].value,
             subjectId = this[Sections.subject].value,
             name = this[Sections.name],
+            order = this[Sections.order],
             createdAt = this[Sections.createdAt],
             lastModifiedAt = this[Sections.lastModifiedAt]
         )

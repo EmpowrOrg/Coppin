@@ -79,3 +79,4 @@ object UpdateSubjectResponse
 
 @Serializable
 object DeleteSubjectResponse
+

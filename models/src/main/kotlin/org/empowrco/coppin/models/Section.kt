@@ -12,6 +12,7 @@ data class Section(
     @Serializable(with = UUIDSerializer::class)
     val subjectId: UUID,
     val name: String,
+    val order: Int,
     val createdAt: LocalDateTime,
     val lastModifiedAt: LocalDateTime,
 )

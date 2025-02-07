@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import org.empowrco.coppin.courses.backend.CoursesPortalRepository
 import org.empowrco.coppin.models.Course
+import org.empowrco.coppin.models.Section
 import org.empowrco.coppin.models.Subject
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.utils.DuplicateKeyException
@@ -25,6 +26,10 @@ interface CoursesPortalPresenter {
     suspend fun getSubject(request: GetSubjectRequest): Result<GetSubjectResponse>
     suspend fun updateSubject(request: UpdateSubjectRequest): Result<UpdateSubjectResponse>
     suspend fun deleteSubject(request: DeleteSubjectRequest): Result<DeleteSubjectResponse>
+    suspend fun createSection(request: CreateSectionRequest)
+    suspend fun updateSection(request: UpdateSectionRequest)
+    suspend fun deleteSection(request: DeleteSectionRequest)
+    suspend fun getSection(request: GetSectionRequest)
 }
 
 internal class RealCoursesPortalPresenter(
@@ -175,6 +180,7 @@ internal class RealCoursesPortalPresenter(
             courseId = courseId,
             name = request.name,
             createdAt = currentTime,
+            sections = emptyList(),
             lastModifiedAt = currentTime,
         )
         return try {
@@ -317,5 +323,41 @@ internal class RealCoursesPortalPresenter(
                 )
             )
         ).toResult()
+    }
+
+    override suspend fun createSection(request: CreateSectionRequest) {
+        val subjectId = request.subjectId.toUuid() ?: return
+        repo.getSubject(subjectId) ?: return
+        val currentTime = LocalDateTime.now()
+        val section = Section(
+            id = UUID.randomUUID(),
+            subjectId = subjectId,
+            name = request.name,
+            createdAt = currentTime,
+            order = request.order,
+            lastModifiedAt = currentTime,
+        )
+        repo.createSection(section)
+    }
+
+    override suspend fun updateSection(request: UpdateSectionRequest) {
+        val sectionId = request.id.toUuid() ?: return
+        val section = repo.getSection(sectionId) ?: return
+        val updatedSection = section.copy(
+            name = request.name,
+            order = request.order,
+            lastModifiedAt = LocalDateTime.now(),
+        )
+        repo.updateSection(updatedSection)
+    }
+
+    override suspend fun deleteSection(request: DeleteSectionRequest) {
+        val sectionId = request.id.toUuid() ?: return
+        val deleted = repo.deleteSection(sectionId)
+    }
+
+    override suspend fun getSection(request: GetSectionRequest) {
+        val sectionId = request.id.toUuid() ?: return
+        val section = repo.getSection(sectionId) ?: return
     }
 }

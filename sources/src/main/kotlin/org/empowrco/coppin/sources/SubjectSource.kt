@@ -23,10 +23,10 @@ interface SubjectSource {
     suspend fun deleteSubject(subject: Subject): Boolean
 }
 
-internal class RealSubjectSource(cache: Cache) : SubjectSource {
+internal class RealSubjectSource(cache: Cache, sectionsSource: SectionsSource) : SubjectSource {
 
     private val cache = CacheSubjectSource(cache)
-    private val database = DatabaseSubjectSource()
+    private val database = DatabaseSubjectSource(sectionsSource)
 
     override suspend fun getSubjectsForCourse(id: UUID): List<Subject> {
         return cache.getSubjectsForCourse(id).ifEmpty {
@@ -94,13 +94,13 @@ private class CacheSubjectSource(private val cache: Cache) : SubjectSource {
     }
 }
 
-private class DatabaseSubjectSource : SubjectSource {
+private class DatabaseSubjectSource(private val sectionsSource: SectionsSource): SubjectSource {
     override suspend fun getSubjectsForCourse(id: UUID): List<Subject> = dbQuery {
-        Subjects.select { Subjects.course eq id }.orderBy(Subjects.name).map { it.toSubject() }
+        Subjects.select { Subjects.course eq id }.orderBy(Subjects.name).map { it.toSubject(sectionsSource) }
     }
 
     override suspend fun getSubject(id: UUID): Subject? = dbQuery {
-        Subjects.select { Subjects.id eq id }.limit(1).map { it.toSubject() }.firstOrNull()
+        Subjects.select { Subjects.id eq id }.limit(1).map { it.toSubject(sectionsSource) }.firstOrNull()
     }
 
     override suspend fun createSubject(subject: Subject) = dbQuery {
@@ -128,11 +128,14 @@ private class DatabaseSubjectSource : SubjectSource {
         this[Subjects.lastModifiedAt] = subject.lastModifiedAt
     }
 
-    private fun ResultRow.toSubject(): Subject {
+    private suspend fun ResultRow.toSubject(sectionsSource: SectionsSource): Subject {
+        val subjectId = this[Subjects.id].value
+        val sections = sectionsSource.getSectionsForSubject(subjectId)
         return Subject(
-            id = this[Subjects.id].value,
+            id = subjectId,
             name = this[Subjects.name],
             courseId = this[Subjects.course].value,
+            sections = sections,
             createdAt = this[Subjects.createdAt],
             lastModifiedAt = this[Subjects.lastModifiedAt],
         )

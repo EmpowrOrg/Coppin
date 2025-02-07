@@ -1,20 +1,11 @@
 package org.empowrco.coppin.courses.backend
 
 import kotlinx.datetime.LocalDateTime
-import org.empowrco.coppin.models.Assignment
-import org.empowrco.coppin.models.Course
-import org.empowrco.coppin.models.Subject
-import org.empowrco.coppin.models.Submission
-import org.empowrco.coppin.models.User
+import org.empowrco.coppin.models.*
 import org.empowrco.coppin.models.responses.EdxCourse
 import org.empowrco.coppin.models.responses.EdxCoursesResponse
 import org.empowrco.coppin.models.responses.EdxEnrollmentsResponse
-import org.empowrco.coppin.sources.AssignmentSource
-import org.empowrco.coppin.sources.CoursesSource
-import org.empowrco.coppin.sources.EdxSource
-import org.empowrco.coppin.sources.SubjectSource
-import org.empowrco.coppin.sources.SubmissionSource
-import org.empowrco.coppin.sources.UsersSource
+import org.empowrco.coppin.sources.*
 import java.util.UUID
 
 interface CoursesPortalRepository {
@@ -39,6 +30,10 @@ interface CoursesPortalRepository {
     suspend fun deleteSubject(subject: Subject): Boolean
     suspend fun unlinkCoursesNotIn(courseIds: List<UUID>, userId: UUID)
     suspend fun getUserByEmail(email: String): User?
+    suspend fun createSection(section: Section)
+    suspend fun updateSection(section: Section): Boolean
+    suspend fun deleteSection(id: UUID): Boolean
+    suspend fun getSection(id: UUID): Section?
 }
 
 internal class RealCoursesPortalRepository(
@@ -48,6 +43,7 @@ internal class RealCoursesPortalRepository(
     private val submissionSource: SubmissionSource,
     private val subjectSource: SubjectSource,
     private val usersSource: UsersSource,
+    private val sectionsSource: SectionsSource,
 ) : CoursesPortalRepository {
 
     override suspend fun createSubject(subject: Subject) {
@@ -133,5 +129,21 @@ internal class RealCoursesPortalRepository(
 
     override suspend fun getUserByEmail(email: String): User? {
         return usersSource.getUserByEmail(email)
+    }
+
+    override suspend fun createSection(section: Section) {
+        sectionsSource.createSection(section)
+    }
+
+    override suspend fun updateSection(section: Section): Boolean {
+        return sectionsSource.updateSection(section)
+    }
+
+    override suspend fun deleteSection(id: UUID): Boolean {
+        return sectionsSource.deleteSection(id)
+    }
+
+    override suspend fun getSection(id: UUID): Section? {
+        return sectionsSource.getSection(id)
     }
 }

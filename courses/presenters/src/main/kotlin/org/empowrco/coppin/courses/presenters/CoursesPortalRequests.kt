@@ -14,3 +14,10 @@ data class GetSubjectRequest(val id: String?, val courseId: String)
 
 @Serializable
 data class DeleteSubjectRequest(val id: String)
+
+@Serializable
+data class CreateSectionRequest(val subjectId: String, val name: String, val order: Int)
+data class UpdateSectionRequest(val id: String, val name: String, val order: Int)
+@Serializable
+data class DeleteSectionRequest(val id: String)
+data class GetSectionRequest(val id: String)
