@@ -8,6 +8,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
+import org.empowrco.coppin.utils.logs.logError
 import org.empowrco.coppin.utils.serialization.json
 import java.util.Timer
 import java.util.concurrent.TimeUnit
@@ -46,6 +47,7 @@ internal class RealCache : Cache {
                 try {
                     json.decodeFromString(deserializer, value)
                 } catch (ex: Exception) {
+                    logError(ex, "Error getting key $key")
                     delete(key)
                     null
                 }
@@ -53,6 +55,7 @@ internal class RealCache : Cache {
                 null
             }
         } catch (ex: Exception) {
+            logError(ex, "Error getting key $key")
             delete(key)
             null
         }
@@ -72,6 +75,7 @@ internal class RealCache : Cache {
                 emptyList()
             }
         } catch (ex: Exception) {
+            logError(ex, "Error getting key $key")
             delete(key)
             emptyList()
         }
